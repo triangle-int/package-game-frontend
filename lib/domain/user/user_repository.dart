@@ -73,7 +73,7 @@ class UserRepository {
       Logger().d('User added to the stream');
 
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       Logger().d(e.requestOptions.headers);
       if (e.response?.statusCode == 403) {
         if (e.response!.data['message'] == 'nicknameTaken') {

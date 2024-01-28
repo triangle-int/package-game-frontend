@@ -16,7 +16,7 @@ class ConnectionRepository {
     try {
       await _dio.get('/ping');
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

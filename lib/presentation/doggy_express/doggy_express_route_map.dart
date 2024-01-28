@@ -273,7 +273,7 @@ class _DoggyExpressRouteMapState extends ConsumerState<DoggyExpressRouteMap> {
                                     anchorPos:
                                         AnchorPos.align(AnchorAlign.center),
                                   );
-                                }).toList(),
+                                }),
                               ],
                             )
                           ],

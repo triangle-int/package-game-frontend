@@ -40,7 +40,7 @@ class BuildingRepository {
       // newBuildings.sort((a, b) => a.id.compareTo(b.id));
       _buildings = newBuildings;
       yield right(_buildings);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       yield left(ServerFailure.fromError(e));
     } finally {
       yield* _streamController.stream;
@@ -59,7 +59,7 @@ class BuildingRepository {
       final building = Building.fromJson(response.data as Map<String, dynamic>);
       updateBuilding(building);
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -80,7 +80,7 @@ class BuildingRepository {
       final building = Building.fromJson(response.data as Map<String, dynamic>);
       updateBuilding(building);
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -97,7 +97,7 @@ class BuildingRepository {
       final building = Building.fromJson(response.data as Map<String, dynamic>);
       updateBuilding(building);
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -114,7 +114,7 @@ class BuildingRepository {
       final building = Building.fromJson(response.data as Map<String, dynamic>);
       updateBuilding(building);
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -132,7 +132,7 @@ class BuildingRepository {
       _streamController.add(right(_buildings));
 
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -152,7 +152,7 @@ class BuildingRepository {
       return right(
         MarketBuilding.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -172,7 +172,7 @@ class BuildingRepository {
       return right(
         StorageBuilding.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -192,7 +192,7 @@ class BuildingRepository {
       return right(
         GetBusinessResponse.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

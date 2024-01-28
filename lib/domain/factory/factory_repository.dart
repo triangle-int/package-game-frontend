@@ -37,7 +37,7 @@ class FactoryRepository {
           FactoryBuilding.fromJson(response.data as Map<String, dynamic>);
       _buildingRepository.updateBuilding(factoryBuilding);
       return right(factoryBuilding);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response?.statusCode == 403) {
         final message = e.response!.data['message'];
         if (message == 'factoryNotFound') {
@@ -70,7 +70,7 @@ class FactoryRepository {
           FactoryBuilding.fromJson(response.data as Map<String, dynamic>);
       _buildingRepository.updateBuilding(factoryBuilding);
       return right(factoryBuilding);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -92,7 +92,7 @@ class FactoryRepository {
           FactoryBuilding.fromJson(response.data as Map<String, dynamic>);
       _buildingRepository.updateBuilding(factoryBuilding);
       return right(factoryBuilding);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -112,7 +112,7 @@ class FactoryRepository {
           FactoryBuilding.fromJson(response.data as Map<String, dynamic>);
       _buildingRepository.updateBuilding(factoryBuilding);
       return right(factoryBuilding);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

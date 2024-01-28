@@ -24,7 +24,7 @@ class ServerFailure with _$ServerFailure {
   const factory ServerFailure.serverIsDown() = _ServerIsDown;
   const factory ServerFailure.banned(String reason) = _Banned;
 
-  factory ServerFailure.fromError(DioError error) {
+  factory ServerFailure.fromError(DioException error) {
     Logger().w('DioError: $error, Message: ${error.response?.data}');
     if (error.response != null) {
       if (error.response?.statusCode == 502) {
@@ -69,10 +69,10 @@ class ServerFailure with _$ServerFailure {
       }
       return ServerFailure.unknown(message.toString());
     }
-    if (error.type == DioErrorType.connectionTimeout) {
+    if (error.type == DioExceptionType.connectionTimeout) {
       return const ServerFailure.connectionTimedOut();
     }
-    if (error.type == DioErrorType.connectionError) {
+    if (error.type == DioExceptionType.connectionError) {
       return const ServerFailure.connectionRefused();
     }
     return ServerFailure.unknown(error.message ?? 'Unknown');

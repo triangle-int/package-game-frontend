@@ -53,11 +53,13 @@ class BuyBloc extends Bloc<BuyEvent, BuyState> {
                 success: false,
               ),
             ),
-            (_) => emit(state.copyWith(
-              isLoading: false,
-              failureOrNull: null,
-              success: true,
-            ),),
+            (_) => emit(
+              state.copyWith(
+                isLoading: false,
+                failureOrNull: null,
+                success: true,
+              ),
+            ),
           );
         },
       );

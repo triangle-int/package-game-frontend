@@ -35,7 +35,7 @@ class FMMarketRepository {
             .map((e) => TradeItem.fromJson(e as Map<String, dynamic>))
             .toList(),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -54,7 +54,7 @@ class FMMarketRepository {
       );
 
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -71,7 +71,7 @@ class FMMarketRepository {
             .toList()
           ..sort((a, b) => a.id.compareTo(b.id)),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -90,7 +90,7 @@ class FMMarketRepository {
       );
 
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

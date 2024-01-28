@@ -7,15 +7,15 @@ import 'package:package_flutter/domain/core/env/env_staging.dart';
 final environmentProvider = Provider(
   (ref) => const String.fromEnvironment(
     'ENVIRONMENT',
-    defaultValue: kDebugMode ? Env.STAGING : Env.PROD,
+    defaultValue: kDebugMode ? Env.stagingEnviroment : Env.productionEnviroment,
   ),
 );
 
 final envProvider = Provider((ref) {
   switch (ref.watch(environmentProvider)) {
-    case Env.PROD:
+    case Env.productionEnviroment:
       return EnvProduction();
-    case Env.STAGING:
+    case Env.stagingEnviroment:
       return EnvStaging();
     default:
       return EnvProduction();

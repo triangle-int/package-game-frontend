@@ -46,7 +46,7 @@ class PurchaseRepository {
         },
       );
       return true;
-    } on DioError {
+    } on DioException {
       return false;
     }
   }

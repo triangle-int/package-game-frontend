@@ -20,8 +20,9 @@ class FactoryUpgradeButton extends HookConsumerWidget {
     return BlocBuilder<InventoryBloc, InventoryState>(
       builder: (context, inventoryState) {
         final inventory = inventoryState.maybeMap(
-            loadSuccess: (s) => s.inventory,
-            orElse: () => throw const UnexpectedValueError(),);
+          loadSuccess: (s) => s.inventory,
+          orElse: () => throw const UnexpectedValueError(),
+        );
         return BlocBuilder<FactoryBloc, FactoryState>(
           builder: (context, factoryState) {
             final b = factoryState.maybeMap(

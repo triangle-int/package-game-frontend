@@ -53,7 +53,7 @@ class TruckRepository {
       return right(
         CalculatedPath.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -89,7 +89,7 @@ class TruckRepository {
       );
 
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -101,7 +101,7 @@ class TruckRepository {
       return right(
         TruckSchedulesResponse.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -139,7 +139,7 @@ class TruckRepository {
       });
       yield right(trucks);
       yield* _streamController.stream;
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       yield left(ServerFailure.fromError(e));
     } catch (e) {
       Logger().e("Can't load trucks", e, (e as Error).stackTrace);
@@ -154,7 +154,7 @@ class TruckRepository {
       return right(
         DeliveryBuildings.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -169,7 +169,7 @@ class TruckRepository {
       );
 
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

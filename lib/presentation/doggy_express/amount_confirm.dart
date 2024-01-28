@@ -60,52 +60,53 @@ class AmountConfirm extends HookWidget {
           width: 160,
           height: 45,
           child: TextField(
-              keyboardType: TextInputType.number,
-              controller: controller,
-              textAlign: TextAlign.center,
-              textAlignVertical: TextAlignVertical.center,
-              style: const TextStyle(
+            keyboardType: TextInputType.number,
+            controller: controller,
+            textAlign: TextAlign.center,
+            textAlignVertical: TextAlignVertical.center,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+            ),
+            decoration: InputDecoration(
+              hintStyle: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w600,
+                color: Color(0xFF8D8D8D),
               ),
-              decoration: InputDecoration(
-                hintStyle: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF8D8D8D),
+              enabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.white,
+                  width: 2,
                 ),
-                enabledBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.white,
-                    width: 2,
-                  ),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.white,
-                    width: 2,
-                  ),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 5),
-                border: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.white,
-                    width: 2,
-                  ),
-                ),
-                focusColor: Colors.white,
-                hintText: maxAmount.toCurrency(),
               ),
-              onChanged: (text) {
-                BigInt amount = BigInt.tryParse(text) ?? BigInt.from(0);
-                if (amount > maxAmount) {
-                  amount = maxAmount;
-                  controller.text = amount.toString();
-                }
-                context
-                    .read<DoggieExpressBloc>()
-                    .add(DoggieExpressEvent.amountEntered(amount));
-              },),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.white,
+                  width: 2,
+                ),
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 5),
+              border: const OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.white,
+                  width: 2,
+                ),
+              ),
+              focusColor: Colors.white,
+              hintText: maxAmount.toCurrency(),
+            ),
+            onChanged: (text) {
+              BigInt amount = BigInt.tryParse(text) ?? BigInt.from(0);
+              if (amount > maxAmount) {
+                amount = maxAmount;
+                controller.text = amount.toString();
+              }
+              context
+                  .read<DoggieExpressBloc>()
+                  .add(DoggieExpressEvent.amountEntered(amount));
+            },
+          ),
         ),
       ],
     );

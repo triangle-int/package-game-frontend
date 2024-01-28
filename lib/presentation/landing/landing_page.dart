@@ -100,7 +100,7 @@ class LandingPage extends HookConsumerWidget {
         },
         error: (e, st) {
           Logger().e("Can't load config!", e, st);
-          if (e is DioError) {
+          if (e is DioException) {
             final f = ServerFailure.fromError(e);
             f.maybeMap(
               connectionRefused: (_) {},
@@ -308,9 +308,9 @@ class LandingPage extends HookConsumerWidget {
                           data: (_) => userState.map(
                             loading: (_) => 'Loading user...',
                             error: (s) {
-                              if (s.error is DioError) {
+                              if (s.error is DioException) {
                                 final f = ServerFailure.fromError(
-                                  s.error as DioError,
+                                  s.error as DioException,
                                 );
 
                                 failure = f;

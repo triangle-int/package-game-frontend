@@ -65,7 +65,9 @@ class BusinessLoading extends StatelessWidget {
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 22, vertical: 10,),
+                        horizontal: 22,
+                        vertical: 10,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(37),
                       ),

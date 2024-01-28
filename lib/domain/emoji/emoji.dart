@@ -7,10 +7,15 @@ part 'emoji.g.dart';
 class Emoji with _$Emoji {
   const factory Emoji({
     required String unified,
-    @JsonKey(name: 'non_qualified') String? nonQualified,
+    @JsonKey(name: 'non_qualified')
+        String? nonQualified,
     required String image,
-    @Default('') @JsonKey(ignore: true) String imageUrlMedium,
-    @Default('') @JsonKey(ignore: true) String imageUrlHigh,
+    @Default('')
+    @JsonKey(includeFromJson: false, includeToJson: false)
+        String imageUrlMedium,
+    @Default('')
+    @JsonKey(includeFromJson: false, includeToJson: false)
+        String imageUrlHigh,
   }) = _Emoji;
 
   factory Emoji.fromJson(Map<String, dynamic> json) => _$EmojiFromJson(json);

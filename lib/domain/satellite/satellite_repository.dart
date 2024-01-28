@@ -28,7 +28,7 @@ class SatelliteRepository {
       return right(
         SatelliteBuilding.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

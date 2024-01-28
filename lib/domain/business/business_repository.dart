@@ -34,7 +34,7 @@ class BusinessRepository {
           BusinessBuilding.fromJson(response.data as Map<String, dynamic>);
       _buildingRepository.updateBuilding(building);
       return right(building);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -54,7 +54,7 @@ class BusinessRepository {
           BusinessBuilding.fromJson(response.data as Map<String, dynamic>);
       _buildingRepository.updateBuilding(building);
       return right(building);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

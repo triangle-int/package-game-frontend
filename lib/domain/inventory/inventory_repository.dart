@@ -32,7 +32,7 @@ class InventoryRepository {
           Inventory.fromJson(response.data as Map<String, dynamic>);
       Logger().d('Get Inventory: Emitting response');
       yield right(inventory);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       yield left(InventoryFailure.serverFailure(e.message!));
     } finally {
       yield* _socketRepository.getInventoryUpdates().map((i) => right(i));

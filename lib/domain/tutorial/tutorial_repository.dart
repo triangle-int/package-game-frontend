@@ -39,7 +39,7 @@ class TutorialRepository {
         _analytics.logTutorialBegin();
       }
       return right(step);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -56,7 +56,7 @@ class TutorialRepository {
         await _analytics.logTutorialComplete();
       }
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

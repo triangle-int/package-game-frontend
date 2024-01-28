@@ -33,7 +33,7 @@ class NotificationsRepository {
         },
       );
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
