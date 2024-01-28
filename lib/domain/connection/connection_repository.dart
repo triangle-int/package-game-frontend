@@ -1,11 +1,15 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/server_failure.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final connectionRepositoryProvider =
-    Provider((ref) => ConnectionRepository(ref.watch(dioProvider)));
+part 'connection_repository.g.dart';
+
+@riverpod
+ConnectionRepository connectionRepository(ConnectionRepositoryRef ref) {
+  return ConnectionRepository(ref.watch(dioProvider));
+}
 
 class ConnectionRepository {
   ConnectionRepository(this._dio);

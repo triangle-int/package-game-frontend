@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/firebase_messaging_provider.dart';
@@ -13,13 +12,17 @@ import 'package:package_flutter/domain/truck/calculated_path.dart';
 import 'package:package_flutter/domain/truck/delivery_buildings.dart';
 import 'package:package_flutter/domain/truck/truck.dart';
 import 'package:package_flutter/domain/truck/truck_schedules_response.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final truckRepositoryProvider = Provider(
-  (ref) => TruckRepository(
+part 'truck_repository.g.dart';
+
+@riverpod
+TruckRepository truckRepository(TruckRepositoryRef ref) {
+  return TruckRepository(
     ref.watch(dioProvider),
     ref.watch(firebaseMessagingProvider),
-  ),
-);
+  );
+}
 
 class TruckRepository {
   final Dio _dio;

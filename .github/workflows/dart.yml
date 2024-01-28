@@ -25,6 +25,9 @@ jobs:
       - name: Analyze project source
         run: dart analyze --fatal-infos
 
+      - name: Analyze project with riverpod
+        run: dart run custom_lint --fatal-infos
+
       # Add tests later
       # - name: Run tests
       #   run: flutter test

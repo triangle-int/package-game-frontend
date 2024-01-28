@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'socket_connection_provider.g.dart';
 
+// TODO(P5ina): Add socket connection widget with lifecycle events
 @Riverpod(keepAlive: true)
 class SocketConnection extends _$SocketConnection {
   Future<void> connect() async {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:package_flutter/bloc/sidebar/effects_volume_provider.dart';
-import 'package:package_flutter/bloc/sidebar/map_dark_mode_provider.dart';
 import 'package:package_flutter/presentation/core/emoji_image.dart';
+import 'package:package_flutter/presentation/core/root/map_dark_mode.dart';
+import 'package:package_flutter/presentation/core/root/sfx_volume.dart';
 import 'package:package_flutter/presentation/sidebar/sidebar_item.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wiredash/wiredash.dart';
@@ -16,24 +16,6 @@ class SidebarSettings extends HookConsumerWidget {
       padding: const EdgeInsets.only(left: 30, top: 16),
       child: Column(
         children: [
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          //   child: Row(
-          //     children: [
-          //       const EmojiImage(
-          //         emoji: '🎵',
-          //         size: 24,
-          //       ),
-          //       Slider(
-          //         onChanged: (value) {
-          //           ref.read(musicVolumeProvider.notifier).setVolume(value);
-          //         },
-          //         value: ref.watch(musicVolumeProvider),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          // const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
@@ -44,9 +26,9 @@ class SidebarSettings extends HookConsumerWidget {
                 ),
                 Slider(
                   onChanged: (value) {
-                    ref.read(effectsVolumeProvider.notifier).setVolume(value);
+                    ref.read(sfxVolumeProvider.notifier).setVolume(value);
                   },
-                  value: ref.watch(effectsVolumeProvider),
+                  value: ref.watch(sfxVolumeProvider),
                 ),
               ],
             ),

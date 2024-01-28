@@ -1,17 +1,21 @@
 import 'package:flutter/foundation.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/domain/core/env/env.dart';
 import 'package:package_flutter/domain/core/env/env_production.dart';
 import 'package:package_flutter/domain/core/env/env_staging.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final environmentProvider = Provider(
-  (ref) => const String.fromEnvironment(
+part 'env_provider.g.dart';
+
+@riverpod
+String environment(EnvironmentRef ref) {
+  return const String.fromEnvironment(
     'ENVIRONMENT',
     defaultValue: kDebugMode ? Env.stagingEnviroment : Env.productionEnviroment,
-  ),
-);
+  );
+}
 
-final envProvider = Provider((ref) {
+@riverpod
+Env env(EnvRef ref) {
   switch (ref.watch(environmentProvider)) {
     case Env.productionEnviroment:
       return EnvProduction();
@@ -20,4 +24,4 @@ final envProvider = Provider((ref) {
     default:
       return EnvProduction();
   }
-});
+}

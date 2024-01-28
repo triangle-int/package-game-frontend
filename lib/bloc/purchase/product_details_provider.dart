@@ -1,9 +1,12 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:package_flutter/bloc/config/config_provider.dart';
 import 'package:package_flutter/domain/config/store_item.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final productDetailsProvider = FutureProvider((ref) async {
+part 'product_details_provider.g.dart';
+
+@riverpod
+Future<ProductDetailsResponse> productDetails(ProductDetailsRef ref) async {
   final config = ref.watch(configProvider).value!;
 
   final productIds = config.storeItems.values
@@ -13,4 +16,4 @@ final productDetailsProvider = FutureProvider((ref) async {
       .toSet();
 
   return InAppPurchase.instance.queryProductDetails(productIds);
-});
+}

@@ -1,10 +1,12 @@
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/domain/core/shared_preferences_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'effects_volume_provider.g.dart';
+part 'sfx_volume.g.dart';
 
-@Riverpod(keepAlive: true)
-class EffectsVolume extends _$EffectsVolume {
+@riverpod
+class SfxVolume extends _$SfxVolume {
   @override
   double build() {
     final sharedPrefs = ref.watch(sharedPreferencesProvider).value;
@@ -15,5 +17,17 @@ class EffectsVolume extends _$EffectsVolume {
     state = volume;
     final sharedPrefs = await ref.read(sharedPreferencesProvider.future);
     await sharedPrefs.setDouble('effectsVolume', volume);
+  }
+}
+
+class SfxVolumeWidget extends ConsumerWidget {
+  const SfxVolumeWidget({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(sfxVolumeProvider);
+    return child;
   }
 }

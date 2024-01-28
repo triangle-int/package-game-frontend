@@ -1,18 +1,21 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/domain/building/building.dart';
 import 'package:package_flutter/domain/building/building_repository.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/server_failure.dart';
 import 'package:package_flutter/domain/factory/factory_resource_select_failure.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final factoryRepositoryProvider = Provider(
-  (ref) => FactoryRepository(
+part 'factory_repository.g.dart';
+
+@riverpod
+FactoryRepository factoryRepository(FactoryRepositoryRef ref) {
+  return FactoryRepository(
     ref.watch(dioProvider),
     ref.watch(buildingRepositoryProvider),
-  ),
-);
+  );
+}
 
 class FactoryRepository {
   final Dio _dio;

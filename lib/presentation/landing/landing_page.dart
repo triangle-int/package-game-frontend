@@ -124,35 +124,38 @@ class LandingPage extends HookConsumerWidget {
       purchasesStreamProvider,
       (previous, next) {
         next.when(
-          data: (data) => data.forEach((PurchaseDetails purchaseDetails) async {
-            if (purchaseDetails.status == PurchaseStatus.pending) {
-              // _showPendingUI();
-            } else {
-              final notificationBloc = context.read<NotificationsBloc>();
-              if (purchaseDetails.status == PurchaseStatus.error) {
-                notificationBloc.add(
-                  NotificationsEvent.warningAdded(
-                    purchaseDetails.error!.message,
-                  ),
-                );
-              } else if (purchaseDetails.status == PurchaseStatus.purchased ||
-                  purchaseDetails.status == PurchaseStatus.restored) {
-                final valid = await ref
-                    .read(purchaseRepositoryProvider)
-                    .validateReceipt(purchaseDetails);
-                if (!valid) {
+          data: (data) async {
+            for (PurchaseDetails purchaseDetails in data) {
+              if (purchaseDetails.status == PurchaseStatus.pending) {
+                // _showPendingUI();
+              } else {
+                final notificationBloc = context.read<NotificationsBloc>();
+                if (purchaseDetails.status == PurchaseStatus.error) {
                   notificationBloc.add(
-                    const NotificationsEvent.warningAdded(
-                      'Ya tvou mamu gebal',
+                    NotificationsEvent.warningAdded(
+                      purchaseDetails.error!.message,
                     ),
                   );
+                } else if (purchaseDetails.status == PurchaseStatus.purchased ||
+                    purchaseDetails.status == PurchaseStatus.restored) {
+                  final valid = await ref
+                      .read(purchaseRepositoryProvider)
+                      .validateReceipt(purchaseDetails);
+                  if (!valid) {
+                    notificationBloc.add(
+                      const NotificationsEvent.warningAdded(
+                        'Ya tvou mamu gebal',
+                      ),
+                    );
+                  }
+                }
+                if (purchaseDetails.pendingCompletePurchase) {
+                  await InAppPurchase.instance
+                      .completePurchase(purchaseDetails);
                 }
               }
-              if (purchaseDetails.pendingCompletePurchase) {
-                await InAppPurchase.instance.completePurchase(purchaseDetails);
-              }
             }
-          }),
+          },
           error: (e, st) => Logger().e('Purchase stream failure', e, st),
           loading: () {},
         );

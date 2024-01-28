@@ -1,10 +1,14 @@
 import 'package:dio/dio.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/domain/config/config.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final configRepositoryProvider =
-    Provider((ref) => ConfigRepository(ref.watch(dioProvider)));
+part 'config_repository.g.dart';
+
+@riverpod
+ConfigRepository configRepository(ConfigRepositoryRef ref) {
+  return ConfigRepository(ref.watch(dioProvider));
+}
 
 class ConfigRepository {
   final Dio _dio;

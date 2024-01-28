@@ -5,13 +5,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/bloc/business/business_bloc.dart';
 import 'package:package_flutter/bloc/business/upgrade/business_upgrade_bloc.dart';
 import 'package:package_flutter/bloc/notifications/notifications_bloc.dart';
-import 'package:package_flutter/bloc/sidebar/effects_volume_provider.dart';
 import 'package:package_flutter/bloc/user/user_provider.dart';
 import 'package:package_flutter/domain/building/building_repository.dart';
 import 'package:package_flutter/domain/business/business_repository.dart';
 import 'package:package_flutter/presentation/business/business_body.dart';
 import 'package:package_flutter/presentation/business/business_body_other.dart';
 import 'package:package_flutter/presentation/business/business_loading.dart';
+import 'package:package_flutter/presentation/core/root/sfx_volume.dart';
 
 class BusinessMenu extends HookConsumerWidget {
   const BusinessMenu(this.businessId, {super.key});
@@ -43,7 +43,7 @@ class BusinessMenu extends HookConsumerWidget {
                     BusinessEvent.businessGot(s.building),
                   );
               final player = AudioPlayer();
-              await player.setVolume(ref.read(effectsVolumeProvider));
+              await player.setVolume(ref.read(sfxVolumeProvider));
               AudioPlayer().play(
                 AssetSource(
                   'sounds/upgrade_business.wav',

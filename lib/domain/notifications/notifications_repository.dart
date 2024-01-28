@@ -1,19 +1,23 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/firebase_messaging_provider.dart';
 import 'package:package_flutter/domain/core/server_failure.dart';
 import 'package:package_flutter/domain/notifications/notification_data.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final notificationsRepositoryProvider = Provider(
-  (ref) => NotificationsRepository(
+part 'notifications_repository.g.dart';
+
+@riverpod
+NotificationsRepository notificationsRepository(
+    NotificationsRepositoryRef ref) {
+  return NotificationsRepository(
     ref.watch(firebaseMessagingProvider),
     ref.watch(dioProvider),
-  ),
-);
+  );
+}
 
 class NotificationsRepository {
   final FirebaseMessaging _firebaseMessaging;

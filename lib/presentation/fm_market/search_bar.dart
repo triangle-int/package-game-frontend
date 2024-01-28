@@ -26,6 +26,7 @@ class _SearchBarState extends State<SearchBar> {
       await context.read<TutorialBloc>().state.step.maybeMap(
             openFMMarket: (_) async {
               await Future.delayed(const Duration(milliseconds: 400));
+              if (!context.mounted) return;
               ShowCaseWidget.of(context).startShowCase([_profileKey]);
             },
             orElse: () async {},

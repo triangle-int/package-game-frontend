@@ -17,8 +17,6 @@ import 'package:package_flutter/bloc/map/map_bloc.dart';
 import 'package:package_flutter/bloc/map/map_bounds_provider.dart';
 import 'package:package_flutter/bloc/pin_marker/pin_marker_bloc.dart';
 import 'package:package_flutter/bloc/satellite/satellite_bloc.dart';
-import 'package:package_flutter/bloc/sidebar/effects_volume_provider.dart';
-import 'package:package_flutter/bloc/sidebar/map_dark_mode_provider.dart';
 import 'package:package_flutter/bloc/truck/truck_bloc.dart';
 import 'package:package_flutter/bloc/tutorial/tutorial_bloc.dart';
 import 'package:package_flutter/bloc/user/user_provider.dart';
@@ -31,6 +29,8 @@ import 'package:package_flutter/domain/user/user.dart';
 import 'package:package_flutter/domain/user/user_on_map.dart';
 import 'package:package_flutter/presentation/business/business_menu.dart';
 import 'package:package_flutter/presentation/core/cached_tile_provider.dart';
+import 'package:package_flutter/presentation/core/root/map_dark_mode.dart';
+import 'package:package_flutter/presentation/core/root/sfx_volume.dart';
 import 'package:package_flutter/presentation/factory/factory_menu.dart';
 import 'package:package_flutter/presentation/map/business_marker.dart';
 import 'package:package_flutter/presentation/map/destory_dialog.dart';
@@ -184,7 +184,7 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                   );
                               final player = AudioPlayer();
                               await player.setVolume(
-                                ref.read(effectsVolumeProvider),
+                                ref.read(sfxVolumeProvider),
                               );
                               player.play(
                                 AssetSource(
@@ -212,8 +212,9 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                         _mapController.bounds!,
                                       ),
                                     );
-                                ref.read(mapBoundsProvider.notifier).state =
-                                    _mapController.bounds!;
+                                ref
+                                    .read(mapBoundsProvider.notifier)
+                                    .setBounds(_mapController.bounds!);
                               },
                               onPositionChanged: (position, hasGesture) {
                                 if (hasGesture) {
@@ -224,8 +225,9 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                         position.bounds!,
                                       ),
                                     );
-                                ref.read(mapBoundsProvider.notifier).state =
-                                    _mapController.bounds!;
+                                ref
+                                    .read(mapBoundsProvider.notifier)
+                                    .setBounds(_mapController.bounds!);
                               },
                               onTap: (event, location) {
                                 context.read<PinMarkerBloc>().add(
@@ -533,7 +535,7 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                                 final player = AudioPlayer();
                                                 await player.setVolume(
                                                   ref.read(
-                                                    effectsVolumeProvider,
+                                                    sfxVolumeProvider,
                                                   ),
                                                 );
                                                 player.play(
@@ -569,7 +571,7 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                                 final player = AudioPlayer();
                                                 await player.setVolume(
                                                   ref.read(
-                                                    effectsVolumeProvider,
+                                                    sfxVolumeProvider,
                                                   ),
                                                 );
                                                 player.play(
@@ -591,7 +593,7 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                                 final player = AudioPlayer();
                                                 await player.setVolume(
                                                   ref.read(
-                                                    effectsVolumeProvider,
+                                                    sfxVolumeProvider,
                                                   ),
                                                 );
                                                 AudioPlayer().play(

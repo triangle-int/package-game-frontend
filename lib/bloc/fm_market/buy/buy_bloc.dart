@@ -8,7 +8,7 @@ part 'buy_state.dart';
 part 'buy_bloc.freezed.dart';
 
 class BuyBloc extends Bloc<BuyEvent, BuyState> {
-  final FMMarketRepository _repository;
+  final FmMarketRepository _repository;
 
   BuyBloc(this._repository) : super(BuyState.initial()) {
     on<BuyEvent>((event, emit) async {
