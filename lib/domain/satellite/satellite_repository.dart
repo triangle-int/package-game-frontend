@@ -1,0 +1,35 @@
+import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
+import 'package:package_flutter/domain/building/building.dart';
+import 'package:package_flutter/domain/core/dio_provider.dart';
+import 'package:package_flutter/domain/core/server_failure.dart';
+
+final satelliteRepositoryProvider =
+    Provider((ref) => SatelliteRepository(ref.watch(dioProvider)));
+
+class SatelliteRepository {
+  final Dio _dio;
+
+  SatelliteRepository(this._dio);
+
+  Future<Either<ServerFailure, SatelliteBuilding>> collectMoney(int id) async {
+    try {
+      final response = await _dio.post(
+        '/satellite/collect-money',
+        data: {
+          'satelliteId': id,
+        },
+      );
+
+      Logger().d(response.data);
+
+      return right(
+        SatelliteBuilding.fromJson(response.data as Map<String, dynamic>),
+      );
+    } on DioError catch (e) {
+      return left(ServerFailure.fromError(e));
+    }
+  }
+}
