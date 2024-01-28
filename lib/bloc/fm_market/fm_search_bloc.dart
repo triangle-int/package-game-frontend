@@ -10,7 +10,7 @@ part 'fm_search_state.dart';
 part 'fm_search_bloc.freezed.dart';
 
 class FmSearchBloc extends Bloc<FmSearchEvent, FmSearchState> {
-  final FMMarketRepository _fmMarketRepository;
+  final FmMarketRepository _fmMarketRepository;
 
   FmSearchBloc(this._fmMarketRepository) : super(FmSearchState.initial()) {
     on<FmSearchEvent>((event, emit) async {

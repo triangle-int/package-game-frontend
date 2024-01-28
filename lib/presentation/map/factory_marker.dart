@@ -26,21 +26,21 @@ class _FactoryMarkerState extends ConsumerState<FactoryMarker> {
 
   SMITrigger? _upgradeTrigger;
 
-  Future<void> _onRiveInit(Artboard artboard) async {
-    Logger().d('Rive marker Factory initializing...');
-    // Get State Machine Controller for the state machine called "bumpy"
-    controller = StateMachineController.fromArtboard(
-      artboard,
-      'State Machine',
-      onStateChange: _onStateChange,
-    );
-    artboard.addController(controller!);
-    // Get a reference to the "bump" state machine input
-    _upgradeTrigger = controller!.findInput<bool>('Upgrade') as SMITrigger?;
-    Logger().d('Updated trigger');
-    await Future.delayed(const Duration(milliseconds: 50));
-    controller!.isActive = widget.factoryBuilding.enabled;
-  }
+  // Future<void> _onRiveInit(Artboard artboard) async {
+  //   Logger().d('Rive marker Factory initializing...');
+  //   // Get State Machine Controller for the state machine called "bumpy"
+  //   controller = StateMachineController.fromArtboard(
+  //     artboard,
+  //     'State Machine',
+  //     onStateChange: _onStateChange,
+  //   );
+  //   artboard.addController(controller!);
+  //   // Get a reference to the "bump" state machine input
+  //   _upgradeTrigger = controller!.findInput<bool>('Upgrade') as SMITrigger?;
+  //   Logger().d('Updated trigger');
+  //   await Future.delayed(const Duration(milliseconds: 50));
+  //   controller!.isActive = widget.factoryBuilding.enabled;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -83,10 +83,10 @@ class _FactoryMarkerState extends ConsumerState<FactoryMarker> {
     );
   }
 
-  void _onStateChange(
-    String stateMachineName,
-    String stateName,
-  ) {
-    Logger().d('New factory state: $stateName');
-  }
+  // void _onStateChange(
+  //   String stateMachineName,
+  //   String stateName,
+  // ) {
+  //   Logger().d('New factory state: $stateName');
+  // }
 }

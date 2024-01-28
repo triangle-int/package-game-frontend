@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/firebase_messaging_provider.dart';
@@ -13,13 +12,17 @@ import 'package:package_flutter/domain/truck/calculated_path.dart';
 import 'package:package_flutter/domain/truck/delivery_buildings.dart';
 import 'package:package_flutter/domain/truck/truck.dart';
 import 'package:package_flutter/domain/truck/truck_schedules_response.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final truckRepositoryProvider = Provider(
-  (ref) => TruckRepository(
+part 'truck_repository.g.dart';
+
+@riverpod
+TruckRepository truckRepository(TruckRepositoryRef ref) {
+  return TruckRepository(
     ref.watch(dioProvider),
     ref.watch(firebaseMessagingProvider),
-  ),
-);
+  );
+}
 
 class TruckRepository {
   final Dio _dio;
@@ -53,7 +56,7 @@ class TruckRepository {
       return right(
         CalculatedPath.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -89,7 +92,7 @@ class TruckRepository {
       );
 
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -101,7 +104,7 @@ class TruckRepository {
       return right(
         TruckSchedulesResponse.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -139,7 +142,7 @@ class TruckRepository {
       });
       yield right(trucks);
       yield* _streamController.stream;
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       yield left(ServerFailure.fromError(e));
     } catch (e) {
       Logger().e("Can't load trucks", e, (e as Error).stackTrace);
@@ -154,7 +157,7 @@ class TruckRepository {
       return right(
         DeliveryBuildings.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -169,7 +172,7 @@ class TruckRepository {
       );
 
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

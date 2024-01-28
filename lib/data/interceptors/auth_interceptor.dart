@@ -16,7 +16,7 @@ class AuthInterceptor extends Interceptor {
     if (accessToken == null) {
       handler.reject(
         NotAuthenticatedException(
-          error: DioError(
+          error: DioException(
             requestOptions: options,
           ),
         ),

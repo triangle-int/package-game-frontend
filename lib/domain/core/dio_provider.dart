@@ -2,14 +2,17 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/data/interceptors/auth_interceptor.dart';
 import 'package:package_flutter/data/interceptors/version_interceptor.dart';
 import 'package:package_flutter/domain/auth/auth_repository.dart';
 import 'package:package_flutter/domain/core/env_provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final dioProvider = Provider((ref) {
+part 'dio_provider.g.dart';
+
+@riverpod
+Dio dio(DioRef ref) {
   final env = ref.watch(envProvider);
   final serverUrl = env.serverUrl;
 
@@ -37,4 +40,4 @@ final dioProvider = Provider((ref) {
     },
   );
   return dio;
-});
+}

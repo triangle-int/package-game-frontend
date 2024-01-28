@@ -32,43 +32,6 @@ class EmojiRepository {
     }
   }
 
-  String _symbolFromUnicode(String unicode) {
-    final result = String.fromCharCodes(
-      unicode.split('-').map((u) => int.parse(u, radix: 16)),
-    );
-    if (unicode == '26FA') {
-      return '⛺️';
-    }
-    if (unicode == '1F3CE-FE0F') {
-      return '🏎';
-    }
-    if (unicode == '1F3DE-FE0F') {
-      return '🏞';
-    }
-    if (unicode == '1F5A8-FE0F') {
-      return '🖨';
-    }
-    if (unicode == '1F5A5-FE0F') {
-      return '🖥';
-    }
-    if (unicode == '26F5') {
-      return '⛵️';
-    }
-    if (unicode == '1F6E5-FE0F') {
-      return '🛥';
-    }
-    if (unicode == '26F4-FE0F') {
-      return '⛴';
-    }
-    if (unicode == '1F6F3-FE0F') {
-      return '🛳';
-    }
-    if (unicode == '1F6E9-FE0F') {
-      return '🛩';
-    }
-    return result;
-  }
-
   String _makeEmojiImageUrl(String image, {bool mediumQuality = false}) {
     const baseUrl =
         'https://raw.githubusercontent.com/iamcal/emoji-data/master';

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/bloc/booster/booster_activate_provider.dart';
 import 'package:package_flutter/bloc/config/config_provider.dart';
-import 'package:package_flutter/bloc/inventory/inventory_bloc.dart';
 import 'package:package_flutter/domain/config/item.dart';
 import 'package:package_flutter/domain/inventory/inventory_item.dart';
 import 'package:package_flutter/presentation/core/emoji_image.dart';

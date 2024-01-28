@@ -37,9 +37,8 @@ import 'package:package_flutter/domain/truck/truck_repository.dart';
 import 'package:package_flutter/domain/tutorial/tutorial_repository.dart';
 import 'package:package_flutter/domain/user/user_repository.dart';
 import 'package:package_flutter/firebase_options.dart';
-import 'package:package_flutter/presentation/music/music.dart';
+import 'package:package_flutter/presentation/core/root/sfx_volume.dart';
 import 'package:package_flutter/theme.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:wiredash/wiredash.dart';
 
 Future<void> main(List<String> args) async {
@@ -163,17 +162,14 @@ class App extends HookConsumerWidget {
                       error: (_, __) => null,
                       data: (data) => data,
                     );
-                final packageInfo = await PackageInfo.fromPlatform();
 
                 return metaData
-                  ..buildVersion = packageInfo.version
-                  ..buildNumber = packageInfo.buildNumber
                   ..userId = user?.id.toString()
                   ..custom['username'] = '${user?.avatar} ${user?.nickname}'
                   ..custom['user'] = user?.toString();
               },
             ),
-            child: Music(
+            child: SfxVolumeWidget(
               child: MaterialApp.router(
                 theme: appTheme,
                 routerDelegate: _appRouter.delegate(),

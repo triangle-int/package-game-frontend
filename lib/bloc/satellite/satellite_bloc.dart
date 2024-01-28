@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:geohex/geohex.dart';
 import 'package:latlong2/latlong.dart';
@@ -19,80 +19,82 @@ class SatelliteBloc extends Bloc<SatelliteEvent, SatelliteState> {
 
   SatelliteBloc(this._repository) : super(const SatelliteState.initial()) {
     on<SatelliteEvent>((event, emit) async {
-      await event.map(collectedMoney: (e) async {
-        Logger().d(
-          'Collecting from businesses by satellite',
-        );
-        emit(const SatelliteState.loading());
-        final failureOrSatellite = await _repository.collectMoney(e.id);
+      await event.map(
+        collectedMoney: (e) async {
+          Logger().d(
+            'Collecting from businesses by satellite',
+          );
+          emit(const SatelliteState.loading());
+          final failureOrSatellite = await _repository.collectMoney(e.id);
 
-        failureOrSatellite.fold(
-          (failure) {},
-          (satellite) {
-            Logger().d(satellite);
-            final lines = <SatelliteLine>[];
-            final firstLayer = <Zone>[];
-            final secondLayer = <Zone>[];
-            final q = Queue<SatelliteBuilding>();
-            q.add(satellite);
-            while (q.isNotEmpty) {
-              final current = q.removeFirst();
+          failureOrSatellite.fold(
+            (failure) {},
+            (satellite) {
+              Logger().d(satellite);
+              final lines = <SatelliteLine>[];
+              final firstLayer = <Zone>[];
+              final secondLayer = <Zone>[];
+              final q = Queue<SatelliteBuilding>();
+              q.add(satellite);
+              while (q.isNotEmpty) {
+                final current = q.removeFirst();
 
-              if (current.level == 1) {
-                final hex = Zone.byCode(current.geohex);
+                if (current.level == 1) {
+                  final hex = Zone.byCode(current.geohex);
 
-                firstLayer.addAll(hex.neighbours!);
-                for (final neighbor in hex.neighbours!) {
-                  for (final n in neighbor.neighbours!) {
-                    if (firstLayer.any((h) => h.code == n.code) ||
-                        secondLayer.any((h) => h.code == n.code)) continue;
+                  firstLayer.addAll(hex.neighbours!);
+                  for (final neighbor in hex.neighbours!) {
+                    for (final n in neighbor.neighbours!) {
+                      if (firstLayer.any((h) => h.code == n.code) ||
+                          secondLayer.any((h) => h.code == n.code)) continue;
 
-                    secondLayer.add(n);
+                      secondLayer.add(n);
+                    }
                   }
+
+                  secondLayer.removeWhere((e) => e.code == hex.code);
                 }
 
-                secondLayer.removeWhere((e) => e.code == hex.code);
-              }
+                for (final s in current.children ?? <SatelliteBuilding>[]) {
+                  final start = Zone.byCode(current.geohex);
+                  final end = Zone.byCode(s.geohex);
 
-              for (final s in current.children ?? <SatelliteBuilding>[]) {
-                final start = Zone.byCode(current.geohex);
-                final end = Zone.byCode(s.geohex);
+                  if (satellite.id == current.id) {
+                    Logger().d(
+                      'Satellite ${satellite.id} is collecting from ${s.id}',
+                    );
+                  }
 
-                if (satellite.id == current.id) {
-                  Logger().d(
-                    'Satellite ${satellite.id} is collecting from ${s.id}',
+                  q.addLast(s);
+                  lines.add(
+                    SatelliteLine(
+                      fromId: current.id,
+                      toId: s.id,
+                      showHexes: s.level == 1,
+                      start: LatLng(start.lat, start.lon),
+                      end: LatLng(end.lat, end.lon),
+                    ),
                   );
                 }
-
-                q.addLast(s);
-                lines.add(
-                  SatelliteLine(
-                    fromId: current.id,
-                    toId: s.id,
-                    showHexes: s.level == 1,
-                    start: LatLng(start.lat, start.lon),
-                    end: LatLng(end.lat, end.lon),
-                  ),
-                );
               }
-            }
 
-            emit(
-              SatelliteState.showLines(
-                LinesAndHexes(
-                  firstLayer: firstLayer,
-                  secondLayer: secondLayer,
-                  lines: lines,
+              emit(
+                SatelliteState.showLines(
+                  LinesAndHexes(
+                    firstLayer: firstLayer,
+                    secondLayer: secondLayer,
+                    lines: lines,
+                  ),
                 ),
-              ),
-            );
-          },
-        );
+              );
+            },
+          );
 
-        Logger().d(
-          'Collected!',
-        );
-      },);
+          Logger().d(
+            'Collected!',
+          );
+        },
+      );
     });
   }
 }

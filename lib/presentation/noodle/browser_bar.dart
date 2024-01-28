@@ -8,11 +8,12 @@ class BrowserBar extends StatelessWidget implements PreferredSizeWidget {
   final IconData icon;
   final bool? backButtonDisabled;
 
-  const BrowserBar(
-      {super.key,
-      required this.link,
-      required this.icon,
-      this.backButtonDisabled,});
+  const BrowserBar({
+    super.key,
+    required this.link,
+    required this.icon,
+    this.backButtonDisabled,
+  });
 
   @override
   Widget build(BuildContext context) {

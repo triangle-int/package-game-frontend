@@ -8,12 +8,12 @@ import 'package:package_flutter/bloc/doggie_express/delivery_buildings/delivery_
 import 'package:package_flutter/bloc/doggie_express/doggie_express_bloc.dart';
 import 'package:package_flutter/bloc/geolocation/geolocation_bloc.dart';
 import 'package:package_flutter/bloc/notifications/notifications_bloc.dart';
-import 'package:package_flutter/bloc/sidebar/map_dark_mode_provider.dart';
 import 'package:package_flutter/bloc/tutorial/tutorial_bloc.dart';
 import 'package:package_flutter/bloc/user/user_provider.dart';
 import 'package:package_flutter/domain/building/building.dart';
 import 'package:package_flutter/domain/core/env_provider.dart';
 import 'package:package_flutter/presentation/core/cached_tile_provider.dart';
+import 'package:package_flutter/presentation/core/root/map_dark_mode.dart';
 import 'package:package_flutter/presentation/map/business_marker.dart';
 import 'package:package_flutter/presentation/map/factory_marker.dart';
 import 'package:package_flutter/presentation/map/storage_marker.dart';
@@ -273,7 +273,7 @@ class _DoggyExpressRouteMapState extends ConsumerState<DoggyExpressRouteMap> {
                                     anchorPos:
                                         AnchorPos.align(AnchorAlign.center),
                                   );
-                                }).toList(),
+                                }),
                               ],
                             )
                           ],

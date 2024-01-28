@@ -100,7 +100,8 @@ class ProductConfirm extends HookConsumerWidget {
                   padding: const EdgeInsets.all(7),
                 ),
                 onPressed: () => context.read<DoggieExpressBloc>().add(
-                    DoggieExpressEvent.resourceSelected(items[index].name),),
+                      DoggieExpressEvent.resourceSelected(items[index].name),
+                    ),
                 child: EmojiImage(emoji: items[index].emoji),
               ),
             ),

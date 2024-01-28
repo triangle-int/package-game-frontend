@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
@@ -13,14 +12,18 @@ import 'package:package_flutter/domain/socket/socket_repository.dart';
 import 'package:package_flutter/domain/user/create_user_failure.dart';
 import 'package:package_flutter/domain/user/user.dart';
 import 'package:package_flutter/domain/user/user_on_map.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
-final userRepositoryProvider = Provider<UserRepository>(
-  (ref) => UserRepository(
+part 'user_repository.g.dart';
+
+@riverpod
+UserRepository userRepository(UserRepositoryRef ref) {
+  return UserRepository(
     ref.watch(dioProvider),
     ref.watch(socketRepositoryProvider),
-  ),
-);
+  );
+}
 
 class UserRepository {
   final Dio _dio;
@@ -73,7 +76,7 @@ class UserRepository {
       Logger().d('User added to the stream');
 
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       Logger().d(e.requestOptions.headers);
       if (e.response?.statusCode == 403) {
         if (e.response!.data['message'] == 'nicknameTaken') {

@@ -1,17 +1,20 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/domain/building/building.dart';
 import 'package:package_flutter/domain/building/building_repository.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/server_failure.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final businessRepositoryProvider = Provider(
-  (ref) => BusinessRepository(
+part 'business_repository.g.dart';
+
+@riverpod
+BusinessRepository businessRepository(BusinessRepositoryRef ref) {
+  return BusinessRepository(
     ref.watch(dioProvider),
     ref.watch(buildingRepositoryProvider),
-  ),
-);
+  );
+}
 
 class BusinessRepository {
   final Dio _dio;
@@ -34,7 +37,7 @@ class BusinessRepository {
           BusinessBuilding.fromJson(response.data as Map<String, dynamic>);
       _buildingRepository.updateBuilding(building);
       return right(building);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -54,7 +57,7 @@ class BusinessRepository {
           BusinessBuilding.fromJson(response.data as Map<String, dynamic>);
       _buildingRepository.updateBuilding(building);
       return right(building);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

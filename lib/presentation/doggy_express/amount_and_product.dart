@@ -65,7 +65,8 @@ class AmountAndProduct extends HookConsumerWidget {
                       : EmojiImage(
                           emoji: config
                               .getItemByName(doggieExpressState.resource)
-                              .emoji,),
+                              .emoji,
+                        ),
                 ),
                 const SizedBox(width: 10),
                 OutlinedButton(

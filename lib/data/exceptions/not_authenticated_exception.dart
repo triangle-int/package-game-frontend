@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
-class NotAuthenticatedException extends DioError {
-  NotAuthenticatedException({required DioError error})
+class NotAuthenticatedException extends DioException {
+  NotAuthenticatedException({required DioException error})
       : super(
           requestOptions: error.requestOptions,
           response: error.response,

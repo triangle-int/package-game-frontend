@@ -46,12 +46,14 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
             final businessOrFailure = await _businessRepository.collectMoney(
               businessId: s.businessAndTax.business.id,
             );
-            emit(businessOrFailure.fold(
-              (f) => BusinessState.loadFailure(f),
-              (business) => BusinessState.loadSuccess(
-                s.businessAndTax.copyWith(business: business),
+            emit(
+              businessOrFailure.fold(
+                (f) => BusinessState.loadFailure(f),
+                (business) => BusinessState.loadSuccess(
+                  s.businessAndTax.copyWith(business: business),
+                ),
               ),
-            ),);
+            );
           },
         ),
         businessGot: (e) => state.map(

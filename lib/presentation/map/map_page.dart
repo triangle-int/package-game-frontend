@@ -11,11 +11,11 @@ import 'package:package_flutter/bloc/map/build_panel/build_panel_bloc.dart';
 import 'package:package_flutter/bloc/map/map_bloc.dart';
 import 'package:package_flutter/bloc/notifications/notifications_bloc.dart';
 import 'package:package_flutter/bloc/pin_marker/pin_marker_bloc.dart';
-import 'package:package_flutter/bloc/sidebar/effects_volume_provider.dart';
 import 'package:package_flutter/bloc/tutorial/tutorial_bloc.dart';
 import 'package:package_flutter/bloc/user/user_provider.dart';
 import 'package:package_flutter/domain/building/building_repository.dart';
 import 'package:package_flutter/domain/user/user.dart';
+import 'package:package_flutter/presentation/core/root/sfx_volume.dart';
 import 'package:package_flutter/presentation/core/transformers/currency_transformer.dart';
 import 'package:package_flutter/presentation/core/unexpected_value_error.dart';
 import 'package:package_flutter/presentation/inventory/inventory.dart';
@@ -96,7 +96,7 @@ class _MapPageState extends ConsumerState<MapPage> {
 
                         final player = AudioPlayer();
                         await player.setVolume(
-                          ref.read(effectsVolumeProvider),
+                          ref.read(sfxVolumeProvider),
                         );
                         player.play(AssetSource('sounds/pin_placed.wav'));
                       }
@@ -348,7 +348,7 @@ class _CurrencyUpdateTextState extends ConsumerState<CurrencyUpdateText>
     final scaleTween = Tween<double>(begin: 20, end: 32);
     final opacityTween = Tween<double>(begin: 1, end: 0);
 
-    // TODO (P5ina): remove previous values
+    // TODO(P5ina): remove previous values
     ref.listen<AsyncValue<User>>(userProvider, (previous, next) {
       final user = next.value!;
       if (previousMoney != user.money) {
