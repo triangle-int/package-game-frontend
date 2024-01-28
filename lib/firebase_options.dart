@@ -2,7 +2,7 @@
 // ignore_for_file: lines_longer_than_80_chars, avoid_classes_with_only_static_members
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
-    show TargetPlatform, defaultTargetPlatform, kIsWeb;
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -65,10 +65,8 @@ class DefaultFirebaseOptions {
     projectId: 'package-6031d',
     databaseURL: 'https://package-6031d.firebaseio.com',
     storageBucket: 'package-6031d.appspot.com',
-    androidClientId:
-        '731781815007-6phju19k7ss0qe669vs2qfq17c8eihb7.apps.googleusercontent.com',
-    iosClientId:
-        '731781815007-m9jepjvj8kcne9akssjah0jq2qtc9qkn.apps.googleusercontent.com',
+    androidClientId: '731781815007-6phju19k7ss0qe669vs2qfq17c8eihb7.apps.googleusercontent.com',
+    iosClientId: '731781815007-m9jepjvj8kcne9akssjah0jq2qtc9qkn.apps.googleusercontent.com',
     iosBundleId: 'com.triangle-interactive.package',
   );
 }
