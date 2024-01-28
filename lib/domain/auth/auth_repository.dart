@@ -5,18 +5,21 @@ import 'package:crypto/crypto.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/domain/auth/auth_failure.dart';
 import 'package:package_flutter/domain/core/firebase_auth_provider.dart';
 import 'package:package_flutter/domain/core/google_sign_in_provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-final authRepositoryProvider = Provider(
-  (ref) => AuthRepository(
+part 'auth_repository.g.dart';
+
+@riverpod
+AuthRepository authRepository(AuthRepositoryRef ref) {
+  return AuthRepository(
     ref.watch(firebaseAuthProvider),
     ref.watch(googleSignInProvider),
-  ),
-);
+  );
+}
 
 class AuthRepository {
   final FirebaseAuth _auth;

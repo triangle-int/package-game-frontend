@@ -9,10 +9,12 @@ class LoadingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.white, //or set color with: Color(0xFF0000FF)
-      statusBarBrightness: Brightness.dark,
-    ),);
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.white, //or set color with: Color(0xFF0000FF)
+        statusBarBrightness: Brightness.dark,
+      ),
+    );
 
     return Scaffold(
       body: Center(

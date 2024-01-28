@@ -44,7 +44,7 @@ class CreateUserPage extends HookConsumerWidget {
                       nicknameAlreadyInUse: () =>
                           'Company name is busy, please enter another.',
                       serverFailure: (String message) => message,
-                      // TODO(p5ina): Minimal size from config
+                      // TODO(P5ina): Minimal size from config
                       tooShortNickname: (minSize) =>
                           'Company name is too short. Minimal size $minSize',
                       invalidAccessToken: () => 'Invalid access token',

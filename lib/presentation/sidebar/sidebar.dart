@@ -28,10 +28,12 @@ class _SidebarState extends ConsumerState<Sidebar> {
       await context.read<TutorialBloc>().state.step.maybeMap(
             openDoggyExpress: (_) async {
               await Future.delayed(const Duration(milliseconds: 400));
+              if (!context.mounted) return;
               ShowCaseWidget.of(context).startShowCase([_doggyExpress]);
             },
             openFMMarket: (_) async {
               await Future.delayed(const Duration(milliseconds: 400));
+              if (!context.mounted) return;
               ShowCaseWidget.of(context).startShowCase([_noodle]);
             },
             orElse: () async {},

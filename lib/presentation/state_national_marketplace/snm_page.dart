@@ -146,7 +146,7 @@ class SNMPage extends HookConsumerWidget {
                                                 ),
                                               ),
                                       error: (e, st) {
-                                        if (e is DioError) {
+                                        if (e is DioException) {
                                           final failure =
                                               ServerFailure.fromError(e);
                                           context.read<NotificationsBloc>().add(

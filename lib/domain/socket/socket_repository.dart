@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/auth/auth_repository.dart';
 import 'package:package_flutter/domain/ban/ban.dart';
@@ -9,17 +8,21 @@ import 'package:package_flutter/domain/core/env/env.dart';
 import 'package:package_flutter/domain/core/env_provider.dart';
 import 'package:package_flutter/domain/inventory/inventory.dart';
 import 'package:package_flutter/domain/user/user.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:socket_io_client/socket_io_client.dart' as io;
 
-final socketRepositoryProvider = Provider(
-  (ref) => SocketRepository(
+part 'socket_repository.g.dart';
+
+@riverpod
+SocketRepository socketRepository(SocketRepositoryRef ref) {
+  return SocketRepository(
     ref.watch(authRepositoryProvider),
     ref.watch(envProvider),
-  ),
-);
+  );
+}
 
 class SocketRepository {
-  IO.Socket? _socket;
+  io.Socket? _socket;
 
   final AuthRepository authRepository;
   final Env env;
@@ -30,9 +33,9 @@ class SocketRepository {
     if (_socket == null) {
       final serverSocketUrl = env.serverUrl;
 
-      _socket = IO.io(
+      _socket = io.io(
         serverSocketUrl,
-        IO.OptionBuilder()
+        io.OptionBuilder()
             .setAuth({'token': await authRepository.getToken()})
             .setTransports(
               ['websocket'],
@@ -40,6 +43,7 @@ class SocketRepository {
             .disableAutoConnect()
             .build(),
       );
+
       _socket!.on('connect', (_) {
         Logger().d('Socket connected');
       });

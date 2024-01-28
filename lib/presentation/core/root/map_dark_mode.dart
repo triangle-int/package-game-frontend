@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/domain/core/shared_preferences_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'map_dark_mode_provider.g.dart';
+part 'map_dark_mode.g.dart';
 
-@Riverpod(keepAlive: true)
+@riverpod
 class MapDarkMode extends _$MapDarkMode {
   @override
   bool build() {
@@ -15,5 +17,17 @@ class MapDarkMode extends _$MapDarkMode {
     state = isDarkModeEnabled;
     final sharedPrefs = await ref.read(sharedPreferencesProvider.future);
     await sharedPrefs.setBool('isDarkModeEnabled', isDarkModeEnabled);
+  }
+}
+
+class MapDarkModeWidget extends ConsumerWidget {
+  const MapDarkModeWidget({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(mapDarkModeProvider);
+    return child;
   }
 }

@@ -5,9 +5,14 @@ import 'package:logger/logger.dart';
 import 'package:package_flutter/bloc/config/config_provider.dart';
 import 'package:package_flutter/domain/config/store_item.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final purchaseRepositoryProvider =
-    Provider((ref) => PurchaseRepository(ref.watch(dioProvider), ref));
+part 'purchase_repository.g.dart';
+
+@riverpod
+PurchaseRepository purchaseRepository(PurchaseRepositoryRef ref) {
+  return PurchaseRepository(ref.watch(dioProvider), ref);
+}
 
 class PurchaseRepository {
   final Dio _dio;
@@ -46,7 +51,7 @@ class PurchaseRepository {
         },
       );
       return true;
-    } on DioError {
+    } on DioException {
       return false;
     }
   }

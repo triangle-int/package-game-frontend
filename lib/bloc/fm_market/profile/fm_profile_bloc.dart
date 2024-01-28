@@ -9,7 +9,7 @@ part 'fm_profile_state.dart';
 part 'fm_profile_bloc.freezed.dart';
 
 class FmProfileBloc extends Bloc<FmProfileEvent, FmProfileState> {
-  final FMMarketRepository _repository;
+  final FmMarketRepository _repository;
 
   FmProfileBloc(this._repository) : super(FmProfileState.initial()) {
     on<FmProfileEvent>((event, emit) async {

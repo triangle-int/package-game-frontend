@@ -6,7 +6,7 @@ on:
 
 jobs:
   analyze:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v3
@@ -22,8 +22,31 @@ jobs:
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
 
+      - name: Create .env file
+        uses: SpicyPizza/create-envfile@v2.0.2
+        with:
+          envkey_SERVER_URL: ""
+          envkey_MAP_ACCESS_KEY: ""
+          envkey_MAP_URL_DARK: ""
+          envkey_MAP_URL_WHITE: ""
+          envkey_WIREDASH_SECRET_TOKEN: ""
+          envkey_WIREDASH_PROJECT_ID: ""
+          envkey_SERVER_CERTIFICATE: ""
+          file_name: .env
+
+      - name: Copy .env file to .env.{staging,production}
+        run: |
+          cp .env .env.staging
+          cp .env .env.production
+
+      - name: Run build_runner
+        run: dart run build_runner build --delete-conflicting-outputs
+
       - name: Analyze project source
         run: dart analyze --fatal-infos
+
+      - name: Analyze project with riverpod
+        run: dart run custom_lint --fatal-infos
 
       # Add tests later
       # - name: Run tests

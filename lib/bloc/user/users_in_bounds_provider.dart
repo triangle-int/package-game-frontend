@@ -1,10 +1,13 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/bloc/core/ref_debounce_extension.dart';
 import 'package:package_flutter/bloc/map/map_bounds_provider.dart';
 import 'package:package_flutter/domain/user/user_on_map.dart';
 import 'package:package_flutter/domain/user/user_repository.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final usersInBoundsProvider = StreamProvider<List<UserOnMap>>((ref) {
+part 'users_in_bounds_provider.g.dart';
+
+@riverpod
+Stream<List<UserOnMap>> usersInBounds(UsersInBoundsRef ref) {
   final bounds = ref.watch(mapBoundsProvider);
   final userRepository = ref.watch(userRepositoryProvider);
 
@@ -16,4 +19,4 @@ final usersInBoundsProvider = StreamProvider<List<UserOnMap>>((ref) {
       maxCoords: bounds.northEast!,
     );
   }).asyncMap((event) => event);
-});
+}

@@ -100,7 +100,7 @@ class LandingPage extends HookConsumerWidget {
         },
         error: (e, st) {
           Logger().e("Can't load config!", e, st);
-          if (e is DioError) {
+          if (e is DioException) {
             final f = ServerFailure.fromError(e);
             f.maybeMap(
               connectionRefused: (_) {},
@@ -124,35 +124,38 @@ class LandingPage extends HookConsumerWidget {
       purchasesStreamProvider,
       (previous, next) {
         next.when(
-          data: (data) => data.forEach((PurchaseDetails purchaseDetails) async {
-            if (purchaseDetails.status == PurchaseStatus.pending) {
-              // _showPendingUI();
-            } else {
-              final notificationBloc = context.read<NotificationsBloc>();
-              if (purchaseDetails.status == PurchaseStatus.error) {
-                notificationBloc.add(
-                  NotificationsEvent.warningAdded(
-                    purchaseDetails.error!.message,
-                  ),
-                );
-              } else if (purchaseDetails.status == PurchaseStatus.purchased ||
-                  purchaseDetails.status == PurchaseStatus.restored) {
-                final valid = await ref
-                    .read(purchaseRepositoryProvider)
-                    .validateReceipt(purchaseDetails);
-                if (!valid) {
+          data: (data) async {
+            for (PurchaseDetails purchaseDetails in data) {
+              if (purchaseDetails.status == PurchaseStatus.pending) {
+                // _showPendingUI();
+              } else {
+                final notificationBloc = context.read<NotificationsBloc>();
+                if (purchaseDetails.status == PurchaseStatus.error) {
                   notificationBloc.add(
-                    const NotificationsEvent.warningAdded(
-                      'Ya tvou mamu gebal',
+                    NotificationsEvent.warningAdded(
+                      purchaseDetails.error!.message,
                     ),
                   );
+                } else if (purchaseDetails.status == PurchaseStatus.purchased ||
+                    purchaseDetails.status == PurchaseStatus.restored) {
+                  final valid = await ref
+                      .read(purchaseRepositoryProvider)
+                      .validateReceipt(purchaseDetails);
+                  if (!valid) {
+                    notificationBloc.add(
+                      const NotificationsEvent.warningAdded(
+                        'Ya tvou mamu gebal',
+                      ),
+                    );
+                  }
+                }
+                if (purchaseDetails.pendingCompletePurchase) {
+                  await InAppPurchase.instance
+                      .completePurchase(purchaseDetails);
                 }
               }
-              if (purchaseDetails.pendingCompletePurchase) {
-                await InAppPurchase.instance.completePurchase(purchaseDetails);
-              }
             }
-          }),
+          },
           error: (e, st) => Logger().e('Purchase stream failure', e, st),
           loading: () {},
         );
@@ -308,9 +311,9 @@ class LandingPage extends HookConsumerWidget {
                           data: (_) => userState.map(
                             loading: (_) => 'Loading user...',
                             error: (s) {
-                              if (s.error is DioError) {
+                              if (s.error is DioException) {
                                 final f = ServerFailure.fromError(
-                                  s.error as DioError,
+                                  s.error as DioException,
                                 );
 
                                 failure = f;

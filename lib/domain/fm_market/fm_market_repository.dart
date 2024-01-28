@@ -1,19 +1,23 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/server_failure.dart';
 import 'package:package_flutter/domain/fm_market/my_trade.dart';
 import 'package:package_flutter/domain/fm_market/trade_item.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final fmMarketRepositoryProvider =
-    Provider((ref) => FMMarketRepository(ref.watch(dioProvider)));
+part 'fm_market_repository.g.dart';
 
-class FMMarketRepository {
+@riverpod
+FmMarketRepository fmMarketRepository(FmMarketRepositoryRef ref) {
+  return FmMarketRepository(ref.watch(dioProvider));
+}
+
+class FmMarketRepository {
   final Dio _dio;
 
-  FMMarketRepository(this._dio);
+  FmMarketRepository(this._dio);
 
   Future<Either<ServerFailure, List<TradeItem>>> fetchTrades({
     required int page,
@@ -35,7 +39,7 @@ class FMMarketRepository {
             .map((e) => TradeItem.fromJson(e as Map<String, dynamic>))
             .toList(),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -54,7 +58,7 @@ class FMMarketRepository {
       );
 
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -71,7 +75,7 @@ class FMMarketRepository {
             .toList()
           ..sort((a, b) => a.id.compareTo(b.id)),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -90,7 +94,7 @@ class FMMarketRepository {
       );
 
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

@@ -2,16 +2,20 @@ import 'dart:async';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/building/building.dart';
 import 'package:package_flutter/domain/building/get_business_response.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/server_failure.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final buildingRepositoryProvider =
-    Provider((ref) => BuildingRepository(ref.watch(dioProvider)));
+part 'building_repository.g.dart';
+
+@riverpod
+BuildingRepository buildingRepository(BuildingRepositoryRef ref) {
+  return BuildingRepository(ref.watch(dioProvider));
+}
 
 class BuildingRepository {
   final Dio _dio;
@@ -40,7 +44,7 @@ class BuildingRepository {
       // newBuildings.sort((a, b) => a.id.compareTo(b.id));
       _buildings = newBuildings;
       yield right(_buildings);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       yield left(ServerFailure.fromError(e));
     } finally {
       yield* _streamController.stream;
@@ -59,7 +63,7 @@ class BuildingRepository {
       final building = Building.fromJson(response.data as Map<String, dynamic>);
       updateBuilding(building);
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -80,7 +84,7 @@ class BuildingRepository {
       final building = Building.fromJson(response.data as Map<String, dynamic>);
       updateBuilding(building);
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -97,7 +101,7 @@ class BuildingRepository {
       final building = Building.fromJson(response.data as Map<String, dynamic>);
       updateBuilding(building);
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -114,7 +118,7 @@ class BuildingRepository {
       final building = Building.fromJson(response.data as Map<String, dynamic>);
       updateBuilding(building);
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -132,7 +136,7 @@ class BuildingRepository {
       _streamController.add(right(_buildings));
 
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -152,7 +156,7 @@ class BuildingRepository {
       return right(
         MarketBuilding.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -172,7 +176,7 @@ class BuildingRepository {
       return right(
         StorageBuilding.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -192,7 +196,7 @@ class BuildingRepository {
       return right(
         GetBusinessResponse.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

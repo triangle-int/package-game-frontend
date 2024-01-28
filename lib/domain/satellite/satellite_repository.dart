@@ -1,13 +1,17 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/building/building.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/server_failure.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final satelliteRepositoryProvider =
-    Provider((ref) => SatelliteRepository(ref.watch(dioProvider)));
+part 'satellite_repository.g.dart';
+
+@riverpod
+SatelliteRepository satelliteRepository(SatelliteRepositoryRef ref) {
+  return SatelliteRepository(ref.watch(dioProvider));
+}
 
 class SatelliteRepository {
   final Dio _dio;
@@ -28,7 +32,7 @@ class SatelliteRepository {
       return right(
         SatelliteBuilding.fromJson(response.data as Map<String, dynamic>),
       );
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

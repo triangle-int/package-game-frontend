@@ -1,4 +1,4 @@
-// TODO(p5ina): Emoji image with placeholder and quality settings
+// TODO(P5ina): Emoji image with placeholder and quality settings
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';

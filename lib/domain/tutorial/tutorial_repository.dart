@@ -3,19 +3,22 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/firebase_analytics_provider.dart';
 import 'package:package_flutter/domain/core/server_failure.dart';
 import 'package:package_flutter/domain/tutorial/tutorial_step.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final tutorialRepositoryProvider = Provider(
-  (ref) => TutorialRepository(
+part 'tutorial_repository.g.dart';
+
+@riverpod
+TutorialRepository tutorialRepository(TutorialRepositoryRef ref) {
+  return TutorialRepository(
     ref.watch(dioProvider),
     ref.watch(firebaseAnalyticsProvider),
-  ),
-);
+  );
+}
 
 class TutorialRepository {
   final Dio _dio;
@@ -39,7 +42,7 @@ class TutorialRepository {
         _analytics.logTutorialBegin();
       }
       return right(step);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }
@@ -56,7 +59,7 @@ class TutorialRepository {
         await _analytics.logTutorialComplete();
       }
       return right(unit);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       return left(ServerFailure.fromError(e));
     }
   }

@@ -1,10 +1,14 @@
 import 'package:dio/dio.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/domain/booster/booster.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final boosterRepositoryProvider =
-    Provider((ref) => BoosterRepository(ref.watch(dioProvider)));
+part 'booster_repository.g.dart';
+
+@riverpod
+BoosterRepository boosterRepository(BoosterRepositoryRef ref) {
+  return BoosterRepository(ref.watch(dioProvider));
+}
 
 class BoosterRepository {
   final Dio _dio;

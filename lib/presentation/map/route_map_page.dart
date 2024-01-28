@@ -9,7 +9,6 @@ import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:package_flutter/bloc/notifications/notifications_bloc.dart';
-import 'package:package_flutter/bloc/sidebar/map_dark_mode_provider.dart';
 import 'package:package_flutter/bloc/truck/remove_schedule.dart/remove_schedule_bloc.dart';
 import 'package:package_flutter/bloc/truck/truck_bloc.dart';
 import 'package:package_flutter/data/latlng/lat_lng_extension.dart';
@@ -18,6 +17,7 @@ import 'package:package_flutter/domain/truck/truck.dart';
 import 'package:package_flutter/domain/truck/truck_schedule.dart';
 import 'package:package_flutter/presentation/core/cached_tile_provider.dart';
 import 'package:package_flutter/presentation/core/emoji_image.dart';
+import 'package:package_flutter/presentation/core/root/map_dark_mode.dart';
 import 'package:package_flutter/presentation/core/unexpected_value_error.dart';
 
 @RoutePage()
