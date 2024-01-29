@@ -65,8 +65,10 @@ class DefaultFirebaseOptions {
     projectId: 'package-6031d',
     databaseURL: 'https://package-6031d.firebaseio.com',
     storageBucket: 'package-6031d.appspot.com',
-    androidClientId: '731781815007-6phju19k7ss0qe669vs2qfq17c8eihb7.apps.googleusercontent.com',
-    iosClientId: '731781815007-m9jepjvj8kcne9akssjah0jq2qtc9qkn.apps.googleusercontent.com',
+    androidClientId:
+        '731781815007-6phju19k7ss0qe669vs2qfq17c8eihb7.apps.googleusercontent.com',
+    iosClientId:
+        '731781815007-m9jepjvj8kcne9akssjah0jq2qtc9qkn.apps.googleusercontent.com',
     iosBundleId: 'com.triangle-interactive.package',
   );
 }
