@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "603208825849",
+    "project_id": "package-flutter-rewrite",
+    "storage_bucket": "package-flutter-rewrite.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:603208825849:android:cae321f4750ae6ea891b28",
+        "android_client_info": {
+          "package_name": "com.triangleinteractive.package"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCl29DqaNwGsc_QL7cy8uLGxQFYQ-uXkIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
