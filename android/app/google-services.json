@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "731781815007-bpoqhhijioqk009b185sdf4456d72625.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.TriangleInteractive.Package",
+            "certificate_hash": "2be3ae6dd25b3c64978f38b13966a0ff2167486e"
+          }
+        },
+        {
           "client_id": "731781815007-jplr16ik9nlut2q92pavrhmi80n98ph8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -44,6 +52,14 @@
           "android_info": {
             "package_name": "com.TriangleInteractive.Package",
             "certificate_hash": "67e756d9c67c9e6ba04682ffe19967ee43a15bb0"
+          }
+        },
+        {
+          "client_id": "731781815007-tn9hiso4q5gds0hfqft6e6qknsgus3mv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.TriangleInteractive.Package",
+            "certificate_hash": "a5d1725a6a0ad908e953ab08651406f88b2bc99b"
           }
         },
         {

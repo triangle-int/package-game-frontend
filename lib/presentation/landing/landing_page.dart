@@ -37,6 +37,8 @@ class LandingPage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     useOnAppLifecycleStateChange((previous, current) {
+      Logger().d(
+          'Appltication lifecycle state is $current and previous is $previous');
       if (current == AppLifecycleState.paused) {
         Logger().d('Paused');
         ref.read(socketConnectionProvider.notifier).disconnect();
