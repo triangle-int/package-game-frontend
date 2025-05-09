@@ -4,7 +4,7 @@ part 'my_trade.freezed.dart';
 part 'my_trade.g.dart';
 
 @freezed
-class MyTrade with _$MyTrade {
+abstract class MyTrade with _$MyTrade {
   const factory MyTrade({
     required int id,
     required String name,
@@ -20,7 +20,7 @@ class MyTrade with _$MyTrade {
 }
 
 @freezed
-class MyTradePrice with _$MyTradePrice {
+abstract class MyTradePrice with _$MyTradePrice {
   const factory MyTradePrice({
     required double? pricePerUnit,
   }) = _MyTradePrice;

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/firebase_messaging_provider.dart';
@@ -17,7 +18,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'truck_repository.g.dart';
 
 @riverpod
-TruckRepository truckRepository(TruckRepositoryRef ref) {
+TruckRepository truckRepository(Ref ref) {
   return TruckRepository(
     ref.watch(dioProvider),
     ref.watch(firebaseMessagingProvider),
@@ -145,7 +146,8 @@ class TruckRepository {
     } on DioException catch (e) {
       yield left(ServerFailure.fromError(e));
     } catch (e) {
-      Logger().e("Can't load trucks", e, (e as Error).stackTrace);
+      Logger().e("Can't load trucks",
+          error: e, stackTrace: (e as Error).stackTrace);
       rethrow;
     }
   }

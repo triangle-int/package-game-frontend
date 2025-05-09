@@ -5,7 +5,7 @@ part 'delivery_buildings.freezed.dart';
 part 'delivery_buildings.g.dart';
 
 @freezed
-class DeliveryBuildings with _$DeliveryBuildings {
+abstract class DeliveryBuildings with _$DeliveryBuildings {
   const factory DeliveryBuildings({
     required List<Building> starts,
     required List<Building> destinations,

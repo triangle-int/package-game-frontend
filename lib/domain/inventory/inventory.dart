@@ -5,7 +5,7 @@ part 'inventory.freezed.dart';
 part 'inventory.g.dart';
 
 @freezed
-class Inventory with _$Inventory {
+abstract class Inventory with _$Inventory {
   const Inventory._();
 
   const factory Inventory({
