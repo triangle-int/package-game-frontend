@@ -14,20 +14,19 @@ class FactoryToggleBloc extends Bloc<FactoryToggleEvent, FactoryToggleState> {
   FactoryToggleBloc(this._factoryRepository)
       : super(const FactoryToggleState.initial()) {
     on<FactoryToggleEvent>((event, emit) async {
-      await event.map(
-        factoryToggled: (e) async {
+      switch (event) {
+        case FactoryToggleEventToggled(:final building):
           emit(const FactoryToggleState.loadInProgress());
           final buildingOrFailure = await _factoryRepository.toggleFactory(
-            e.building.id,
-            enabled: !e.building.enabled,
+            building.id,
+            enabled: !building.enabled,
           );
 
           buildingOrFailure.fold(
             (f) => emit(FactoryToggleState.loadFailure(f)),
             (building) => emit(FactoryToggleState.loadSuccess(building)),
           );
-        },
-      );
+      }
     });
   }
 }

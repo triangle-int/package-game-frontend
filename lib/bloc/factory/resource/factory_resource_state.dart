@@ -1,7 +1,7 @@
 part of 'factory_resource_bloc.dart';
 
 @freezed
-class FactoryResourceState with _$FactoryResourceState {
+abstract class FactoryResourceState with _$FactoryResourceState {
   const factory FactoryResourceState({
     required String resource,
     required bool isLoading,

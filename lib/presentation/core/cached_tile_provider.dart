@@ -5,7 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 
 class CachedTileProvider extends TileProvider {
   @override
-  ImageProvider getImage(Coords<num> coords, TileLayer options) {
-    return CachedNetworkImageProvider(getTileUrl(coords, options));
+  ImageProvider getImage(TileCoordinates coordinates, TileLayer options) {
+    return CachedNetworkImageProvider(getTileUrl(coordinates, options));
   }
 }
