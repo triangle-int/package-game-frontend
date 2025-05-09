@@ -32,12 +32,14 @@ class BuildPanel extends HookConsumerWidget {
       listeners: [
         BlocListener<BuildPanelBloc, BuildPanelState>(
           listener: (context, state) {
-            state.maybeMap(
-              loadFailure: (s) => context
-                  .read<NotificationsBloc>()
-                  .add(NotificationsEvent.warningAdded(s.failure.getMessage())),
-              orElse: () {},
-            );
+            switch (state) {
+              case BuildPanelStateLoadFailure(:final failure):
+                context
+                    .read<NotificationsBloc>()
+                    .add(NotificationsEvent.warningAdded(failure.getMessage()));
+              default:
+                break;
+            }
           },
         ),
       ],

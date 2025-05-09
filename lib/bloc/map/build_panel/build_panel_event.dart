@@ -1,10 +1,13 @@
 part of 'build_panel_bloc.dart';
 
 @freezed
-class BuildPanelEvent with _$BuildPanelEvent {
-  const factory BuildPanelEvent.buildBusiness(LatLng location) = _BuildBusiness;
-  const factory BuildPanelEvent.buildStorage(LatLng location) = _BuildStorage;
-  const factory BuildPanelEvent.buildFactory(LatLng location) = _BuildFactory;
+sealed class BuildPanelEvent with _$BuildPanelEvent {
+  const factory BuildPanelEvent.buildBusiness(LatLng location) =
+      BuildPanelEventBuildBusiness;
+  const factory BuildPanelEvent.buildStorage(LatLng location) =
+      BuildPanelEventBuildStorage;
+  const factory BuildPanelEvent.buildFactory(LatLng location) =
+      BuildPanelEventBuildFactory;
   const factory BuildPanelEvent.buildSatellite(LatLng location, int level) =
-      _BuildSatellite;
+      BuildPanelEventBuildSatellite;
 }

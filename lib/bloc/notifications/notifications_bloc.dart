@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:package_flutter/domain/notifications/notification_data.dart';
 import 'package:package_flutter/domain/notifications/notifications_repository.dart';
 
 part 'notifications_event.dart';
@@ -16,35 +17,32 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   NotificationsBloc(this._repository)
       : super(const NotificationsState.initial()) {
     on<NotificationsEvent>((event, emit) async {
-      await event.map(
-        warningAdded: (e) async {
+      switch (event) {
+        case NotificationsEventWarningAdded(:final message):
           emit(
-            NotificationsState.warningNotificationReceived(message: e.message),
+            NotificationsState.warningReceived(message: message),
           );
           emit(const NotificationsState.initial());
-        },
-        successAdded: (e) async {
+        case NotificationsEventSuccessAdded(:final message):
           emit(
-            NotificationsState.successNotificationReceived(message: e.message),
+            NotificationsState.successReceived(message: message),
           );
           emit(const NotificationsState.initial());
-        },
-        notificationAdded: (e) async {
+        case NotificationsEventAdded(:final title, :final message):
           emit(
-            NotificationsState.notificationReceived(
-              title: e.title,
-              message: e.message,
+            NotificationsState.received(
+              title: title,
+              message: message,
             ),
           );
           emit(const NotificationsState.initial());
-        },
-        setup: (_) async {
+        case NotificationsEventSetup():
           final failureOrUnit = await _repository.setup();
 
           failureOrUnit.fold(
             (failure) {
               emit(
-                const NotificationsState.warningNotificationReceived(
+                const NotificationsState.warningReceived(
                   message: 'Failed to setup notifications',
                 ),
               );
@@ -54,20 +52,23 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
               _notificationsSubscription?.cancel();
               _notificationsSubscription =
                   _repository.notificationsStream().listen((notification) {
-                notification.map(
-                  notification: (n) => add(
-                    NotificationsEvent.notificationAdded(n.title, n.message),
-                  ),
-                  success: (n) =>
-                      add(NotificationsEvent.successAdded(n.message)),
-                  warning: (n) =>
-                      add(NotificationsEvent.warningAdded(n.message)),
-                );
+                switch (notification) {
+                  case NotificationDataNotification(
+                      :final title,
+                      :final message
+                    ):
+                    add(
+                      NotificationsEvent.added(title, message),
+                    );
+                  case NotificationDataSuccess(:final message):
+                    add(NotificationsEvent.successAdded(message));
+                  case NotificationDataWarning(:final message):
+                    add(NotificationsEvent.warningAdded(message));
+                }
               });
             },
           );
-        },
-      );
+      }
     });
   }
 

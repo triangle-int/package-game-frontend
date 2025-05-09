@@ -14,11 +14,11 @@ class MarketBloc extends Bloc<MarketEvent, MarketState> {
 
   MarketBloc(this._buildingRepository) : super(const MarketState.initial()) {
     on<MarketEvent>((event, emit) async {
-      await event.map(
-        marketRequested: (e) async {
+      switch (event) {
+        case MarketEventRequested(:final marketId):
           emit(const MarketState.loadInProgress());
           final marketOrFailure =
-              await _buildingRepository.getMarket(marketId: e.marketId);
+              await _buildingRepository.getMarket(marketId: marketId);
           Logger().d(marketOrFailure);
           emit(
             marketOrFailure.fold(
@@ -26,8 +26,7 @@ class MarketBloc extends Bloc<MarketEvent, MarketState> {
               (market) => MarketState.loadSuccess(market),
             ),
           );
-        },
-      );
+      }
     });
   }
 }

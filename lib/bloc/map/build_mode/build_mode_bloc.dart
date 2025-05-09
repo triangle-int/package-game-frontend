@@ -12,14 +12,15 @@ class BuildModeBloc extends Bloc<BuildModeEvent, BuildModeState> {
   BuildModeBloc(this._buildingRepository)
       : super(const BuildModeState.buildMode()) {
     on<BuildModeEvent>((event, emit) async {
-      await event.map(
-        enteredDestroyMode: (_) async =>
-            emit(const BuildModeState.destroyMode()),
-        removedBuilding: (s) async {
-          _buildingRepository.destroyBuilding(s.id);
-        },
-        exitedDestroyMode: (_) async => emit(const BuildModeState.buildMode()),
-      );
+      switch (event) {
+        case BuildModeEventEnteredDestroyMode():
+          emit(const BuildModeState.destroyMode());
+        case BuildModeEventRemovedBuilding(:final id):
+          // TODO: Check usage of await here
+          _buildingRepository.destroyBuilding(id);
+        case BuildModeEventExitedDestroyMode():
+          emit(const BuildModeState.buildMode());
+      }
     });
   }
 }

@@ -12,34 +12,37 @@ part 'pin_marker_bloc.freezed.dart';
 class PinMarkerBloc extends Bloc<PinMarkerEvent, PinMarkerState> {
   PinMarkerBloc() : super(PinMarkerState.initial()) {
     on<PinMarkerEvent>((event, emit) async {
-      await event.map(
-        markerPlaced: (e) async {
-          final distance = e.location.calculateDistance(e.circleCenter);
+      switch (event) {
+        case PinMarkerEventPlaced(
+            :final location,
+            :final circleCenter,
+            :final circleRadius,
+            :final config
+          ):
+          final distance = location.calculateDistance(circleCenter);
 
-          if (e.circleRadius < distance) {
+          if (circleRadius < distance) {
             return;
           }
 
           emit(
             state.copyWith(
-              location: e.location,
+              location: location,
               cell: Zone.byLocation(
-                e.location.latitude,
-                e.location.longitude,
-                e.config.buildingsCellLevel,
+                location.latitude,
+                location.longitude,
+                config.buildingsCellLevel,
               ),
               isShown: true,
             ),
           );
-        },
-        markerHidden: (e) async {
+        case PinMarkerEventHidden():
           emit(
             state.copyWith(
               isShown: false,
             ),
           );
-        },
-      );
+      }
     });
   }
 }

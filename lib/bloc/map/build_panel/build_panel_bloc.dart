@@ -13,49 +13,45 @@ class BuildPanelBloc extends Bloc<BuildPanelEvent, BuildPanelState> {
 
   BuildPanelBloc(this._repository) : super(const BuildPanelState.initial()) {
     on<BuildPanelEvent>((event, emit) async {
-      await event.map(
-        buildBusiness: (e) async {
+      switch (event) {
+        case BuildPanelEventBuildBusiness(:final location):
           emit(const BuildPanelState.loadInProgress());
 
-          final unitOrFailure = await _repository.createBusiness(e.location);
+          final unitOrFailure = await _repository.createBusiness(location);
 
           unitOrFailure.fold(
             (failure) => emit(BuildPanelState.loadFailure(failure)),
             (unit) => emit(const BuildPanelState.loadSuccess()),
           );
-        },
-        buildFactory: (e) async {
+        case BuildPanelEventBuildFactory(:final location):
           emit(const BuildPanelState.loadInProgress());
 
-          final unitOrFailure = await _repository.createFactory(e.location);
+          final unitOrFailure = await _repository.createFactory(location);
 
           unitOrFailure.fold(
             (failure) => emit(BuildPanelState.loadFailure(failure)),
             (unit) => emit(const BuildPanelState.loadSuccess()),
           );
-        },
-        buildStorage: (e) async {
+        case BuildPanelEventBuildStorage(:final location):
           emit(const BuildPanelState.loadInProgress());
 
-          final unitOrFailure = await _repository.createStorage(e.location);
+          final unitOrFailure = await _repository.createStorage(location);
 
           unitOrFailure.fold(
             (failure) => emit(BuildPanelState.loadFailure(failure)),
             (unit) => emit(const BuildPanelState.loadSuccess()),
           );
-        },
-        buildSatellite: (e) async {
+        case BuildPanelEventBuildSatellite(:final location, :final level):
           emit(const BuildPanelState.loadInProgress());
 
           final unitOrFailure =
-              await _repository.createSatellite(e.location, e.level);
+              await _repository.createSatellite(location, level);
 
           unitOrFailure.fold(
             (failure) => emit(BuildPanelState.loadFailure(failure)),
             (unit) => emit(const BuildPanelState.loadSuccess()),
           );
-        },
-      );
+      }
     });
   }
 }

@@ -1,16 +1,16 @@
 part of 'notifications_bloc.dart';
 
 @freezed
-class NotificationsState with _$NotificationsState {
-  const factory NotificationsState.initial() = _Initial;
-  const factory NotificationsState.successNotificationReceived({
+sealed class NotificationsState with _$NotificationsState {
+  const factory NotificationsState.initial() = NotificationsStateInitial;
+  const factory NotificationsState.successReceived({
     required String message,
-  }) = _SuccessNotificationReceived;
-  const factory NotificationsState.warningNotificationReceived({
+  }) = NotificationsStateSuccessReceived;
+  const factory NotificationsState.warningReceived({
     required String message,
-  }) = _WarningNotificationReceived;
-  const factory NotificationsState.notificationReceived({
+  }) = NotificationsStateWarningReceived;
+  const factory NotificationsState.received({
     required String message,
     required String title,
-  }) = _NotificationReceived;
+  }) = NotificationsStateReceived;
 }

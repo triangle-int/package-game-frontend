@@ -1,6 +1,6 @@
 part of 'market_bloc.dart';
 
 @freezed
-class MarketEvent with _$MarketEvent {
-  const factory MarketEvent.marketRequested(int marketId) = _MarketRequested;
+sealed class MarketEvent with _$MarketEvent {
+  const factory MarketEvent.requested(int marketId) = MarketEventRequested;
 }

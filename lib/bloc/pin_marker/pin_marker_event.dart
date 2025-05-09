@@ -1,12 +1,12 @@
 part of 'pin_marker_bloc.dart';
 
 @freezed
-class PinMarkerEvent with _$PinMarkerEvent {
-  const factory PinMarkerEvent.markerPlaced(
+sealed class PinMarkerEvent with _$PinMarkerEvent {
+  const factory PinMarkerEvent.placed(
     LatLng location,
     LatLng circleCenter,
     double circleRadius,
     Config config,
-  ) = _MarkerPlaced;
-  const factory PinMarkerEvent.markerHidden() = _MarkerHidden;
+  ) = PinMarkerEventPlaced;
+  const factory PinMarkerEvent.hidden() = PinMarkerEventHidden;
 }

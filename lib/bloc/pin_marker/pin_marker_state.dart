@@ -1,7 +1,7 @@
 part of 'pin_marker_bloc.dart';
 
 @freezed
-class PinMarkerState with _$PinMarkerState {
+abstract class PinMarkerState with _$PinMarkerState {
   const factory PinMarkerState({
     required LatLng location,
     required bool isShown,
