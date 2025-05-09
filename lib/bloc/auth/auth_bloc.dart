@@ -19,34 +19,31 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc(this._auth) : super(const AuthState.initial()) {
     on<AuthEvent>((event, emit) {
-      event.map(
-        listenAuthStatusRequested: (e) {
+      switch (event) {
+        case ListenAuthStatusRequested():
           emit(const AuthState.loadInProgress());
           _authStatusStream?.cancel();
           _authStatusStream = _auth.authStateChanges().listen(
                 (userOrFailure) =>
                     add(AuthEvent.authStatusReceived(userOrFailure)),
               );
-        },
-        authStatusReceived: (e) {
+        case AuthStatusReceived(userOrFailure: final userOrFailure):
           Logger().d(
-            e.userOrFailure.fold(
+            userOrFailure.fold(
               (l) => 'Auth failure',
               (r) => 'Auth success',
             ),
           );
           emit(
-            e.userOrFailure.fold(
+            userOrFailure.fold(
               (l) => AuthState.loadFailure(l),
               (r) => AuthState.loadSuccess(r),
             ),
           );
-        },
-        signedOut: (e) {
+        case SignedOut():
           _auth.signOut();
           emit(const AuthState.loadFailure(AuthFailure.unauthenticated()));
-        },
-      );
+      }
     });
   }
 

@@ -5,6 +5,7 @@ import 'package:package_flutter/bloc/inventory/inventory_bloc.dart';
 import 'package:package_flutter/bloc/notifications/notifications_bloc.dart';
 import 'package:package_flutter/bloc/user/create_user/create_user_bloc.dart';
 import 'package:package_flutter/bloc/user/user_provider.dart';
+import 'package:package_flutter/domain/user/create_user_failure.dart';
 import 'package:package_flutter/domain/user/user.dart';
 import 'package:package_flutter/domain/user/user_repository.dart';
 import 'package:package_flutter/presentation/user/create_user_body.dart';
@@ -33,22 +34,19 @@ class CreateUserPage extends HookConsumerWidget {
           if (state.failureOrNull != null) {
             context.read<NotificationsBloc>().add(
                   NotificationsEvent.warningAdded(
-                    state.failureOrNull!.when(
-                      tooLongNickname: (maxSize) =>
-                          'Company name is too long. Maximal size $maxSize',
-                      noAvatar: () => "You haven't selected an avatar",
-                      invalidNickname: () =>
-                          'Your company name contains invalid characters',
-                      // accountExists: () =>
-                      //     'You already have an account. Something goes wrong.',
-                      nicknameAlreadyInUse: () =>
-                          'Company name is busy, please enter another.',
-                      serverFailure: (String message) => message,
-                      // TODO(P5ina): Minimal size from config
-                      tooShortNickname: (minSize) =>
-                          'Company name is too short. Minimal size $minSize',
-                      invalidAccessToken: () => 'Invalid access token',
-                    ),
+                    switch (state.failureOrNull!) {
+                      TooLongNickname(maxSize: final maxSize) =>
+                        'Company name is too long. Maximal size $maxSize',
+                      NoAvatar() => "You haven't selected an avatar",
+                      InvalidNickname() =>
+                        'Your company name contains invalid characters',
+                      NicknameAlreadyInUse() =>
+                        'Company name is busy, please enter another.',
+                      ServerFailure(message: final message) => message,
+                      TooShortNickname(minSize: final minSize) =>
+                        'Company name is too short. Minimal size $minSize',
+                      InvalidAccessToken() => 'Invalid access token',
+                    },
                   ),
                 );
           }

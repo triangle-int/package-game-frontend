@@ -3,16 +3,14 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'create_user_failure.freezed.dart';
 
 @freezed
-class CreateUserFailure with _$CreateUserFailure {
+sealed class CreateUserFailure with _$CreateUserFailure {
   const factory CreateUserFailure.tooShortNickname(int minSize) =
-      _TooShortNickname;
+      TooShortNickname;
   const factory CreateUserFailure.tooLongNickname(int maxSize) =
-      _TooLongNickname;
-  const factory CreateUserFailure.invalidNickname() = _InvalidNickname;
-  const factory CreateUserFailure.invalidAccessToken() = _InvalidAccessToken;
-  const factory CreateUserFailure.noAvatar() = _NoAvatar;
-  const factory CreateUserFailure.nicknameAlreadyInUse() =
-      _NicknameAlreadyInUse;
-  const factory CreateUserFailure.serverFailure(String message) =
-      _ServerFailure;
+      TooLongNickname;
+  const factory CreateUserFailure.invalidNickname() = InvalidNickname;
+  const factory CreateUserFailure.invalidAccessToken() = InvalidAccessToken;
+  const factory CreateUserFailure.noAvatar() = NoAvatar;
+  const factory CreateUserFailure.nicknameAlreadyInUse() = NicknameAlreadyInUse;
+  const factory CreateUserFailure.serverFailure(String message) = ServerFailure;
 }

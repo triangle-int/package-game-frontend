@@ -1,11 +1,11 @@
 part of 'auth_bloc.dart';
 
 @freezed
-class AuthEvent with _$AuthEvent {
+sealed class AuthEvent with _$AuthEvent {
   const factory AuthEvent.listenAuthStatusRequested() =
-      _ListenAuthStatusRequested;
-  const factory AuthEvent.signedOut() = _SignedOut;
+      ListenAuthStatusRequested;
+  const factory AuthEvent.signedOut() = SignedOut;
   const factory AuthEvent.authStatusReceived(
     Either<AuthFailure, User> userOrFailure,
-  ) = _AuthStatusReceived;
+  ) = AuthStatusReceived;
 }

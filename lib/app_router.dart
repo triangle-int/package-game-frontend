@@ -18,7 +18,7 @@ import 'package:package_flutter/presentation/state_national_marketplace/snm_page
 part 'app_router.gr.dart';
 
 @AutoRouterConfig()
-class AppRouter extends _$AppRouter {
+class AppRouter extends RootStackRouter {
   @override
   RouteType get defaultRouteType => const RouteType.material();
 
