@@ -129,19 +129,19 @@ class _MapWidgetState extends ConsumerState<MapWidget>
               idle: (s) {},
               moveToPlayer: (s) async {
                 final mapLatitudeTween = Tween<double>(
-                  begin: _mapController.center.latitude,
+                  begin: _mapController.camera.center.latitude,
                   end: widget.geolocation.latitude,
                 );
                 final mapLongitudeTween = Tween<double>(
-                  begin: _mapController.center.longitude,
+                  begin: _mapController.camera.center.longitude,
                   end: widget.geolocation.longitude,
                 );
                 final mapZoomTween = Tween<double>(
-                  begin: _mapController.zoom,
+                  begin: _mapController.camera.zoom,
                   end: 15.5,
                 );
                 final mapRotationTween = Tween<double>(
-                  begin: _mapController.rotation,
+                  begin: _mapController.camera.rotation,
                   end: 0,
                 );
 

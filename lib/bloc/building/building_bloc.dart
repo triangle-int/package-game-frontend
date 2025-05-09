@@ -22,8 +22,8 @@ class BuildingBloc extends Bloc<BuildingEvent, BuildingState> {
   BuildingBloc(this._repository) : super(BuildingState.initial()) {
     on<BuildingEvent>(
       (event, emit) async {
-        await event.map(
-          updatedBounds: (e) async {
+        switch (event) {
+          case UpdatedBounds(:final bounds):
             emit(
               state.copyWith(
                 isLoading: true,
@@ -31,20 +31,19 @@ class BuildingBloc extends Bloc<BuildingEvent, BuildingState> {
               ),
             );
             Logger().d(
-              'Bounds updated: ${e.bounds.southWest} - ${e.bounds.northEast}',
+              'Bounds updated: ${bounds.southWest} - ${bounds.northEast}',
             );
             _streamSubscription?.cancel();
             _streamSubscription = _repository
                 .getBuildingsInBound(
-                  minCoords: e.bounds.southWest!,
-                  maxCoords: e.bounds.northEast!,
+                  minCoords: bounds.southWest,
+                  maxCoords: bounds.northEast,
                 )
                 .listen((b) => add(BuildingEvent.buildingsReceived(b)));
-          },
-          buildingsReceived: (e) {
+          case BuildingsReceived(:final buildingsOrFailure):
             Logger().d('Buildings received!');
             emit(
-              e.buildingsOrFailure.fold(
+              buildingsOrFailure.fold(
                 (f) => state.copyWith(
                   isLoading: false,
                   failureOrNull: f,
@@ -56,30 +55,28 @@ class BuildingBloc extends Bloc<BuildingEvent, BuildingState> {
                 ),
               ),
             );
-          },
-          buildingUpdated: (e) {
+          case BuildingUpdated(:final building):
             final list = List<Building>.from(state.buildings);
-            list.removeWhere((b) => b.id == e.building.id);
-            emit(state.copyWith(buildings: [...state.buildings, e.building]));
-          },
-        );
+            list.removeWhere((b) => b.id == building.id);
+            emit(state.copyWith(buildings: [...state.buildings, building]));
+        }
       },
       transformer: (events, mapper) {
         final debounce = events
             .where(
-              (event) => event.map(
-                updatedBounds: (e) => true,
-                buildingsReceived: (e) => false,
-                buildingUpdated: (e) => false,
-              ),
+              (event) => switch (event) {
+                UpdatedBounds() => true,
+                BuildingsReceived() => false,
+                BuildingUpdated() => false,
+              },
             )
             .debounceTime(const Duration(milliseconds: 200));
         final nonDebounce = events.where(
-          (event) => event.map(
-            updatedBounds: (e) => false,
-            buildingsReceived: (e) => true,
-            buildingUpdated: (e) => true,
-          ),
+          (event) => switch (event) {
+            UpdatedBounds() => false,
+            BuildingsReceived() => true,
+            BuildingUpdated() => true,
+          },
         );
         return MergeStream([debounce, nonDebounce]).asyncExpand(mapper);
       },

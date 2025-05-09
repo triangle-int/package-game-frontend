@@ -15,19 +15,18 @@ class BusinessUpgradeBloc
   BusinessUpgradeBloc(this._repository)
       : super(const BusinessUpgradeState.initial()) {
     on<BusinessUpgradeEvent>((event, emit) async {
-      await event.map(
-        upgradeRequested: (e) async {
+      switch (event) {
+        case UpgradeRequested(:final building):
           emit(const BusinessUpgradeState.loadInProgress());
 
           final failureOrBusiness =
-              await _repository.upgradeBusiness(businessId: e.building.id);
+              await _repository.upgradeBusiness(businessId: building.id);
 
           failureOrBusiness.fold(
             (f) => emit(BusinessUpgradeState.loadFailure(f)),
             (building) => emit(BusinessUpgradeState.loadSuccess(building)),
           );
-        },
-      );
+      }
     });
   }
 }

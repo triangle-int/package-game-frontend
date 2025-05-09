@@ -5,7 +5,7 @@ part 'get_business_response.freezed.dart';
 part 'get_business_response.g.dart';
 
 @freezed
-class GetBusinessResponse with _$GetBusinessResponse {
+abstract class GetBusinessResponse with _$GetBusinessResponse {
   const factory GetBusinessResponse({
     required BusinessBuilding business,
     required double tax,

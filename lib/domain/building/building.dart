@@ -7,7 +7,7 @@ part 'building.freezed.dart';
 part 'building.g.dart';
 
 @Freezed(unionKey: 'discriminator')
-class Building with _$Building {
+sealed class Building with _$Building {
   const Building._();
 
   const factory Building.business({
@@ -64,13 +64,13 @@ class Building with _$Building {
   }) = SatelliteBuilding;
 
   String getEmoji(Config config) {
-    return map(
-      business: (b) => config.getBusinessEmoji(b.level),
-      storage: (_) => '⛺️',
-      factory: (_) => '🏭',
-      market: (_) => '🏬',
-      satellite: (_) => '🛰',
-    );
+    return switch (this) {
+      BusinessBuilding() => config.getBusinessEmoji(level),
+      StorageBuilding() => '⛺️',
+      FactoryBuilding() => '🏭',
+      MarketBuilding() => '🏬',
+      SatelliteBuilding() => '🛰',
+    };
   }
 
   factory Building.fromJson(Map<String, dynamic> json) =>

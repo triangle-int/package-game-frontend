@@ -1,10 +1,11 @@
 part of 'inventory_bloc.dart';
 
 @freezed
-class InventoryState with _$InventoryState {
-  const factory InventoryState.initial() = _Initial;
-  const factory InventoryState.loadInProgress() = _LoadInProgress;
+sealed class InventoryState with _$InventoryState {
+  const factory InventoryState.initial() = InventoryStateInitial;
+  const factory InventoryState.loadInProgress() = InventoryStateLoadInProgress;
   const factory InventoryState.loadFailure(InventoryFailure failure) =
-      _LoadFailure;
-  const factory InventoryState.loadSuccess(Inventory inventory) = _LoadSuccess;
+      InventoryStateLoadFailure;
+  const factory InventoryState.loadSuccess(Inventory inventory) =
+      InventoryStateLoadSuccess;
 }
