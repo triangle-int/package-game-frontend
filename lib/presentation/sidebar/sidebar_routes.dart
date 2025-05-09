@@ -14,14 +14,14 @@ class SidebarRoutes extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<RemoveScheduleBloc, RemoveScheduleState>(
       listener: (context, state) {
-        state.maybeMap(
-          loadSuccess: (_) {
+        switch (state) {
+          case RemoveScheduleStateLoadSuccess():
             context
                 .read<SidebarBloc>()
                 .add(const SidebarEvent.routesSelected());
-          },
-          orElse: () {},
-        );
+          default:
+            break;
+        }
       },
       child: Expanded(
         child: ListView(

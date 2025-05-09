@@ -1,8 +1,9 @@
 part of 'sidebar_bloc.dart';
 
 @freezed
-class SidebarEvent with _$SidebarEvent {
-  const factory SidebarEvent.routesSelected() = _RoutesSelected;
-  const factory SidebarEvent.initialPageSelected() = _InitialPageSelected;
-  const factory SidebarEvent.settingsToggled() = _SettingsToggled;
+sealed class SidebarEvent with _$SidebarEvent {
+  const factory SidebarEvent.routesSelected() = SidebarEventRoutesSelected;
+  const factory SidebarEvent.initialPageSelected() =
+      SidebarEventInitialPageSelected;
+  const factory SidebarEvent.settingsToggled() = SidebarEventSettingsToggled;
 }

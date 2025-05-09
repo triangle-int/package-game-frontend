@@ -85,10 +85,11 @@ class SidebarBody extends StatelessWidget {
                       ),
                     ),
                     body: const SidebarSettings(),
-                    isExpanded: state.map(
-                      initial: (s) => s.isSettingsOpened,
-                      routes: (_) => false,
-                    ),
+                    isExpanded: switch (state) {
+                      SidebarStateInitial(:final isSettingsOpened) =>
+                        isSettingsOpened,
+                      SidebarStateRoutes() => false,
+                    },
                     canTapOnHeader: true,
                   ),
                 ],

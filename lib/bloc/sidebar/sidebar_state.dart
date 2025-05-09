@@ -1,12 +1,12 @@
 part of 'sidebar_bloc.dart';
 
 @freezed
-class SidebarState with _$SidebarState {
+sealed class SidebarState with _$SidebarState {
   const factory SidebarState.initial({
     required bool isSettingsOpened,
-  }) = _Initial;
+  }) = SidebarStateInitial;
   const factory SidebarState.routes(
     Either<ServerFailure, TruckSchedulesResponse>? schedulesOrFailure, {
     required bool isLoading,
-  }) = _Routes;
+  }) = SidebarStateRoutes;
 }

@@ -11,6 +11,7 @@ import 'package:package_flutter/bloc/purchase/product_details_provider.dart';
 import 'package:package_flutter/bloc/purchase/purchases_stream_provider.dart';
 import 'package:package_flutter/bloc/snm/buy_booster_provider.dart';
 import 'package:package_flutter/domain/config/item.dart';
+import 'package:package_flutter/domain/config/store_item.dart';
 import 'package:package_flutter/domain/core/server_failure.dart';
 import 'package:package_flutter/domain/purchase/purchase_repository.dart';
 import 'package:package_flutter/presentation/noodle/browser_bar.dart';
@@ -35,7 +36,8 @@ class SNMPage extends HookConsumerWidget {
               Logger().w("Can't found products: ${d.notFoundIDs}");
             }
           },
-          error: (e, st) => Logger().e('No products loaded', e, st),
+          error: (e, st) =>
+              Logger().e('No products loaded', error: e, stackTrace: st),
           loading: () => Logger().d('Loading products...'),
         );
       },
@@ -80,111 +82,118 @@ class SNMPage extends HookConsumerWidget {
                         return Column(
                           children: [
                             const SizedBox(height: 14),
-                            i.map(
-                              iap: (i) {
-                                final productPrice =
-                                    ref.watch(productDetailsProvider).when(
-                                          data: (data) => data.productDetails
-                                              .where((pd) => pd.id == i.id)
-                                              .firstOrNull
-                                              ?.price,
-                                          error: (_, __) => 'error',
-                                          loading: () => '...',
-                                        );
-                                final purchaseDetails = ref
-                                    .watch(purchasesStreamProvider)
-                                    .when(
-                                      data: (data) {
-                                        final pds = data.where(
-                                          (pd) => pd.productID == i.id,
-                                        );
-                                        return pds.isEmpty ? null : pds.first;
-                                      },
-                                      error: (_, __) => null,
-                                      loading: () => null,
-                                    );
-                                return SNMProduct(
-                                  isLoading: purchaseDetails?.status ==
-                                      PurchaseStatus.pending,
-                                  icon: i.icon,
-                                  amount: i.amount,
-                                  price: productPrice ?? '???',
-                                  onPressed: () {
-                                    ref.watch(productDetailsProvider).maybeWhen(
-                                          data: (data) {
-                                            ref
-                                                .read(
-                                                    purchaseRepositoryProvider)
-                                                .buyProduct(
-                                                  data.productDetails
-                                                      .firstWhere(
-                                                    (pd) => pd.id == i.id,
+                            switch (i) {
+                              StoreItemIAP() => () {
+                                  final productPrice =
+                                      ref.watch(productDetailsProvider).when(
+                                            data: (data) => data.productDetails
+                                                .where((pd) => pd.id == i.id)
+                                                .firstOrNull
+                                                ?.price,
+                                            error: (_, __) => 'error',
+                                            loading: () => '...',
+                                          );
+                                  final purchaseDetails = ref
+                                      .watch(purchasesStreamProvider)
+                                      .when(
+                                        data: (data) {
+                                          final pds = data.where(
+                                            (pd) => pd.productID == i.id,
+                                          );
+                                          return pds.isEmpty ? null : pds.first;
+                                        },
+                                        error: (_, __) => null,
+                                        loading: () => null,
+                                      );
+
+                                  return SNMProduct(
+                                    isLoading: purchaseDetails?.status ==
+                                        PurchaseStatus.pending,
+                                    icon: i.icon,
+                                    amount: i.amount,
+                                    price: productPrice ?? '???',
+                                    onPressed: () {
+                                      ref
+                                          .watch(productDetailsProvider)
+                                          .maybeWhen(
+                                            data: (data) {
+                                              ref
+                                                  .read(
+                                                      purchaseRepositoryProvider)
+                                                  .buyProduct(
+                                                    data.productDetails
+                                                        .firstWhere(
+                                                      (pd) => pd.id == i.id,
+                                                    ),
+                                                  );
+                                            },
+                                            orElse: () {},
+                                          );
+                                    },
+                                    description: 'Just Gems, change this later',
+                                  );
+                                },
+                              StoreItemBooster() => () {
+                                  final buyBooster =
+                                      ref.watch(buyBoosterProvider(i.name));
+                                  final emoji = config.items
+                                      .firstWhere((e) => e.name == i.name)
+                                      .emoji;
+
+                                  ref.listen<AsyncValue<void>>(
+                                    buyBoosterProvider(i.name),
+                                    (previous, next) {
+                                      next.when(
+                                        data: (_) => context
+                                            .read<NotificationsBloc>()
+                                            .add(
+                                              NotificationsEvent.successAdded(
+                                                'Bought booster $emoji',
+                                              ),
+                                            ),
+                                        error: (e, st) {
+                                          if (e is DioException) {
+                                            final failure =
+                                                ServerFailure.fromError(e);
+                                            context
+                                                .read<NotificationsBloc>()
+                                                .add(
+                                                  NotificationsEvent
+                                                      .warningAdded(
+                                                    failure.getMessage(),
                                                   ),
                                                 );
-                                          },
-                                          orElse: () {},
-                                        );
-                                  },
-                                  description: 'Just Gems, change this later',
-                                );
-                              },
-                              booster: (i) {
-                                final buyBooster =
-                                    ref.watch(buyBoosterProvider(i.name));
-                                final emoji = config.items
-                                    .firstWhere((e) => e.name == i.name)
-                                    .emoji;
+                                            return;
+                                          }
+                                          Logger().e('Can\'t buy booster',
+                                              error: e, stackTrace: st);
+                                        },
+                                        loading: () {},
+                                      );
+                                    },
+                                  );
 
-                                ref.listen<AsyncValue<void>>(
-                                  buyBoosterProvider(i.name),
-                                  (previous, next) {
-                                    next.when(
-                                      data: (_) =>
-                                          context.read<NotificationsBloc>().add(
-                                                NotificationsEvent.successAdded(
-                                                  'Bought booster $emoji',
-                                                ),
-                                              ),
-                                      error: (e, st) {
-                                        if (e is DioException) {
-                                          final failure =
-                                              ServerFailure.fromError(e);
-                                          context.read<NotificationsBloc>().add(
-                                                NotificationsEvent.warningAdded(
-                                                  failure.getMessage(),
-                                                ),
-                                              );
-                                          return;
-                                        }
-                                        Logger().e('Can\'t buy booster',
-                                            error: e, stackTrace: st);
-                                      },
-                                      loading: () {},
-                                    );
-                                  },
-                                );
-
-                                return SNMProduct(
-                                  isLoading: buyBooster.isLoading,
-                                  icon: emoji,
-                                  amount: i.amount,
-                                  price: i.price,
-                                  description: config.items
-                                      .whereType<ItemBooster>()
-                                      .firstWhere((e) => e.name == i.name)
-                                      .description
-                                      .replaceAll('{duration}',
-                                          '${config.boosterDuration} hour'),
-                                  onPressed: () {
-                                    ref
-                                        .read(
-                                          buyBoosterProvider(i.name).notifier,
-                                        )
-                                        .buy();
-                                  },
-                                );
-                              },
-                            ),
+                                  return SNMProduct(
+                                    isLoading: buyBooster.isLoading,
+                                    icon: emoji,
+                                    amount: i.amount,
+                                    price: i.price,
+                                    description: config.items
+                                        .whereType<ItemBooster>()
+                                        .firstWhere((e) => e.name == i.name)
+                                        .description
+                                        .replaceAll('{duration}',
+                                            '${config.boosterDuration} hour'),
+                                    onPressed: () {
+                                      ref
+                                          .read(
+                                            buyBoosterProvider(i.name).notifier,
+                                          )
+                                          .buy();
+                                    },
+                                  );
+                                },
+                            }(),
                           ],
                         );
                       }),

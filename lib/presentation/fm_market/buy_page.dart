@@ -8,6 +8,7 @@ import 'package:package_flutter/bloc/config/config_provider.dart';
 import 'package:package_flutter/bloc/fm_market/buy/buy_bloc.dart';
 import 'package:package_flutter/bloc/fm_market/fm_search_bloc.dart';
 import 'package:package_flutter/bloc/notifications/notifications_bloc.dart';
+import 'package:package_flutter/domain/fm_market/buy_failure.dart';
 import 'package:package_flutter/domain/fm_market/fm_market_repository.dart';
 import 'package:package_flutter/domain/fm_market/trade_item.dart';
 import 'package:package_flutter/presentation/core/emoji_image.dart';
@@ -45,10 +46,11 @@ class BuyPage extends HookConsumerWidget {
           if (buyState.failureOrNull != null) {
             context.read<NotificationsBloc>().add(
                   NotificationsEvent.warningAdded(
-                    buyState.failureOrNull!.map(
-                      invalidAmount: (_) => 'Amount is invalid',
-                      serverFailure: (f) => f.failure.getMessage(),
-                    ),
+                    switch (buyState.failureOrNull!) {
+                      BuyFailureInvalidAmount() => 'Amount is invalid',
+                      BuyFailureServerFailure(:final failure) =>
+                        failure.getMessage(),
+                    },
                   ),
                 );
           }

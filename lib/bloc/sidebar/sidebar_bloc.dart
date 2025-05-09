@@ -15,27 +15,27 @@ class SidebarBloc extends Bloc<SidebarEvent, SidebarState> {
   SidebarBloc(this._truckRepository)
       : super(const SidebarState.initial(isSettingsOpened: false)) {
     on<SidebarEvent>((event, emit) async {
-      await event.map(
-        routesSelected: (_) async {
-          emit(
-            state.map(
-              initial: (_) => const SidebarState.routes(
+      switch (event) {
+        case SidebarEventRoutesSelected():
+          emit(switch (state) {
+            SidebarStateInitial() => const SidebarState.routes(
                 null,
                 isLoading: true,
               ),
-              routes: (s) => s.copyWith(isLoading: true),
-            ),
-          );
+            SidebarStateRoutes(:final copyWith) => copyWith(isLoading: true),
+          });
           final schedulesOrFailure = await _truckRepository.getSchedules();
           emit(SidebarState.routes(schedulesOrFailure, isLoading: false));
-        },
-        initialPageSelected: (_) async =>
-            emit(const SidebarState.initial(isSettingsOpened: false)),
-        settingsToggled: (_) async => state.mapOrNull(
-          initial: (s) =>
-              emit(s.copyWith(isSettingsOpened: !s.isSettingsOpened)),
-        ),
-      );
+        case SidebarEventInitialPageSelected():
+          emit(const SidebarState.initial(isSettingsOpened: false));
+        case SidebarEventSettingsToggled():
+          switch (state) {
+            case SidebarStateInitial(:final copyWith, :final isSettingsOpened):
+              emit(copyWith(isSettingsOpened: !isSettingsOpened));
+            default:
+              break;
+          }
+      }
     });
   }
 }

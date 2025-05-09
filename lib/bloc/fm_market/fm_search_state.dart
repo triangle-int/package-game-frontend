@@ -1,7 +1,7 @@
 part of 'fm_search_bloc.dart';
 
 @freezed
-class FmSearchState with _$FmSearchState {
+abstract class FmSearchState with _$FmSearchState {
   const factory FmSearchState({
     required bool isSearchOpen,
     required String nickname,

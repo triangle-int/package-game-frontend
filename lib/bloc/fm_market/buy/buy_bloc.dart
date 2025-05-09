@@ -12,15 +12,16 @@ class BuyBloc extends Bloc<BuyEvent, BuyState> {
 
   BuyBloc(this._repository) : super(BuyState.initial()) {
     on<BuyEvent>((event, emit) async {
-      await event.map(
-        amountUpdated: (e) async => emit(
-          state.copyWith(
-            amount: e.newAmount,
-            failureOrNull: null,
-            success: false,
-          ),
-        ),
-        bought: (e) async {
+      switch (event) {
+        case BuyEventAmountUpdated(:final newAmount):
+          emit(
+            state.copyWith(
+              amount: newAmount,
+              failureOrNull: null,
+              success: false,
+            ),
+          );
+        case BuyEventBought(:final tradeId):
           emit(
             state.copyWith(
               isLoading: true,
@@ -41,7 +42,7 @@ class BuyBloc extends Bloc<BuyEvent, BuyState> {
           }
 
           final failureOrUnit = await _repository.buyTrade(
-            tradeId: e.tradeId,
+            tradeId: tradeId,
             resourcesCount: state.amount.toInt(),
           );
 
@@ -61,8 +62,7 @@ class BuyBloc extends Bloc<BuyEvent, BuyState> {
               ),
             ),
           );
-        },
-      );
+      }
     });
   }
 }

@@ -113,7 +113,7 @@ class _MapWidgetState extends ConsumerState<MapWidget>
       next.when(
         data: (_) {},
         error: (e, st) {
-          Logger().e("Can't get users in bounds!", e, st);
+          Logger().e("Can't get users in bounds!", error: e, stackTrace: st);
         },
         loading: () {},
       );

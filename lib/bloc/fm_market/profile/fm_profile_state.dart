@@ -1,7 +1,7 @@
 part of 'fm_profile_bloc.dart';
 
 @freezed
-class FmProfileState with _$FmProfileState {
+abstract class FmProfileState with _$FmProfileState {
   const factory FmProfileState({
     required List<MyTrade> trades,
     required bool isLoading,
