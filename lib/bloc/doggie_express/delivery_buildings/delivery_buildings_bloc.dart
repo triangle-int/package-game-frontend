@@ -15,16 +15,15 @@ class DeliveryBuildingsBloc
   DeliveryBuildingsBloc(this._repository)
       : super(const DeliveryBuildingsState.initial()) {
     on<DeliveryBuildingsEvent>((event, emit) async {
-      await event.map(
-        buildingsRequested: (e) async {
+      switch (event) {
+        case DeliveryBuildingsEventBuildingsRequested():
           emit(const DeliveryBuildingsState.loadInProgress());
           final targetsOrFailure = await _repository.getDeliveryTargets();
           targetsOrFailure.fold(
             (f) => emit(DeliveryBuildingsState.loadFailure(f)),
             (targets) => emit(DeliveryBuildingsState.loadSuccess(targets)),
           );
-        },
-      );
+      }
     });
   }
 }

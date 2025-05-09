@@ -1,22 +1,24 @@
 part of 'doggie_express_bloc.dart';
 
 @freezed
-class DoggieExpressEvent with _$DoggieExpressEvent {
+sealed class DoggieExpressEvent with _$DoggieExpressEvent {
   const factory DoggieExpressEvent.truckTypeUpdated(int truckType) =
-      _TruckTypeUpdated;
+      DoggieExpressEventTruckTypeUpdated;
   const factory DoggieExpressEvent.resourceSelected(String name) =
-      _ResourceSelected;
+      DoggieExpressEventResourceSelected;
   const factory DoggieExpressEvent.amountEntered(BigInt amount) =
-      _AmountEntered;
+      DoggieExpressEventAmountEntered;
   const factory DoggieExpressEvent.pointASelected(Building point) =
-      _PointASelected;
-  const factory DoggieExpressEvent.pointADeselected() = _PointADeselected;
+      DoggieExpressEventPointASelected;
+  const factory DoggieExpressEvent.pointADeselected() =
+      DoggieExpressEventPointADeselected;
   const factory DoggieExpressEvent.pointBSelected(Building point) =
-      _PointBSelected;
-  const factory DoggieExpressEvent.pointBDeselected() = _PointBDeselected;
+      DoggieExpressEventPointBSelected;
+  const factory DoggieExpressEvent.pointBDeselected() =
+      DoggieExpressEventPointBDeselected;
   const factory DoggieExpressEvent.scheduleDurationUpdated(int duration) =
-      _ScheduleDurationUpdated;
-  const factory DoggieExpressEvent.calculate() = _Calculate;
-  const factory DoggieExpressEvent.confirm() = _Confirm;
-  const factory DoggieExpressEvent.reset() = _Reset;
+      DoggieExpressEventScheduleDurationUpdated;
+  const factory DoggieExpressEvent.calculate() = DoggieExpressEventCalculate;
+  const factory DoggieExpressEvent.confirm() = DoggieExpressEventConfirm;
+  const factory DoggieExpressEvent.reset() = DoggieExpressEventReset;
 }

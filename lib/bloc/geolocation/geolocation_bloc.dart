@@ -25,8 +25,8 @@ class GeolocationBloc extends Bloc<GeolocationEvent, GeolocationState> {
   GeolocationBloc(this._geo, this._userRepository)
       : super(const GeolocationState.initial()) {
     on<GeolocationEvent>((event, emit) async {
-      await event.map(
-        listenGeolocationRequested: (e) async {
+      switch (event) {
+        case ListenGeolocationRequested():
           emit(const GeolocationState.loadInProgress());
           final failureOrUnit = await _geo.checkRequirements();
 
@@ -44,10 +44,9 @@ class GeolocationBloc extends Bloc<GeolocationEvent, GeolocationState> {
                   );
             },
           );
-        },
-        geolocationReceived: (e) {
+        case GeolocationReceived(:final positionOrFailure):
           emit(
-            e.positionOrFailure.fold(
+            positionOrFailure.fold(
               (f) => GeolocationState.loadFailure(f),
               (pos) {
                 if (_lastSendedLocation == null ||
@@ -67,23 +66,19 @@ class GeolocationBloc extends Bloc<GeolocationEvent, GeolocationState> {
               },
             ),
           );
-        },
-        openAppSettings: (e) async {
+        case OpenAppSettings():
           emit(const GeolocationState.loadInProgress());
           await _geo.openAppSettings();
           add(const GeolocationEvent.listenGeolocationRequested());
-        },
-        openLocationSettings: (e) async {
+        case OpenLocationSettings():
           emit(const GeolocationState.loadInProgress());
           await _geo.openLocationSettings();
           add(const GeolocationEvent.listenGeolocationRequested());
-        },
-        requestPermission: (e) async {
+        case RequestPermission():
           emit(const GeolocationState.loadInProgress());
           await _geo.requestPermission();
           add(const GeolocationEvent.listenGeolocationRequested());
-        },
-      );
+      }
     });
   }
 

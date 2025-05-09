@@ -15,8 +15,8 @@ class EmojiBloc extends Bloc<EmojiEvent, EmojiState> {
 
   EmojiBloc(this._repository) : super(const EmojiState.initial()) {
     on<EmojiEvent>((event, emit) async {
-      await event.map(
-        emojisRequested: (e) async {
+      switch (event) {
+        case EmojiEventEmojisRequested():
           emit(const EmojiState.loadInProgress());
           final emojisOrFailure = await _repository.loadEmojis();
           emit(
@@ -25,8 +25,7 @@ class EmojiBloc extends Bloc<EmojiEvent, EmojiState> {
               (emojis) => EmojiState.loadSuccess(emojis),
             ),
           );
-        },
-      );
+      }
     });
   }
 }

@@ -19,13 +19,13 @@ class SatelliteBloc extends Bloc<SatelliteEvent, SatelliteState> {
 
   SatelliteBloc(this._repository) : super(const SatelliteState.initial()) {
     on<SatelliteEvent>((event, emit) async {
-      await event.map(
-        collectedMoney: (e) async {
+      switch (event) {
+        case CollectedMoney(:final id):
           Logger().d(
             'Collecting from businesses by satellite',
           );
           emit(const SatelliteState.loading());
-          final failureOrSatellite = await _repository.collectMoney(e.id);
+          final failureOrSatellite = await _repository.collectMoney(id);
 
           failureOrSatellite.fold(
             (failure) {},
@@ -93,8 +93,7 @@ class SatelliteBloc extends Bloc<SatelliteEvent, SatelliteState> {
           Logger().d(
             'Collected!',
           );
-        },
-      );
+      }
     });
   }
 }

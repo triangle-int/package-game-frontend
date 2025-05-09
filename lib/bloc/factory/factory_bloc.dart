@@ -13,28 +13,28 @@ class FactoryBloc extends Bloc<FactoryEvent, FactoryState> {
 
   FactoryBloc(this._repository) : super(const FactoryState.initial()) {
     on<FactoryEvent>((event, emit) async {
-      await event.map(
-        factoryRequested: (e) async {
+      switch (event) {
+        case FactoryEventFactoryRequested(:final factoryId):
           emit(const FactoryState.loadInProgress());
           final factoryOrFailure =
-              await _repository.getFactory(factoryId: e.factoryId);
+              await _repository.getFactory(factoryId: factoryId);
           emit(
             factoryOrFailure.fold(
               (f) => FactoryState.loadFailure(f),
               (factoryBuilding) => FactoryState.loadSuccess(factoryBuilding),
             ),
           );
-        },
-        factoryGot: (e) async => state.maybeMap(
-          loadSuccess: (s) => emit(
-            FactoryState.loadSuccess(
-              e.factoryBuilding
-                  .copyWith(inventory: s.factoryBuilding.inventory),
-            ),
-          ),
-          orElse: () => emit(FactoryState.loadSuccess(e.factoryBuilding)),
-        ),
-      );
+        case FactoryEventFactoryGot(:final factoryBuilding):
+          emit(switch (state) {
+            FactoryStateLoadSuccess(:final factoryBuilding) =>
+              FactoryState.loadSuccess(
+                factoryBuilding.copyWith(
+                  inventory: factoryBuilding.inventory,
+                ),
+              ),
+            _ => FactoryState.loadSuccess(factoryBuilding),
+          });
+      }
     });
   }
 }
