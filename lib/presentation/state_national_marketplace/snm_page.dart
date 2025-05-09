@@ -156,7 +156,8 @@ class SNMPage extends HookConsumerWidget {
                                               );
                                           return;
                                         }
-                                        Logger().e("Can't buy booster", e, st);
+                                        Logger().e('Can\'t buy booster',
+                                            error: e, stackTrace: st);
                                       },
                                       loading: () {},
                                     );

@@ -5,7 +5,7 @@ import 'package:logger/logger.dart';
 part 'server_failure.freezed.dart';
 
 @freezed
-class ServerFailure with _$ServerFailure {
+sealed class ServerFailure with _$ServerFailure {
   const ServerFailure._();
 
   const factory ServerFailure.unknown(String message) = _Unknown;
@@ -79,22 +79,22 @@ class ServerFailure with _$ServerFailure {
   }
 
   String getMessage() {
-    return when(
-      unknown: (message) => 'Unknown error: $message',
-      playerNotFound: () => 'Player not found',
-      buildingNotFound: () => 'Building not found',
-      marketNotFound: () => 'Market not found',
-      tooManyFactories: () => 'Too many factories',
-      zoneIsBusy: () => 'Zone is busy',
-      storageAlreadyExists: () => 'Storage already exists',
-      notEnoughCurrency: () => 'Not enough currency',
-      factoryAlreadyToggled: () => 'Factory already toggled',
-      notEnoughResources: () => 'Not enough resources',
-      connectionTimedOut: () => 'Connection timed out',
-      connectionRefused: () => 'Connection refused',
-      banned: (reason) => 'You have been banned, reason: $reason',
-      serverIsDown: () => 'Server is down',
-      notEnoughGems: () => 'Not enough gems',
-    );
+    return switch (this) {
+      _Unknown(:final message) => 'Unknown error: $message',
+      _PlayerNotFound() => 'Player not found',
+      _BuildingNotFound() => 'Building not found',
+      _MarketNotFound() => 'Market not found',
+      _TooManyFactories() => 'Too many factories',
+      _ZoneIsBusy() => 'Zone is busy',
+      _StorageAlreadyExists() => 'Storage already exists',
+      _NotEnoughCurrency() => 'Not enough currency',
+      _FactoryAlreadyToggled() => 'Factory already toggled',
+      _NotEnoughResources() => 'Not enough resources',
+      _ConnectionTimedOut() => 'Connection timed out',
+      _ConnectionRefused() => 'Connection refused',
+      _Banned(:final reason) => 'You have been banned, reason: $reason',
+      _ServerIsDown() => 'Server is down',
+      _NotEnoughGems() => 'Not enough gems',
+    };
   }
 }
