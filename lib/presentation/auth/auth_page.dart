@@ -14,13 +14,13 @@ class AuthPage extends HookConsumerWidget {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         switch (state) {
-          case Initial():
+          case AuthStateInitial():
             break;
-          case LoadInProgress():
+          case AuthStateLoadInProgress():
             break;
-          case LoadFailure():
+          case AuthStateLoadFailure():
             break;
-          case LoadSuccess():
+          case AuthStateLoadSuccess():
             break;
         }
       },

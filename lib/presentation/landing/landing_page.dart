@@ -99,16 +99,18 @@ class LandingPage extends HookConsumerWidget {
           ref.invalidate(userProvider);
         },
         error: (e, st) {
-          Logger().e("Can't load config!", e, st);
+          Logger().e("Can't load config!", error: e, stackTrace: st);
           if (e is DioException) {
             final f = ServerFailure.fromError(e);
-            f.maybeMap(
-              connectionRefused: (_) {},
-              // context.router.replace(const OnMaintenanceRoute()),
-              orElse: () => context
-                  .read<NotificationsBloc>()
-                  .add(NotificationsEvent.warningAdded(f.getMessage())),
-            );
+            switch (f) {
+              case ServerFailureConnectionRefused():
+                // context.router.replace(const OnMaintenanceRoute()),
+                break;
+              default:
+                context
+                    .read<NotificationsBloc>()
+                    .add(NotificationsEvent.warningAdded(f.getMessage()));
+            }
             return;
           }
 
@@ -156,7 +158,8 @@ class LandingPage extends HookConsumerWidget {
               }
             }
           },
-          error: (e, st) => Logger().e('Purchase stream failure', e, st),
+          error: (e, st) =>
+              Logger().e('Purchase stream failure', error: e, stackTrace: st),
           loading: () {},
         );
       },
@@ -168,12 +171,13 @@ class LandingPage extends HookConsumerWidget {
       listeners: [
         BlocListener<NotificationsBloc, NotificationsState>(
           listener: (context, state) {
-            state.map(
-              initial: (_) {},
-              successNotificationReceived: (s) {
+            switch (state) {
+              case NotificationsStateInitial():
+                break;
+              case NotificationsStateSuccessReceived(:final message):
                 Flushbar(
                   title: 'Success',
-                  message: s.message,
+                  message: message,
                   messageSize: 18,
                   titleSize: 18,
                   shouldIconPulse: false,
@@ -193,11 +197,11 @@ class LandingPage extends HookConsumerWidget {
                   flushbarPosition: FlushbarPosition.TOP,
                 ).show(context);
                 AudioPlayer().play(AssetSource('sounds/notification.wav'));
-              },
-              warningNotificationReceived: (s) {
+
+              case NotificationsStateWarningReceived(:final message):
                 Flushbar(
                   title: 'Warning',
-                  message: s.message,
+                  message: message,
                   messageSize: 18,
                   titleSize: 18,
                   shouldIconPulse: false,
@@ -217,11 +221,11 @@ class LandingPage extends HookConsumerWidget {
                   flushbarPosition: FlushbarPosition.TOP,
                 ).show(context);
                 AudioPlayer().play(AssetSource('sounds/notification.wav'));
-              },
-              notificationReceived: (s) {
+
+              case NotificationsStateReceived(:final title, :final message):
                 Flushbar(
-                  title: s.title,
-                  message: s.message,
+                  title: title,
+                  message: message,
                   messageSize: 18,
                   titleSize: 18,
                   shouldIconPulse: false,
@@ -241,49 +245,57 @@ class LandingPage extends HookConsumerWidget {
                   flushbarPosition: FlushbarPosition.TOP,
                 ).show(context);
                 AudioPlayer().play(AssetSource('sounds/notification.wav'));
-              },
-            );
+            }
           },
         ),
         BlocListener<GeolocationBloc, GeolocationState>(
           listener: (context, geolocationState) {
-            geolocationState.map(
-              initial: (_) {},
-              loadInProgress: (_) {},
-              loadFailure: (s) {},
-              //    context.router.replace(const GeolocationRoute()),
-              loadSuccess: (_) {},
-            );
+            switch (geolocationState) {
+              case GeolocationStateInitial():
+                break;
+              case GeolocationStateLoadInProgress():
+                break;
+              case GeolocationStateLoadFailure():
+                //    context.router.replace(const GeolocationRoute()),
+                break;
+              case GeolocationStateLoadSuccess():
+                break;
+            }
           },
         ),
         BlocListener<AuthBloc, AuthState>(
           listener: (context, authState) {
-            authState.map(
-              initial: (_) {},
-              loadInProgress: (_) {},
-              loadFailure: (_) {}, // context.router.replace(const AuthRoute()),
-              loadSuccess: (_) {
+            switch (authState) {
+              case AuthStateInitial():
+                break;
+              case AuthStateLoadInProgress():
+                break;
+              case AuthStateLoadFailure():
+                // context.router.replace(const AuthRoute()),
+                break;
+              case AuthStateLoadSuccess():
                 ref.invalidate(socketConnectionProvider);
-              },
-            );
+            }
           },
         ),
         BlocListener<InventoryBloc, InventoryState>(
-          listener: (context, state) => state.map<void>(
-            initial: (s) {},
-            loadInProgress: (s) {},
-            loadFailure: (s) => s.failure.map<void>(
-              serverFailure: (_) => context.read<NotificationsBloc>().add(
-                    const NotificationsEvent.warningAdded(
-                      'Something went wrong on server',
-                    ),
-                  ),
-            ),
-            loadSuccess: (s) {
-              Logger().d('Inventory got successfully ✅');
-            },
-          ),
-        )
+          listener: (context, state) {
+            switch (state) {
+              case InventoryStateInitial():
+                break;
+              case InventoryStateLoadInProgress():
+                break;
+              case InventoryStateLoadFailure():
+                context.read<NotificationsBloc>().add(
+                      const NotificationsEvent.warningAdded(
+                        'Something went wrong on server',
+                      ),
+                    );
+              case InventoryStateLoadSuccess():
+                Logger().d('Inventory got successfully ✅');
+            }
+          },
+        ),
       ],
       child: BlocBuilder<InventoryBloc, InventoryState>(
         builder: (context, inventoryState) {
@@ -293,68 +305,70 @@ class LandingPage extends HookConsumerWidget {
               builder: (context, geoState) =>
                   BlocBuilder<EmojiBloc, EmojiState>(
                 builder: (context, emojiState) {
-                  final text = authState.map(
-                    initial: (_) => 'Login to your account...',
-                    loadFailure: (_) => 'Login to your account failed',
-                    loadInProgress: (_) => 'Login to your account...',
-                    loadSuccess: (_) => geoState.map(
-                      initial: (_) => 'Enable geolocation...',
-                      loadInProgress: (_) => 'Enable geolocation...',
-                      loadFailure: (_) => 'Enable geolocation failed',
-                      loadSuccess: (_) => emojiState.map(
-                        initial: (_) => 'Loading emoji...',
-                        loadInProgress: (_) => 'Loading emoji...',
-                        loadFailure: (_) => 'Loading emoji failed',
-                        loadSuccess: (_) => configState.map(
-                          loading: (_) => 'Loading config...',
-                          error: (_) => 'Loading config failed',
-                          data: (_) => userState.map(
-                            loading: (_) => 'Loading user...',
-                            error: (s) {
-                              if (s.error is DioException) {
-                                final f = ServerFailure.fromError(
-                                  s.error as DioException,
-                                );
+                  final text = switch (authState) {
+                    AuthStateInitial() => 'Login to your account...',
+                    AuthStateLoadFailure() => 'Login to your account failed',
+                    AuthStateLoadInProgress() => 'Login to your account...',
+                    AuthStateLoadSuccess() => switch (geoState) {
+                        GeolocationStateInitial() => 'Enable geolocation...',
+                        GeolocationStateLoadInProgress() =>
+                          'Enable geolocation...',
+                        GeolocationStateLoadFailure() =>
+                          'Enable geolocation failed',
+                        GeolocationStateLoadSuccess() => switch (emojiState) {
+                            EmojiStateInitial() => 'Loading emoji...',
+                            EmojiStateLoadInProgress() => 'Loading emoji...',
+                            EmojiStateLoadFailure() => 'Loading emoji failed',
+                            EmojiStateLoadSuccess() => configState.map(
+                                loading: (_) => 'Loading config...',
+                                error: (_) => 'Loading config failed',
+                                data: (_) => userState.map(
+                                  loading: (_) => 'Loading user...',
+                                  error: (s) {
+                                    if (s.error is DioException) {
+                                      final f = ServerFailure.fromError(
+                                        s.error as DioException,
+                                      );
 
-                                failure = f;
+                                      failure = f;
 
-                                return f.getMessage();
-                              }
-                              return 'Loading user failed: ${s.error}';
-                            },
-                            data: (_) {
-                              return switch (inventoryState) {
-                                InventoryStateInitial() =>
-                                  'Loading inventory...',
-                                InventoryStateLoadInProgress() =>
-                                  'Loading inventory...',
-                                InventoryStateLoadFailure() =>
-                                  'Loading inventory failed',
-                                InventoryStateLoadSuccess() =>
-                                  socketConnectionState.when(
-                                    error: (e, __) =>
-                                        "Can't connect to the socket, reason: $e",
-                                    loading: () =>
-                                        'Connecting to the socket...',
-                                    data: (_) => banState.when(
-                                      data: (ban) {
-                                        if (ban == null) return 'Done ✅';
-                                        failure =
-                                            ServerFailure.banned(ban.reason);
-                                        return failure!.getMessage();
-                                      },
-                                      error: (e, __) =>
-                                          "Can't check user on bans, $e",
-                                      loading: () => 'Done ✅',
-                                    ),
-                                  ),
-                              };
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
+                                      return f.getMessage();
+                                    }
+                                    return 'Loading user failed: ${s.error}';
+                                  },
+                                  data: (_) {
+                                    return switch (inventoryState) {
+                                      InventoryStateInitial() =>
+                                        'Loading inventory...',
+                                      InventoryStateLoadInProgress() =>
+                                        'Loading inventory...',
+                                      InventoryStateLoadFailure() =>
+                                        'Loading inventory failed',
+                                      InventoryStateLoadSuccess() =>
+                                        socketConnectionState.when(
+                                          error: (e, __) =>
+                                              "Can't connect to the socket, reason: $e",
+                                          loading: () =>
+                                              'Connecting to the socket...',
+                                          data: (_) => banState.when(
+                                            data: (ban) {
+                                              if (ban == null) return 'Done ✅';
+                                              failure = ServerFailure.banned(
+                                                  ban.reason);
+                                              return failure!.getMessage();
+                                            },
+                                            error: (e, __) =>
+                                                "Can't check user on bans, $e",
+                                            loading: () => 'Done ✅',
+                                          ),
+                                        ),
+                                    };
+                                  },
+                                ),
+                              ),
+                          }
+                      },
+                  };
                   Widget animatedWidget = switch (failure) {
                     ServerFailureBanned(:final reason) =>
                       BanPage(reason: reason),
