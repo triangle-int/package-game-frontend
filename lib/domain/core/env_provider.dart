@@ -1,28 +1,19 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/domain/core/env/env.dart';
-import 'package:package_flutter/domain/core/env/env_production.dart';
-import 'package:package_flutter/domain/core/env/env_staging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'env_provider.g.dart';
 
 @riverpod
-String environment(Ref ref) {
-  return const String.fromEnvironment(
-    'ENVIRONMENT',
-    defaultValue: kDebugMode ? Env.stagingEnviroment : Env.productionEnviroment,
-  );
-}
-
-@riverpod
 Env env(Ref ref) {
-  switch (ref.watch(environmentProvider)) {
-    case Env.productionEnviroment:
-      return EnvProduction();
-    case Env.stagingEnviroment:
-      return EnvStaging();
-    default:
-      return EnvProduction();
-  }
+  return Env(
+    serverUrl: dotenv.env['SERVER_URL']!,
+    mapAccessKey: dotenv.env['MAP_ACCESS_KEY']!,
+    mapDarkUrl: dotenv.env['MAP_DARK_URL']!,
+    mapWhiteUrl: dotenv.env['MAP_WHITE_URL']!,
+    wiredashSecretToken: dotenv.env['WIREDASH_SECRET_TOKEN']!,
+    wiredashProjectId: dotenv.env['WIREDASH_PROJECT_ID']!,
+    serverCertificate: dotenv.env['SERVER_CERTIFICATE']!,
+  );
 }
