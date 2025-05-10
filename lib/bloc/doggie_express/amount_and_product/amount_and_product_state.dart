@@ -1,18 +1,19 @@
 part of 'amount_and_product_bloc.dart';
 
 @freezed
-class AmountAndProductState with _$AmountAndProductState {
-  const factory AmountAndProductState.initial() = _Initial;
-  const factory AmountAndProductState.loadInProgress() = _LoadInProgress;
+sealed class AmountAndProductState with _$AmountAndProductState {
+  const factory AmountAndProductState.initial() = AmountAndProductStateInitial;
+  const factory AmountAndProductState.loadInProgress() =
+      AmountAndProductStateLoadInProgress;
   const factory AmountAndProductState.productSelectionSuccess(
     List<Item> items,
-  ) = _ProductSelectionSuccess;
+  ) = AmountAndProductStateProductSelectionSuccess;
   const factory AmountAndProductState.productSelectionFailure(
     ServerFailure failure,
-  ) = _ProductSelectionFailure;
+  ) = AmountAndProductStateProductSelectionFailure;
   const factory AmountAndProductState.amountSelectionSuccess(BigInt maxAmount) =
-      _AmountSelectionSuccess;
+      AmountAndProductStateAmountSelectionSuccess;
   const factory AmountAndProductState.amountSelectionFailure(
     ServerFailure failure,
-  ) = _AmountSelectionFailure;
+  ) = AmountAndProductStateAmountSelectionFailure;
 }

@@ -11,6 +11,8 @@ import 'package:package_flutter/bloc/tutorial/tutorial_bloc.dart';
 import 'package:package_flutter/bloc/user/user_provider.dart';
 import 'package:package_flutter/domain/building/building_repository.dart';
 import 'package:package_flutter/domain/factory/factory_repository.dart';
+import 'package:package_flutter/domain/truck/truck_failure.dart';
+import 'package:package_flutter/domain/tutorial/tutorial_step.dart';
 import 'package:package_flutter/presentation/core/emoji_image.dart';
 import 'package:package_flutter/presentation/core/transformers/currency_transformer.dart';
 import 'package:package_flutter/presentation/doggy_express/amount_and_product.dart';
@@ -40,14 +42,17 @@ class DoggyExpressPage extends HookConsumerWidget {
         if (doggieExpressState.failureOrNull != null) {
           context.read<NotificationsBloc>().add(
                 NotificationsEvent.warningAdded(
-                  doggieExpressState.failureOrNull!.map(
-                    resourceNotSelected: (_) => 'Resource not selected',
-                    pointANotSelected: (_) => 'First building not selected',
-                    pointBNotSelected: (_) => 'Second building not selected',
-                    amountIsZero: (_) => 'Amount is invalid',
-                    pathNotCalculated: (_) => 'Path not calculated',
-                    serverFailure: (f) => f.f.getMessage(),
-                  ),
+                  switch (doggieExpressState.failureOrNull!) {
+                    TruckFailureResourceNotSelected() =>
+                      'Resource not selected',
+                    TruckFailurePointANotSelected() =>
+                      'First building not selected',
+                    TruckFailurePointBNotSelected() =>
+                      'Second building not selected',
+                    TruckFailureAmountIsZero() => 'Amount is invalid',
+                    TruckFailurePathNotCalculated() => 'Path not calculated',
+                    TruckFailureServerFailure(:final f) => f.getMessage(),
+                  },
                 ),
               );
         }
@@ -72,10 +77,10 @@ class DoggyExpressPage extends HookConsumerWidget {
               appBar: BrowserBar(
                 icon: Icons.arrow_back,
                 link: 'httgs://doggie-express.com',
-                backButtonDisabled: tutorialState.step.maybeMap(
-                  openDoggyExpress: (_) => true,
-                  orElse: () => false,
-                ),
+                backButtonDisabled: switch (tutorialState.step) {
+                  OpenDoggyExpress() => true,
+                  _ => false,
+                },
               ),
               body: ListView(
                 padding: EdgeInsets.zero,
@@ -249,22 +254,34 @@ class DoggyExpressPage extends HookConsumerWidget {
                               child: BlocBuilder<AmountAndProductBloc,
                                   AmountAndProductState>(
                                 builder: (context, amountAndProductState) =>
-                                    amountAndProductState.map(
-                                  initial: (_) => const AmountAndProduct(),
-                                  loadInProgress: (_) => const Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                  productSelectionSuccess: (s) =>
-                                      ProductConfirm(items: s.items),
-                                  productSelectionFailure: (s) => Text(
-                                    'Failure: ${s.failure.getMessage()}',
-                                  ),
-                                  amountSelectionSuccess: (s) =>
-                                      AmountConfirm(maxAmount: s.maxAmount),
-                                  amountSelectionFailure: (s) => Text(
-                                    'Failure: ${s.failure.getMessage()}',
-                                  ),
-                                ),
+                                    switch (amountAndProductState) {
+                                  AmountAndProductStateInitial() =>
+                                    const AmountAndProduct(),
+                                  AmountAndProductStateLoadInProgress() =>
+                                    const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  AmountAndProductStateProductSelectionSuccess(
+                                    :final items
+                                  ) =>
+                                    ProductConfirm(items: items),
+                                  AmountAndProductStateProductSelectionFailure(
+                                    :final failure
+                                  ) =>
+                                    Text(
+                                      'Failure: ${failure.getMessage()}',
+                                    ),
+                                  AmountAndProductStateAmountSelectionSuccess(
+                                    :final maxAmount
+                                  ) =>
+                                    AmountConfirm(maxAmount: maxAmount),
+                                  AmountAndProductStateAmountSelectionFailure(
+                                    :final failure
+                                  ) =>
+                                    Text(
+                                      'Failure: ${failure.getMessage()}',
+                                    ),
+                                },
                               ),
                             ),
                           ),
