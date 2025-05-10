@@ -8,21 +8,29 @@ part 'server_failure.freezed.dart';
 sealed class ServerFailure with _$ServerFailure {
   const ServerFailure._();
 
-  const factory ServerFailure.unknown(String message) = _Unknown;
-  const factory ServerFailure.playerNotFound() = _PlayerNotFound;
-  const factory ServerFailure.buildingNotFound() = _BuildingNotFound;
-  const factory ServerFailure.marketNotFound() = _MarketNotFound;
-  const factory ServerFailure.tooManyFactories() = _TooManyFactories;
-  const factory ServerFailure.zoneIsBusy() = _ZoneIsBusy;
-  const factory ServerFailure.storageAlreadyExists() = _StorageAlreadyExists;
-  const factory ServerFailure.notEnoughCurrency() = _NotEnoughCurrency;
-  const factory ServerFailure.notEnoughGems() = _NotEnoughGems;
-  const factory ServerFailure.factoryAlreadyToggled() = _FactoryAlreadyToggled;
-  const factory ServerFailure.notEnoughResources() = _NotEnoughResources;
-  const factory ServerFailure.connectionTimedOut() = _ConnectionTimedOut;
-  const factory ServerFailure.connectionRefused() = _ConnectionRefused;
-  const factory ServerFailure.serverIsDown() = _ServerIsDown;
-  const factory ServerFailure.banned(String reason) = _Banned;
+  const factory ServerFailure.unknown(String message) = ServerFailureUnknown;
+  const factory ServerFailure.playerNotFound() = ServerFailurePlayerNotFound;
+  const factory ServerFailure.buildingNotFound() =
+      ServerFailureBuildingNotFound;
+  const factory ServerFailure.marketNotFound() = ServerFailureMarketNotFound;
+  const factory ServerFailure.tooManyFactories() =
+      ServerFailureTooManyFactories;
+  const factory ServerFailure.zoneIsBusy() = ServerFailureZoneIsBusy;
+  const factory ServerFailure.storageAlreadyExists() =
+      ServerFailureStorageAlreadyExists;
+  const factory ServerFailure.notEnoughCurrency() =
+      ServerFailureNotEnoughCurrency;
+  const factory ServerFailure.notEnoughGems() = ServerFailureNotEnoughGems;
+  const factory ServerFailure.factoryAlreadyToggled() =
+      ServerFailureFactoryAlreadyToggled;
+  const factory ServerFailure.notEnoughResources() =
+      ServerFailureNotEnoughResources;
+  const factory ServerFailure.connectionTimedOut() =
+      ServerFailureConnectionTimedOut;
+  const factory ServerFailure.connectionRefused() =
+      ServerFailureConnectionRefused;
+  const factory ServerFailure.serverIsDown() = ServerFailureServerIsDown;
+  const factory ServerFailure.banned(String reason) = ServerFailureBanned;
 
   factory ServerFailure.fromError(DioException error) {
     Logger().w('DioError: $error, Message: ${error.response?.data}');
@@ -80,21 +88,22 @@ sealed class ServerFailure with _$ServerFailure {
 
   String getMessage() {
     return switch (this) {
-      _Unknown(:final message) => 'Unknown error: $message',
-      _PlayerNotFound() => 'Player not found',
-      _BuildingNotFound() => 'Building not found',
-      _MarketNotFound() => 'Market not found',
-      _TooManyFactories() => 'Too many factories',
-      _ZoneIsBusy() => 'Zone is busy',
-      _StorageAlreadyExists() => 'Storage already exists',
-      _NotEnoughCurrency() => 'Not enough currency',
-      _FactoryAlreadyToggled() => 'Factory already toggled',
-      _NotEnoughResources() => 'Not enough resources',
-      _ConnectionTimedOut() => 'Connection timed out',
-      _ConnectionRefused() => 'Connection refused',
-      _Banned(:final reason) => 'You have been banned, reason: $reason',
-      _ServerIsDown() => 'Server is down',
-      _NotEnoughGems() => 'Not enough gems',
+      ServerFailureUnknown(:final message) => 'Unknown error: $message',
+      ServerFailurePlayerNotFound() => 'Player not found',
+      ServerFailureBuildingNotFound() => 'Building not found',
+      ServerFailureMarketNotFound() => 'Market not found',
+      ServerFailureTooManyFactories() => 'Too many factories',
+      ServerFailureZoneIsBusy() => 'Zone is busy',
+      ServerFailureStorageAlreadyExists() => 'Storage already exists',
+      ServerFailureNotEnoughCurrency() => 'Not enough currency',
+      ServerFailureFactoryAlreadyToggled() => 'Factory already toggled',
+      ServerFailureNotEnoughResources() => 'Not enough resources',
+      ServerFailureConnectionTimedOut() => 'Connection timed out',
+      ServerFailureConnectionRefused() => 'Connection refused',
+      ServerFailureBanned(:final reason) =>
+        'You have been banned, reason: $reason',
+      ServerFailureServerIsDown() => 'Server is down',
+      ServerFailureNotEnoughGems() => 'Not enough gems',
     };
   }
 }

@@ -4,7 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:dartz/dartz.dart' hide State;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
@@ -233,8 +233,7 @@ class _RouteMapPageState extends ConsumerState<RouteMapPage> {
     return Marker(
       point: interpolatePath(truck.startTime, truck.endTime, points),
       rotate: true,
-      builder: (context) =>
-          Image.asset('assets/images/trucks/truck${truck.truckType}.png'),
+      child: Image.asset('assets/images/trucks/truck${truck.truckType}.png'),
     );
   }
 

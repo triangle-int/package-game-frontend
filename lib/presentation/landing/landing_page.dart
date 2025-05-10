@@ -75,13 +75,13 @@ class LandingPage extends HookConsumerWidget {
           context
               .read<NotificationsBloc>()
               .add(const NotificationsEvent.setup());
-          if (context
-              .read<InventoryBloc>()
-              .state
-              .maybeMap(initial: (_) => true, orElse: () => false)) {
-            context
-                .read<InventoryBloc>()
-                .add(const InventoryEvent.listenInventoryRequested());
+          switch (context.read<InventoryBloc>().state) {
+            case InventoryStateInitial():
+              context
+                  .read<InventoryBloc>()
+                  .add(const InventoryEvent.listenInventoryRequested());
+            default:
+              break;
           }
         },
       );
@@ -322,35 +322,44 @@ class LandingPage extends HookConsumerWidget {
                               }
                               return 'Loading user failed: ${s.error}';
                             },
-                            data: (_) => inventoryState.map(
-                              initial: (_) => 'Loading inventory...',
-                              loadInProgress: (_) => 'Loading inventory...',
-                              loadFailure: (_) => 'Loading inventory failed',
-                              loadSuccess: (_) => socketConnectionState.when(
-                                error: (e, __) =>
-                                    "Can't connect to the socket, reason: $e",
-                                loading: () => 'Connecting to the socket...',
-                                data: (_) => banState.when(
-                                  data: (ban) {
-                                    if (ban == null) return 'Done ✅';
-                                    failure = ServerFailure.banned(ban.reason);
-                                    return failure!.getMessage();
-                                  },
-                                  error: (e, __) =>
-                                      "Can't check user on bans, $e",
-                                  loading: () => 'Done ✅',
-                                ),
-                              ),
-                            ),
+                            data: (_) {
+                              return switch (inventoryState) {
+                                InventoryStateInitial() =>
+                                  'Loading inventory...',
+                                InventoryStateLoadInProgress() =>
+                                  'Loading inventory...',
+                                InventoryStateLoadFailure() =>
+                                  'Loading inventory failed',
+                                InventoryStateLoadSuccess() =>
+                                  socketConnectionState.when(
+                                    error: (e, __) =>
+                                        "Can't connect to the socket, reason: $e",
+                                    loading: () =>
+                                        'Connecting to the socket...',
+                                    data: (_) => banState.when(
+                                      data: (ban) {
+                                        if (ban == null) return 'Done ✅';
+                                        failure =
+                                            ServerFailure.banned(ban.reason);
+                                        return failure!.getMessage();
+                                      },
+                                      error: (e, __) =>
+                                          "Can't check user on bans, $e",
+                                      loading: () => 'Done ✅',
+                                    ),
+                                  ),
+                              };
+                            },
                           ),
                         ),
                       ),
                     ),
                   );
-                  Widget animatedWidget = failure?.mapOrNull(
-                        banned: (f) => BanPage(reason: f.reason),
-                      ) ??
-                      LoadingPage(text: text);
+                  Widget animatedWidget = switch (failure) {
+                    ServerFailureBanned(:final reason) =>
+                      BanPage(reason: reason),
+                    _ => LoadingPage(text: text),
+                  };
 
                   if (text == 'Done ✅') {
                     animatedWidget = const MapPage();

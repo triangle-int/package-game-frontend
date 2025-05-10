@@ -14,7 +14,7 @@ class MarketMenu extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return BlocProvider(
       create: (context) => MarketBloc(ref.watch(buildingRepositoryProvider))
-        ..add(MarketEvent.marketRequested(marketId)),
+        ..add(MarketEvent.requested(marketId)),
       child: Center(
         child: Container(
           width: 334,

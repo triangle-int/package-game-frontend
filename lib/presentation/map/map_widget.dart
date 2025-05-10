@@ -663,10 +663,8 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                   if (pinMarkerState.isShown)
                                     Marker(
                                       point: pinMarkerState.location,
-                                      anchorPos: AnchorPos.align(
-                                        AnchorAlign.top,
-                                      ),
-                                      builder: (context) => const PinMarker(),
+                                      alignment: Alignment.topCenter,
+                                      child: const PinMarker(),
                                     ),
                                 ],
                               )
@@ -704,8 +702,7 @@ class _MapWidgetState extends ConsumerState<MapWidget>
 
     return Marker(
       point: interpolatePath(truck.startTime, truck.endTime, points),
-      builder: (context) =>
-          Image.asset('assets/images/trucks/truck${truck.truckType}.png'),
+      child: Image.asset('assets/images/trucks/truck${truck.truckType}.png'),
     );
   }
 

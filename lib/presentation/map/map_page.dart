@@ -29,6 +29,7 @@ import 'package:package_flutter/presentation/tutorial/dialogue_window.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+// TODO: This is a mess, refactor it
 class MapPage extends ConsumerStatefulWidget {
   const MapPage({super.key});
 
@@ -205,12 +206,12 @@ class _MapPageState extends ConsumerState<MapPage> {
                                         BlocBuilder<TutorialBloc,
                                             TutorialState>(
                                           builder: (context, tutorialState) =>
-                                              tutorialState.step.maybeMap(
-                                            orElse: () =>
-                                                const DialogueWindow(),
-                                            hidden: (_) => Container(),
-                                            hidden2: (_) => Container(),
-                                          ),
+                                              switch (tutorialState.step) {
+                                            Hidden() => Container(),
+                                            Hidden2TutorialStep() =>
+                                              Container(),
+                                            _ => const DialogueWindow(),
+                                          },
                                         ),
                                         BlocBuilder<TutorialBloc,
                                             TutorialState>(
@@ -218,15 +219,16 @@ class _MapPageState extends ConsumerState<MapPage> {
                                             context,
                                             tutorialState,
                                           ) =>
-                                              tutorialState.step.maybeMap(
-                                            initial: (_) => Container(),
-                                            hidden: (_) => Container(),
-                                            hidden2: (_) => Container(),
-                                            businessBuilt: (_) => Container(),
-                                            ending: (_) => Container(),
-                                            orElse: () =>
-                                                const SkipTutorialButton(),
-                                          ),
+                                              switch (tutorialState.step) {
+                                            InitialTutorialStep() =>
+                                              Container(),
+                                            Hidden() => Container(),
+                                            Hidden2TutorialStep() =>
+                                              Container(),
+                                            BusinessBuilt() => Container(),
+                                            Ending() => Container(),
+                                            _ => const SkipTutorialButton(),
+                                          },
                                         ),
                                         const CurrencyUpdateText(),
                                       ],
