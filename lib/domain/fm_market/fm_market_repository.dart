@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/server_failure.dart';
@@ -10,7 +11,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'fm_market_repository.g.dart';
 
 @riverpod
-FmMarketRepository fmMarketRepository(FmMarketRepositoryRef ref) {
+FmMarketRepository fmMarketRepository(Ref ref) {
   return FmMarketRepository(ref.watch(dioProvider));
 }
 

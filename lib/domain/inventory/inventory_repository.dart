@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/inventory/inventory.dart';
@@ -12,7 +13,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'inventory_repository.g.dart';
 
 @riverpod
-InventoryRepository inventoryRepository(InventoryRepositoryRef ref) {
+InventoryRepository inventoryRepository(Ref ref) {
   return InventoryRepository(
     ref.watch(socketRepositoryProvider),
     ref.watch(dioProvider),

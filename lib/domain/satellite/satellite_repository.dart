@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/building/building.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
@@ -9,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'satellite_repository.g.dart';
 
 @riverpod
-SatelliteRepository satelliteRepository(SatelliteRepositoryRef ref) {
+SatelliteRepository satelliteRepository(Ref ref) {
   return SatelliteRepository(ref.watch(dioProvider));
 }
 

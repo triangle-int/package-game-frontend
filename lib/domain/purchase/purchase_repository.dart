@@ -10,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'purchase_repository.g.dart';
 
 @riverpod
-PurchaseRepository purchaseRepository(PurchaseRepositoryRef ref) {
+PurchaseRepository purchaseRepository(Ref ref) {
   return PurchaseRepository(ref.watch(dioProvider), ref);
 }
 
