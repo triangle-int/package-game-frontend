@@ -83,10 +83,10 @@ class Inventory extends HookConsumerWidget {
         BlocBuilder<InventoryBloc, InventoryState>(
           builder: (context, inventoryState) {
             return InventoryBody(
-              inventory: inventoryState.maybeMap(
-                loadSuccess: (s) => s.inventory,
-                orElse: () => throw const UnexpectedValueError(),
-              ),
+              inventory: switch (inventoryState) {
+                InventoryStateLoadSuccess(:final inventory) => inventory,
+                _ => throw const UnexpectedValueError(),
+              },
             );
           },
         ),
