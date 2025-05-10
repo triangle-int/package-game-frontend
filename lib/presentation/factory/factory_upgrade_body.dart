@@ -26,23 +26,25 @@ class FactoryUpgradeBody extends HookConsumerWidget {
 
     return BlocListener<FactoryUpgradeBloc, FactoryUpgradeState>(
       listener: (context, upgradeState) {
-        upgradeState.map(
-          initial: (_) {},
-          loadInProgress: (_) {},
-          loadSuccess: (s) => context
-              .read<FactoryBloc>()
-              .add(FactoryEvent.factoryGot(s.building)),
-          loadFailure: (s) => context
-              .read<NotificationsBloc>()
-              .add(NotificationsEvent.warningAdded(s.failure.getMessage())),
-        );
+        switch (upgradeState) {
+          case FactoryUpgradeStateInitial():
+            break;
+          case FactoryUpgradeStateLoadInProgress():
+            break;
+          case FactoryUpgradeStateLoadSuccess(:final building):
+            context.read<FactoryBloc>().add(FactoryEvent.factoryGot(building));
+          case FactoryUpgradeStateLoadFailure(:final failure):
+            context
+                .read<NotificationsBloc>()
+                .add(NotificationsEvent.warningAdded(failure.getMessage()));
+        }
       },
       child: BlocBuilder<FactoryBloc, FactoryState>(
         builder: (context, factoryState) {
-          final factoryBuilding = factoryState.maybeMap(
-            loadSuccess: (f) => f.factoryBuilding,
-            orElse: () => throw const UnexpectedValueError(),
-          );
+          final factoryBuilding = switch (factoryState) {
+            FactoryStateLoadSuccess(:final factoryBuilding) => factoryBuilding,
+            _ => throw const UnexpectedValueError(),
+          };
           final productionItem = config.items
               .firstWhere(
                 (i) => i.name == factoryBuilding.currentResource,
@@ -96,26 +98,30 @@ class FactoryUpgradeBody extends HookConsumerWidget {
               const SizedBox(height: 13),
               BlocConsumer<FactoryUpgradeBloc, FactoryUpgradeState>(
                 listener: (context, upgradeState) {
-                  upgradeState.mapOrNull(
-                    loadSuccess: (_) {
+                  switch (upgradeState) {
+                    case FactoryUpgradeStateLoadSuccess():
                       AudioPlayer().play(
                         AssetSource('sounds/factory_upgrade.wav'),
                       );
                       context.router.pop();
-                    },
-                  );
+                    default:
+                      break;
+                  }
                 },
                 builder: (context, upgradeState) {
-                  return upgradeState.map(
-                    initial: (_) => const FactoryUpgradeButton(),
-                    loadInProgress: (_) => const SizedBox(
-                      width: 49,
-                      height: 49,
-                      child: CircularProgressIndicator(),
-                    ),
-                    loadSuccess: (_) => const FactoryUpgradeButton(),
-                    loadFailure: (_) => const FactoryUpgradeButton(),
-                  );
+                  return switch (upgradeState) {
+                    FactoryUpgradeStateInitial() =>
+                      const FactoryUpgradeButton(),
+                    FactoryUpgradeStateLoadInProgress() => const SizedBox(
+                        width: 49,
+                        height: 49,
+                        child: CircularProgressIndicator(),
+                      ),
+                    FactoryUpgradeStateLoadSuccess() =>
+                      const FactoryUpgradeButton(),
+                    FactoryUpgradeStateLoadFailure() =>
+                      const FactoryUpgradeButton(),
+                  };
                 },
               ),
               const SizedBox(height: 11),

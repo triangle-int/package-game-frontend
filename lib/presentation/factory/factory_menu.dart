@@ -48,68 +48,69 @@ class FactoryMenu extends HookConsumerWidget {
                 color: Theme.of(context).colorScheme.background,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: factoryState.map(
-                initial: (factoryState) => const MarketLoading(),
-                loadInProgress: (factoryState) => const MarketLoading(),
-                loadFailure: (factoryState) {
-                  return Center(
-                    child: Text(
-                      "Something isn't right: ${factoryState.f.getMessage()}",
-                    ),
-                  );
-                },
-                loadSuccess: (factoryState) {
-                  final factoryBuilding = factoryState.factoryBuilding;
-                  final hasProductionItem =
-                      factoryBuilding.currentResource != null;
-                  final productionItem = hasProductionItem
-                      ? config.items
-                          .firstWhere(
-                            (i) => i.name == factoryBuilding.currentResource,
-                            orElse: () => Item.unknown(
-                              name: factoryBuilding.currentResource!,
-                            ),
-                          )
-                          .emoji
-                      : '🏭';
-                  final enabled = factoryBuilding.enabled;
-                  final productionSpeed = ref
-                      .read(activatedBoostersProvider.notifier)
-                      .getBoostedFactoryProduction(
-                        config.factoryResourcesPerMinute[
-                            factoryBuilding.level - 1],
-                      );
-
-                  if (factoryBuilding.ownerId != user.id) {
+              child: Builder(builder: (context) {
+                switch (factoryState) {
+                  case FactoryStateInitial():
+                    return const MarketLoading();
+                  case FactoryStateLoadInProgress():
+                    return const MarketLoading();
+                  case FactoryStateLoadFailure():
                     return Center(
                       child: Text(
-                        '${factoryBuilding.owner?.avatar} ${factoryBuilding.owner?.nickname}',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 24,
-                        ),
+                        "Something isn't right: ${factoryState.f.getMessage()}",
                       ),
                     );
-                  }
-                  return Column(
-                    children: [
-                      FactoryHeader(
-                        productionItem: productionItem,
-                        productionSpeed: productionSpeed,
-                        factoryBuilding: factoryBuilding,
-                        hasProductionItem: hasProductionItem,
-                        enabled: enabled,
-                      ),
-                      if (hasProductionItem) ...[
-                        const FactoryUpgradeBody(),
-                      ] else ...[
-                        FactorySelectResource(factoryId: factoryId),
-                      ]
-                    ],
-                  );
-                },
-              ),
+                  case FactoryStateLoadSuccess(:final factoryBuilding):
+                    final hasProductionItem =
+                        factoryBuilding.currentResource != null;
+                    final productionItem = hasProductionItem
+                        ? config.items
+                            .firstWhere(
+                              (i) => i.name == factoryBuilding.currentResource,
+                              orElse: () => Item.unknown(
+                                name: factoryBuilding.currentResource!,
+                              ),
+                            )
+                            .emoji
+                        : '🏭';
+                    final enabled = factoryBuilding.enabled;
+                    final productionSpeed = ref
+                        .read(activatedBoostersProvider.notifier)
+                        .getBoostedFactoryProduction(
+                          config.factoryResourcesPerMinute[
+                              factoryBuilding.level - 1],
+                        );
+
+                    if (factoryBuilding.ownerId != user.id) {
+                      return Center(
+                        child: Text(
+                          '${factoryBuilding.owner?.avatar} ${factoryBuilding.owner?.nickname}',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 24,
+                          ),
+                        ),
+                      );
+                    }
+                    return Column(
+                      children: [
+                        FactoryHeader(
+                          productionItem: productionItem,
+                          productionSpeed: productionSpeed,
+                          factoryBuilding: factoryBuilding,
+                          hasProductionItem: hasProductionItem,
+                          enabled: enabled,
+                        ),
+                        if (hasProductionItem) ...[
+                          const FactoryUpgradeBody(),
+                        ] else ...[
+                          FactorySelectResource(factoryId: factoryId),
+                        ]
+                      ],
+                    );
+                }
+              }),
             ),
           );
         },
