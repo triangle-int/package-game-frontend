@@ -35,10 +35,10 @@ jobs:
       #     envkey_SERVER_CERTIFICATE: ""
       #     file_name: .env
 
-      # - name: Copy .env file to .env.{staging,production}
-      #   run: |
-      #     cp .env .env.staging
-      #     cp .env .env.production
+      - name: Create .env.{staging,production}
+        run: |
+          touch .env.staging
+          touch .env.production
 
       - name: Run build_runner
         run: dart run build_runner build --delete-conflicting-outputs
