@@ -126,9 +126,10 @@ class _MapWidgetState extends ConsumerState<MapWidget>
       builder: (context, pinMarkerState) {
         return BlocListener<MapBloc, MapState>(
           listener: (context, state) {
-            state.map(
-              idle: (s) {},
-              moveToPlayer: (s) async {
+            switch (state) {
+              case MapStateIdle():
+                break;
+              case MapStateMoveToPlayer():
                 final mapLatitudeTween = Tween<double>(
                   begin: _mapController.camera.center.latitude,
                   end: widget.geolocation.latitude,
@@ -163,8 +164,7 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                 );
 
                 _cameraAnimationController.forward(from: 0);
-              },
-            );
+            }
           },
           child: BlocBuilder<BuildModeBloc, BuildModeState>(
             builder: (context, buildModeState) {
@@ -173,11 +173,13 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                   return BlocBuilder<BuildingBloc, BuildingState>(
                     builder: (context, buildingState) {
                       return BlocConsumer<SatelliteBloc, SatelliteState>(
-                        listener: (context, satelliteState) {
-                          satelliteState.map(
-                            initial: (_) {},
-                            loading: (_) {},
-                            showLines: (s) async {
+                        listener: (context, satelliteState) async {
+                          switch (satelliteState) {
+                            case SatelliteStateInitial():
+                              break;
+                            case SatelliteStateLoading():
+                              break;
+                            case SatelliteStateShowLines():
                               context.read<BuildingBloc>().add(
                                     BuildingEvent.updatedBounds(
                                       _mapController.camera.visibleBounds,
@@ -193,8 +195,7 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                 ),
                               );
                               _linesAnimationController.forward(from: 0);
-                            },
-                          );
+                          }
                         },
                         builder: (context, satelliteState) {
                           return FlutterMap(
@@ -254,12 +255,14 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                 tileProvider: CachedTileProvider(),
                               ),
                               PolylineLayer(
-                                polylines: [
-                                  ...satelliteState.map(
-                                    initial: (_) => [],
-                                    loading: (_) => [],
-                                    showLines: (s) {
-                                      return s.linesAndHexes.lines.map((l) {
+                                polylines: <Polyline>[
+                                  ...switch (satelliteState) {
+                                    SatelliteStateInitial() => [],
+                                    SatelliteStateLoading() => [],
+                                    SatelliteStateShowLines(
+                                      :final linesAndHexes
+                                    ) =>
+                                      linesAndHexes.lines.map((l) {
                                         final endCurve = CurvedAnimation(
                                           parent: _linesAnimationController,
                                           curve: const Interval(
@@ -307,106 +310,106 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                           color: Theme.of(context).primaryColor,
                                           strokeWidth: 2,
                                         );
-                                      }).toSet();
-                                    },
-                                  ),
+                                      }).toList(),
+                                  },
                                 ],
                               ),
                               PolygonLayer(
-                                polygons: [
-                                  ...satelliteState.map(
-                                    initial: (_) => [],
-                                    loading: (_) => [],
-                                    showLines: (s) => [
-                                      ...s.linesAndHexes.firstLayer.map((h) {
-                                        final curve = CurvedAnimation(
-                                          parent: _linesAnimationController,
-                                          curve: const Interval(
-                                            0.5,
-                                            0.7,
-                                            curve: Curves.easeInQuad,
-                                          ),
-                                        );
-
-                                        final firstLayerOpacity = TweenSequence(
-                                          <TweenSequenceItem<double>>[
-                                            TweenSequenceItem(
-                                              tween: Tween<double>(
-                                                begin: 0,
-                                                end: 1,
-                                              ),
-                                              weight: 50,
+                                polygons: <Polygon>[
+                                  ...switch (satelliteState) {
+                                    SatelliteStateInitial() => [],
+                                    SatelliteStateLoading() => [],
+                                    SatelliteStateShowLines(
+                                      :final linesAndHexes
+                                    ) =>
+                                      [
+                                        ...linesAndHexes.firstLayer.map((h) {
+                                          final curve = CurvedAnimation(
+                                            parent: _linesAnimationController,
+                                            curve: const Interval(
+                                              0.5,
+                                              0.7,
+                                              curve: Curves.easeInQuad,
                                             ),
-                                            TweenSequenceItem(
-                                              tween: Tween<double>(
-                                                begin: 1,
-                                                end: 0,
-                                              ),
-                                              weight: 50,
-                                            ),
-                                          ],
-                                        ).animate(curve);
+                                          );
 
-                                        return Polygon(
-                                          isFilled: true,
-                                          points: h.hexCoords!
-                                              .map(
-                                                (c) => LatLng(c.lat, c.lon),
-                                              )
-                                              .toList(),
-                                          color: const Color(0xFFFFB800)
-                                              .withOpacity(
-                                            firstLayerOpacity.value,
-                                          ),
-                                        );
-                                      }),
-                                      ...s.linesAndHexes.secondLayer.map((h) {
-                                        final curve = CurvedAnimation(
-                                          parent: _linesAnimationController,
-                                          curve: const Interval(
-                                            0.7,
-                                            0.9,
-                                          ),
-                                        );
-
-                                        final secondLayerOpacity =
-                                            TweenSequence(
-                                          <TweenSequenceItem<double>>[
-                                            TweenSequenceItem(
-                                              tween: Tween<double>(
-                                                begin: 0,
-                                                end: 1,
+                                          final firstLayerOpacity =
+                                              TweenSequence(
+                                            <TweenSequenceItem<double>>[
+                                              TweenSequenceItem(
+                                                tween: Tween<double>(
+                                                  begin: 0,
+                                                  end: 1,
+                                                ),
+                                                weight: 50,
                                               ),
-                                              weight: 50,
-                                            ),
-                                            TweenSequenceItem(
-                                              tween: Tween<double>(
-                                                begin: 1,
-                                                end: 0,
+                                              TweenSequenceItem(
+                                                tween: Tween<double>(
+                                                  begin: 1,
+                                                  end: 0,
+                                                ),
+                                                weight: 50,
                                               ),
-                                              weight: 50,
-                                            ),
-                                          ],
-                                        ).animate(curve);
+                                            ],
+                                          ).animate(curve);
 
-                                        return Polygon(
-                                          isFilled: true,
-                                          points: h.hexCoords!
-                                              .map(
-                                                (c) => LatLng(c.lat, c.lon),
-                                              )
-                                              .toList(),
-                                          color: const Color(0xFFFFB800)
-                                              .withOpacity(
-                                            secondLayerOpacity.value,
-                                          ),
-                                        );
-                                      }),
-                                    ],
-                                  ),
+                                          return Polygon(
+                                            points: h.hexCoords!
+                                                .map(
+                                                  (c) => LatLng(c.lat, c.lon),
+                                                )
+                                                .toList(),
+                                            color: const Color(0xFFFFB800)
+                                                .withOpacity(
+                                              firstLayerOpacity.value,
+                                            ),
+                                          );
+                                        }),
+                                        ...linesAndHexes.secondLayer.map((h) {
+                                          final curve = CurvedAnimation(
+                                            parent: _linesAnimationController,
+                                            curve: const Interval(
+                                              0.7,
+                                              0.9,
+                                            ),
+                                          );
+
+                                          final secondLayerOpacity =
+                                              TweenSequence(
+                                            <TweenSequenceItem<double>>[
+                                              TweenSequenceItem(
+                                                tween: Tween<double>(
+                                                  begin: 0,
+                                                  end: 1,
+                                                ),
+                                                weight: 50,
+                                              ),
+                                              TweenSequenceItem(
+                                                tween: Tween<double>(
+                                                  begin: 1,
+                                                  end: 0,
+                                                ),
+                                                weight: 50,
+                                              ),
+                                            ],
+                                          ).animate(curve);
+
+                                          return Polygon(
+                                            points: h.hexCoords!
+                                                .map(
+                                                  (c) => LatLng(c.lat, c.lon),
+                                                )
+                                                .toList(),
+                                            color: const Color(0xFFFFB800)
+                                                .withOpacity(
+                                              secondLayerOpacity.value,
+                                            ),
+                                          );
+                                        }),
+                                      ],
+                                  },
                                   if (pinMarkerState.isShown)
                                     Polygon(
-                                      isFilled: true,
                                       points: pinMarkerState.cell.hexCoords!
                                           .map((e) => LatLng(e.lat, e.lon))
                                           .toList(),
@@ -445,15 +448,16 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                         geohash.latitude(),
                                         geohash.longitude(),
                                       ),
-                                      anchorPos:
-                                          AnchorPos.align(AnchorAlign.center),
-                                      builder: (context) {
-                                        final avatarId =
-                                            config.avatars.indexOf(u.avatar);
-                                        return Image.asset(
-                                          'assets/images/avatars/$avatarId.png',
-                                        );
-                                      },
+                                      alignment: Alignment.center,
+                                      child: Builder(
+                                        builder: (context) {
+                                          final avatarId =
+                                              config.avatars.indexOf(u.avatar);
+                                          return Image.asset(
+                                            'assets/images/avatars/$avatarId.png',
+                                          );
+                                        },
+                                      ),
                                     );
                                   }),
                                   ...buildingState.buildings.map((b) {
@@ -527,91 +531,101 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                           child: GestureDetector(
                                             onTap: switch (buildModeState) {
                                               BuildModeStateBuildMode() => () {
-                                                  b.map(
-                                                    business: (b) async {
-                                                      showModalBottomSheet(
-                                                        backgroundColor:
-                                                            Colors.transparent,
-                                                        context: context,
-                                                        builder: (context) =>
-                                                            BusinessMenu(b.id),
-                                                      );
-                                                      final player =
-                                                          AudioPlayer();
-                                                      await player.setVolume(
-                                                        ref.read(
-                                                          sfxVolumeProvider,
-                                                        ),
-                                                      );
-                                                      player.play(
-                                                        AssetSource(
-                                                          'sounds/business_click.wav',
-                                                        ),
-                                                      );
-                                                      return null;
-                                                    },
-                                                    storage: (_) {
-                                                      return null;
-                                                    },
-                                                    satellite: (b) {
-                                                      if (b.ownerId !=
-                                                          user.id) {
-                                                        return;
-                                                      }
-
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (context) =>
-                                                            SatelliteMenu(b),
-                                                      );
-                                                      return null;
-                                                    },
-                                                    factory: (b) async {
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (context) =>
-                                                            FactoryMenu(
-                                                          factoryId: b.id,
-                                                        ),
-                                                      );
-                                                      final player =
-                                                          AudioPlayer();
-                                                      await player.setVolume(
-                                                        ref.read(
-                                                          sfxVolumeProvider,
-                                                        ),
-                                                      );
-                                                      player.play(
-                                                        AssetSource(
-                                                          'sounds/factory_click.wav',
-                                                        ),
-                                                      );
-                                                      return null;
-                                                    },
-                                                    market: (b) async {
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (context) =>
-                                                            MarketMenu(
-                                                          marketId: b.id,
-                                                        ),
-                                                      );
-
-                                                      final player =
-                                                          AudioPlayer();
-                                                      await player.setVolume(
-                                                        ref.read(
-                                                          sfxVolumeProvider,
-                                                        ),
-                                                      );
-                                                      AudioPlayer().play(
-                                                        AssetSource(
-                                                          'sounds/market_click.wav',
-                                                        ),
-                                                      );
-                                                      return null;
-                                                    },
-                                                  );
+                                                  switch (b) {
+                                                    case BusinessBuilding():
+                                                      () async {
+                                                        showModalBottomSheet(
+                                                          backgroundColor:
+                                                              Colors
+                                                                  .transparent,
+                                                          context: context,
+                                                          builder: (context) =>
+                                                              BusinessMenu(
+                                                                  b.id),
+                                                        );
+                                                        final player =
+                                                            AudioPlayer();
+                                                        await player.setVolume(
+                                                          ref.read(
+                                                            sfxVolumeProvider,
+                                                          ),
+                                                        );
+                                                        player.play(
+                                                          AssetSource(
+                                                            'sounds/business_click.wav',
+                                                          ),
+                                                        );
+                                                        return null;
+                                                      }();
+                                                      break;
+                                                    case StorageBuilding():
+                                                      () {
+                                                        return null;
+                                                      }();
+                                                      break;
+                                                    case SatelliteBuilding():
+                                                      () {
+                                                        if (b.ownerId !=
+                                                            user.id) {
+                                                          return;
+                                                        }
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (context) =>
+                                                              SatelliteMenu(b),
+                                                        );
+                                                        return null;
+                                                      }();
+                                                      break;
+                                                    case FactoryBuilding():
+                                                      () async {
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (context) =>
+                                                              FactoryMenu(
+                                                            factoryId: b.id,
+                                                          ),
+                                                        );
+                                                        final player =
+                                                            AudioPlayer();
+                                                        await player.setVolume(
+                                                          ref.read(
+                                                            sfxVolumeProvider,
+                                                          ),
+                                                        );
+                                                        player.play(
+                                                          AssetSource(
+                                                            'sounds/factory_click.wav',
+                                                          ),
+                                                        );
+                                                        return null;
+                                                      }();
+                                                      break;
+                                                    case MarketBuilding():
+                                                      () async {
+                                                        showDialog(
+                                                          context: context,
+                                                          builder: (context) =>
+                                                              MarketMenu(
+                                                            marketId: b.id,
+                                                          ),
+                                                        );
+                                                        final player =
+                                                            AudioPlayer();
+                                                        await player.setVolume(
+                                                          ref.read(
+                                                            sfxVolumeProvider,
+                                                          ),
+                                                        );
+                                                        AudioPlayer().play(
+                                                          AssetSource(
+                                                            'sounds/market_click.wav',
+                                                          ),
+                                                        );
+                                                        return null;
+                                                      }();
+                                                      break;
+                                                  }
                                                 },
                                               BuildModeStateDestroyMode() =>
                                                 () {
