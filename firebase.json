@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"ios":{"default":{"projectId":"package-legacy","appId":"1:869744813970:ios:f3d692ffd399a8de59434b","uploadDebugSymbols":true,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"package-legacy","configurations":{"ios":"1:869744813970:ios:f3d692ffd399a8de59434b"}}}}}}

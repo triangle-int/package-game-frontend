@@ -12,7 +12,7 @@ import 'package:package_flutter/bloc/notifications/notifications_bloc.dart';
 import 'package:package_flutter/bloc/truck/remove_schedule.dart/remove_schedule_bloc.dart';
 import 'package:package_flutter/bloc/truck/truck_bloc.dart';
 import 'package:package_flutter/data/latlng/lat_lng_extension.dart';
-import 'package:package_flutter/domain/core/env_provider.dart';
+import 'package:package_flutter/domain/core/env/env.dart';
 import 'package:package_flutter/domain/truck/truck.dart';
 import 'package:package_flutter/domain/truck/truck_schedule.dart';
 import 'package:package_flutter/presentation/core/cached_tile_provider.dart';
@@ -105,10 +105,10 @@ class _RouteMapPageState extends ConsumerState<RouteMapPage> {
                     children: [
                       TileLayer(
                         urlTemplate: ref.watch(mapDarkModeProvider)
-                            ? ref.watch(envProvider).mapDarkUrl
-                            : ref.watch(envProvider).mapWhiteUrl,
+                            ? Env.getMapDarkUrl()
+                            : Env.getMapWhiteUrl(),
                         additionalOptions: {
-                          'api_key': ref.watch(envProvider).mapAccessKey,
+                          'api_key': Env.getMapAccessKey(),
                         },
                         tileProvider: CachedTileProvider(),
                       ),

@@ -3,23 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>731781815007-m9jepjvj8kcne9akssjah0jq2qtc9qkn.apps.googleusercontent.com</string>
+	<string>869744813970-bf9439fj9dn1m3cl81p9t9bchvfgbte6.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.731781815007-m9jepjvj8kcne9akssjah0jq2qtc9qkn</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>731781815007-6phju19k7ss0qe669vs2qfq17c8eihb7.apps.googleusercontent.com</string>
+	<string>com.googleusercontent.apps.869744813970-bf9439fj9dn1m3cl81p9t9bchvfgbte6</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCdXRmseIXBVACtTCPSsHAqUlBeSY9cN9w</string>
+	<string>AIzaSyBN8M6witSc3_C3IBgbmcUv47MsgqLWdR8</string>
 	<key>GCM_SENDER_ID</key>
-	<string>731781815007</string>
+	<string>869744813970</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.triangle-interactive.package</string>
 	<key>PROJECT_ID</key>
-	<string>package-6031d</string>
+	<string>package-legacy</string>
 	<key>STORAGE_BUCKET</key>
-	<string>package-6031d.appspot.com</string>
+	<string>package-legacy.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,8 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:731781815007:ios:920a113015656c2ea0676a</string>
-	<key>DATABASE_URL</key>
-	<string>https://package-6031d.firebaseio.com</string>
+	<string>1:869744813970:ios:f3d692ffd399a8de59434b</string>
 </dict>
 </plist>

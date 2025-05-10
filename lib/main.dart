@@ -27,7 +27,6 @@ import 'package:package_flutter/domain/auth/auth_repository.dart';
 import 'package:package_flutter/domain/building/building_repository.dart';
 import 'package:package_flutter/domain/connection/connection_repository.dart';
 import 'package:package_flutter/domain/core/env/env.dart';
-import 'package:package_flutter/domain/core/env_provider.dart';
 import 'package:package_flutter/domain/emoji/emoji_repository.dart';
 import 'package:package_flutter/domain/factory/factory_repository.dart';
 import 'package:package_flutter/domain/fm_market/fm_market_repository.dart';
@@ -163,8 +162,8 @@ class App extends HookConsumerWidget {
       child: Builder(
         builder: (context) {
           return Wiredash(
-            projectId: ref.watch(envProvider).wiredashProjectId,
-            secret: ref.watch(envProvider).wiredashSecretToken,
+            projectId: Env.getWiredashProjectId(),
+            secret: Env.getWiredashSecretToken(),
             theme: WiredashThemeData.fromColor(
               primaryColor: appTheme.primaryColor,
               brightness: Brightness.dark,

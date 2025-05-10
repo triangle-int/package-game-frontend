@@ -111,6 +111,7 @@ class AuthRepository {
     final oauthCredential = OAuthProvider('apple.com').credential(
       idToken: appleCredential.identityToken,
       rawNonce: rawNonce,
+      accessToken: appleCredential.authorizationCode,
     );
 
     // Sign in the user with Firebase. If the nonce we generated earlier does

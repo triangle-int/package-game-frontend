@@ -6,7 +6,6 @@ import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/auth/auth_repository.dart';
 import 'package:package_flutter/domain/ban/ban.dart';
 import 'package:package_flutter/domain/core/env/env.dart';
-import 'package:package_flutter/domain/core/env_provider.dart';
 import 'package:package_flutter/domain/inventory/inventory.dart';
 import 'package:package_flutter/domain/user/user.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -18,7 +17,6 @@ part 'socket_repository.g.dart';
 SocketRepository socketRepository(Ref ref) {
   return SocketRepository(
     ref.watch(authRepositoryProvider),
-    ref.watch(envProvider),
   );
 }
 
@@ -26,13 +24,12 @@ class SocketRepository {
   io.Socket? _socket;
 
   final AuthRepository authRepository;
-  final Env env;
 
-  SocketRepository(this.authRepository, this.env);
+  SocketRepository(this.authRepository);
 
   Future<void> connect() async {
     if (_socket == null) {
-      final serverSocketUrl = env.serverUrl;
+      final serverSocketUrl = Env.getServerUrl();
 
       _socket = io.io(
         serverSocketUrl,
