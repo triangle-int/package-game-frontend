@@ -4,6 +4,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/app_router.dart';
 import 'package:package_flutter/bloc/auth/auth_bloc.dart';
@@ -25,6 +26,7 @@ import 'package:package_flutter/bloc/user/user_provider.dart';
 import 'package:package_flutter/domain/auth/auth_repository.dart';
 import 'package:package_flutter/domain/building/building_repository.dart';
 import 'package:package_flutter/domain/connection/connection_repository.dart';
+import 'package:package_flutter/domain/core/env/env.dart';
 import 'package:package_flutter/domain/core/env_provider.dart';
 import 'package:package_flutter/domain/emoji/emoji_repository.dart';
 import 'package:package_flutter/domain/factory/factory_repository.dart';
@@ -53,6 +55,19 @@ Future<void> main(List<String> args) async {
   if (!kDebugMode) {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   }
+
+  final env = String.fromEnvironment(
+    'ENVIRONMENT',
+    defaultValue:
+        kDebugMode ? Env.stagingEnvironment : Env.productionEnvironment,
+  );
+  switch (env) {
+    case Env.productionEnvironment:
+      await dotenv.load(fileName: '.env.production');
+    case Env.stagingEnvironment:
+      await dotenv.load(fileName: '.env.staging');
+  }
+
   // Audio settings
   // await AudioPlayer.global.changeLogLevel(LogLevel.none);
   final config = AudioContext(

@@ -23,22 +23,22 @@ jobs:
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
 
-      - name: Create .env file
-        uses: SpicyPizza/create-envfile@v2.0.2
-        with:
-          envkey_SERVER_URL: ""
-          envkey_MAP_ACCESS_KEY: ""
-          envkey_MAP_URL_DARK: ""
-          envkey_MAP_URL_WHITE: ""
-          envkey_WIREDASH_SECRET_TOKEN: ""
-          envkey_WIREDASH_PROJECT_ID: ""
-          envkey_SERVER_CERTIFICATE: ""
-          file_name: .env
+      # - name: Create .env file
+      #   uses: SpicyPizza/create-envfile@v2.0.2
+      #   with:
+      #     envkey_SERVER_URL: ""
+      #     envkey_MAP_ACCESS_KEY: ""
+      #     envkey_MAP_URL_DARK: ""
+      #     envkey_MAP_URL_WHITE: ""
+      #     envkey_WIREDASH_SECRET_TOKEN: ""
+      #     envkey_WIREDASH_PROJECT_ID: ""
+      #     envkey_SERVER_CERTIFICATE: ""
+      #     file_name: .env
 
-      - name: Copy .env file to .env.{staging,production}
+      - name: Create .env.{staging,production}
         run: |
-          cp .env .env.staging
-          cp .env .env.production
+          touch .env.staging
+          touch .env.production
 
       - name: Run build_runner
         run: dart run build_runner build --delete-conflicting-outputs
@@ -46,7 +46,7 @@ jobs:
       - name: Analyze project source
         run: dart analyze
 
-      - name: Analyze project with riverpod
+      - name: Analyze project with `custom_lint`
         run: dart run custom_lint
 
       # Add tests later

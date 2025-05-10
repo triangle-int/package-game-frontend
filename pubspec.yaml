@@ -30,7 +30,6 @@ dependencies:
   dart_geohash: ^2.0.2
   dartz: ^0.10.1
   dio: ^5.0.0
-  envied: ^1.1.1
   equatable: ^2.0.5
   firebase_analytics: ^11.4.5
   firebase_auth: ^5.5.3
@@ -41,6 +40,7 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_cache_manager: ^3.3.0
+  flutter_dotenv: ^5.2.1
   flutter_hooks: ^0.21.2
   flutter_map: ^8.1.1
   form_validator: ^2.1.1
@@ -75,8 +75,7 @@ dependencies:
 dev_dependencies:
   auto_route_generator: ^10.0.1
   build_runner: ^2.4.15
-  custom_lint: ^0.7.5 
-  envied_generator: ^1.1.1
+  custom_lint: ^0.7.5
   flutter_launcher_icons: ^0.14.3
   flutter_native_splash: ^2.2.9
   flutter_test:
@@ -119,6 +118,9 @@ flutter:
     - assets/animations/
     # Sounds:
     - assets/sounds/
+    # Env:
+    - .env.production
+    - .env.staging
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
