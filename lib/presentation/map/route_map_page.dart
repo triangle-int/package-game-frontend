@@ -68,15 +68,16 @@ class _RouteMapPageState extends ConsumerState<RouteMapPage> {
 
     return BlocConsumer<RemoveScheduleBloc, RemoveScheduleState>(
       listener: (context, removeScheduleState) {
-        removeScheduleState.maybeMap(
-          loadSuccess: (_) {
+        switch (removeScheduleState) {
+          case RemoveScheduleStateLoadSuccess():
             context.router.pop();
-          },
-          loadFailure: (s) => context
-              .read<NotificationsBloc>()
-              .add(NotificationsEvent.warningAdded(s.failure.getMessage())),
-          orElse: () {},
-        );
+          case RemoveScheduleStateLoadFailure(:final failure):
+            context
+                .read<NotificationsBloc>()
+                .add(NotificationsEvent.warningAdded(failure.getMessage()));
+          default:
+            break;
+        }
       },
       builder: (context, removeScheduleState) {
         return BlocBuilder<TruckBloc, TruckState>(
@@ -88,12 +89,15 @@ class _RouteMapPageState extends ConsumerState<RouteMapPage> {
                   FlutterMap(
                     mapController: _mapController,
                     options: MapOptions(
-                      enableMultiFingerGestureRace: true,
+                      interactionOptions: InteractionOptions(
+                        enableMultiFingerGestureRace: true,
+                      ),
+                      backgroundColor: const Color(0xFF0f1014),
                       onMapReady: () {
-                        _mapController.fitBounds(
-                          LatLngBounds.fromPoints(path),
-                          options: const FitBoundsOptions(
-                            padding: EdgeInsets.all(40),
+                        _mapController.fitCamera(
+                          CameraFit.bounds(
+                            bounds: LatLngBounds.fromPoints(path),
+                            padding: const EdgeInsets.all(40),
                           ),
                         );
                       },
@@ -106,7 +110,6 @@ class _RouteMapPageState extends ConsumerState<RouteMapPage> {
                         additionalOptions: {
                           'api_key': ref.watch(envProvider).mapAccessKey,
                         },
-                        backgroundColor: const Color(0xFF0f1014),
                         tileProvider: CachedTileProvider(),
                       ),
                       PolylineLayer(
@@ -120,11 +123,11 @@ class _RouteMapPageState extends ConsumerState<RouteMapPage> {
                       ),
                       MarkerLayer(
                         markers: [
-                          ...truckState.map(
-                            initial: (_) => [],
-                            loadInProgress: (_) => [],
-                            loadFailure: (_) => [],
-                            loadSuccess: (s) => s.trucks
+                          ...switch (truckState) {
+                            TruckStateInitial() => [],
+                            TruckStateLoadInProgress() => [],
+                            TruckStateLoadFailure() => [],
+                            TruckStateLoadSuccess(:final trucks) => trucks
                                 .where(
                                   (t) => widget.truckOrSchedule.fold(
                                     (t2) => t.id == t2.id,
@@ -132,7 +135,7 @@ class _RouteMapPageState extends ConsumerState<RouteMapPage> {
                                   ),
                                 )
                                 .map((t) => truckMarker(context, t)),
-                          ),
+                          },
                         ],
                       )
                     ],
@@ -162,14 +165,15 @@ class _RouteMapPageState extends ConsumerState<RouteMapPage> {
                       top: MediaQuery.of(context).padding.top + 28,
                       width: 247,
                       height: 49,
-                      child: removeScheduleState.map(
-                        initial: (_) => removeButton(context),
-                        loadInProgress: (_) => const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                        loadFailure: (_) => removeButton(context),
-                        loadSuccess: (_) => Container(),
-                      ),
+                      child: switch (removeScheduleState) {
+                        RemoveScheduleStateInitial() => removeButton(context),
+                        RemoveScheduleStateLoadInProgress() => const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        RemoveScheduleStateLoadFailure() =>
+                          removeButton(context),
+                        RemoveScheduleStateLoadSuccess() => Container(),
+                      },
                     ),
                 ],
               ),
@@ -185,7 +189,7 @@ class _RouteMapPageState extends ConsumerState<RouteMapPage> {
       onPressed: () {
         if (_isConfirm) {
           context.read<RemoveScheduleBloc>().add(
-                RemoveScheduleEvent.removeSchedule(
+                RemoveScheduleEvent.remove(
                   widget.truckOrSchedule.fold(
                     (t) => throw const UnexpectedValueError(),
                     (s) => s.id,
