@@ -6,6 +6,7 @@ import 'package:package_flutter/bloc/factory/resource/factory_resource_bloc.dart
 import 'package:package_flutter/bloc/notifications/notifications_bloc.dart';
 import 'package:package_flutter/bloc/tutorial/tutorial_bloc.dart';
 import 'package:package_flutter/domain/factory/factory_repository.dart';
+import 'package:package_flutter/domain/factory/factory_resource_select_failure.dart';
 import 'package:package_flutter/presentation/factory/select_resource_button.dart';
 
 class FactorySelectResource extends HookConsumerWidget {
@@ -23,14 +24,16 @@ class FactorySelectResource extends HookConsumerWidget {
           if (state.failureOrNull != null) {
             context.read<NotificationsBloc>().add(
                   NotificationsEvent.warningAdded(
-                    state.failureOrNull!.map(
-                      factoryNotFound: (_) =>
-                          'Resource for this factory already selected',
-                      resourceNotSelected: (_) => 'Resource not selected',
-                      serverFailure: (_) => 'Something went wrong on server',
-                      unexpectedFailure: (_) =>
-                          'Something went wrong on client',
-                    ),
+                    switch (state.failureOrNull!) {
+                      FactoryResourceSelectFailureFactoryNotFound() =>
+                        'Resource for this factory already selected',
+                      FactoryResourceSelectFailureResourceNotSelected() =>
+                        'Resource not selected',
+                      FactoryResourceSelectFailureServerFailure() =>
+                        'Something went wrong on server',
+                      FactoryResourceSelectFailureUnexpectedFailure() =>
+                        'Something went wrong on client',
+                    },
                   ),
                 );
           }

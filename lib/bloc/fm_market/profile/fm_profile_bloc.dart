@@ -13,8 +13,8 @@ class FmProfileBloc extends Bloc<FmProfileEvent, FmProfileState> {
 
   FmProfileBloc(this._repository) : super(FmProfileState.initial()) {
     on<FmProfileEvent>((event, emit) async {
-      await event.map(
-        fetchTradesRequested: (e) async {
+      switch (event) {
+        case FmProfileEventFetchTradesRequested():
           emit(state.copyWith(isLoading: true, failureOrNull: null));
 
           final failureOrTrades = await _repository.myTrades();
@@ -33,13 +33,12 @@ class FmProfileBloc extends Bloc<FmProfileEvent, FmProfileState> {
               ),
             ),
           );
-        },
-        priceChanged: (e) async {
+        case FmProfileEventPriceChanged(:final tradeId, :final newPrice):
           emit(state.copyWith(isPriceLoading: true, failureOrNull: null));
 
           final failureOrUnit = await _repository.setPrice(
-            tradeId: e.tradeId,
-            price: e.newPrice,
+            tradeId: tradeId,
+            price: newPrice,
           );
           final failureOrTrades = await _repository.myTrades();
 
@@ -62,8 +61,7 @@ class FmProfileBloc extends Bloc<FmProfileEvent, FmProfileState> {
               ),
             ),
           );
-        },
-      );
+      }
     });
   }
 }

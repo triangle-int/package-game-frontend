@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/server_failure.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -7,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'connection_repository.g.dart';
 
 @riverpod
-ConnectionRepository connectionRepository(ConnectionRepositoryRef ref) {
+ConnectionRepository connectionRepository(Ref ref) {
   return ConnectionRepository(ref.watch(dioProvider));
 }
 

@@ -13,12 +13,16 @@ class AuthPage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        state.map(
-          initial: (_) {},
-          loadInProgress: (_) {},
-          loadFailure: (_) {},
-          loadSuccess: (_) {},
-        );
+        switch (state) {
+          case AuthStateInitial():
+            break;
+          case AuthStateLoadInProgress():
+            break;
+          case AuthStateLoadFailure():
+            break;
+          case AuthStateLoadSuccess():
+            break;
+        }
       },
       child: BlocProvider(
         create: (context) => AuthPageBloc(ref.watch(authRepositoryProvider)),

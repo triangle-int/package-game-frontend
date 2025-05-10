@@ -54,8 +54,8 @@ Future<void> main(List<String> args) async {
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
   }
   // Audio settings
-  await AudioPlayer.global.changeLogLevel(LogLevel.none);
-  const config = AudioContext(
+  // await AudioPlayer.global.changeLogLevel(LogLevel.none);
+  final config = AudioContext(
     android: AudioContextAndroid(
       audioFocus: AndroidAudioFocus.none,
       contentType: AndroidContentType.sonification,
@@ -64,10 +64,10 @@ Future<void> main(List<String> args) async {
     ),
     iOS: AudioContextIOS(
       category: AVAudioSessionCategory.ambient,
-      options: [],
+      options: {},
     ),
   );
-  await AudioPlayer.global.setGlobalAudioContext(config);
+  await AudioPlayer.global.setAudioContext(config);
 
   runApp(ProviderScope(child: App()));
 }

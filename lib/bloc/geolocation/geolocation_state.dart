@@ -1,10 +1,13 @@
 part of 'geolocation_bloc.dart';
 
+// TODO: Convert this to use Either
 @freezed
-class GeolocationState with _$GeolocationState {
-  const factory GeolocationState.initial() = _Initial;
-  const factory GeolocationState.loadInProgress() = _LoadInProgress;
+sealed class GeolocationState with _$GeolocationState {
+  const factory GeolocationState.initial() = GeolocationStateInitial;
+  const factory GeolocationState.loadInProgress() =
+      GeolocationStateLoadInProgress;
   const factory GeolocationState.loadFailure(GeolocationFailure failure) =
-      _LoadFailure;
-  const factory GeolocationState.loadSuccess(Position position) = _LoadSuccess;
+      GeolocationStateLoadFailure;
+  const factory GeolocationState.loadSuccess(Position position) =
+      GeolocationStateLoadSuccess;
 }

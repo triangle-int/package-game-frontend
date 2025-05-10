@@ -4,7 +4,7 @@ part 'item.freezed.dart';
 part 'item.g.dart';
 
 @Freezed(unionKey: 'type')
-class Item with _$Item {
+sealed class Item with _$Item {
   const Item._();
 
   const factory Item.resource({
@@ -24,11 +24,11 @@ class Item with _$Item {
     required String name,
   }) = ItemUnknown;
 
-  String get emoji => map(
-        resource: (i) => i.emoji,
-        booster: (i) => i.emoji,
-        unknown: (_) => '❓',
-      );
+  String get emoji => switch (this) {
+        ItemResource(emoji: final emoji) => emoji,
+        ItemBooster(emoji: final emoji) => emoji,
+        ItemUnknown() => '❓',
+      };
 
   factory Item.fromJson(Map<String, dynamic> json) => _$ItemFromJson(json);
 }

@@ -14,73 +14,81 @@ class DoggieExpressBloc extends Bloc<DoggieExpressEvent, DoggieExpressState> {
 
   DoggieExpressBloc(this._repository) : super(DoggieExpressState.initial()) {
     on<DoggieExpressEvent>((event, emit) async {
-      await event.map(
-        truckTypeUpdated: (e) async => emit(
-          state.copyWith(
-            truckType: e.truckType,
-            failureOrNull: null,
-            path: null,
-          ),
-        ),
-        resourceSelected: (e) async => emit(
-          state.copyWith(
-            resource: e.name,
-            amount: BigInt.from(0),
-            failureOrNull: null,
-            path: null,
-          ),
-        ),
-        amountEntered: (e) async => emit(
-          state.copyWith(
-            amount: e.amount,
-            failureOrNull: null,
-            path: null,
-          ),
-        ),
-        pointASelected: (e) async => emit(
-          state.copyWith(
-            pointA: e.point,
-            failureOrNull: null,
-            amount: BigInt.from(0),
-            resource: '',
-            path: null,
-          ),
-        ),
-        pointADeselected: (e) async => emit(
-          state.copyWith(
-            pointA: null,
-            failureOrNull: null,
-            amount: BigInt.from(0),
-            resource: '',
-            path: null,
-          ),
-        ),
-        pointBSelected: (e) async => emit(
-          state.copyWith(
-            pointB: e.point,
-            failureOrNull: null,
-            amount: BigInt.from(0),
-            resource: '',
-            path: null,
-          ),
-        ),
-        pointBDeselected: (e) async => emit(
-          state.copyWith(
-            pointB: null,
-            failureOrNull: null,
-            amount: BigInt.from(0),
-            resource: '',
-            path: null,
-          ),
-        ),
-        scheduleDurationUpdated: (e) async => emit(
-          state.copyWith(
-            scheduleDuration: e.duration,
-            failureOrNull: null,
-            path: null,
-          ),
-        ),
-        calculate: (e) async {
+      switch (event) {
+        case DoggieExpressEventTruckTypeUpdated(:final truckType):
+          emit(
+            state.copyWith(
+              truckType: truckType,
+              failureOrNull: null,
+              path: null,
+            ),
+          );
+        case DoggieExpressEventResourceSelected(:final name):
+          emit(
+            state.copyWith(
+              resource: name,
+              amount: BigInt.from(0),
+              failureOrNull: null,
+              path: null,
+            ),
+          );
+        case DoggieExpressEventAmountEntered(:final amount):
+          emit(
+            state.copyWith(
+              amount: amount,
+              failureOrNull: null,
+              path: null,
+            ),
+          );
+        case DoggieExpressEventPointASelected(:final point):
+          emit(
+            state.copyWith(
+              pointA: point,
+              failureOrNull: null,
+              amount: BigInt.from(0),
+              resource: '',
+              path: null,
+            ),
+          );
+        case DoggieExpressEventPointADeselected():
+          emit(
+            state.copyWith(
+              pointA: null,
+              failureOrNull: null,
+              amount: BigInt.from(0),
+              resource: '',
+              path: null,
+            ),
+          );
+        case DoggieExpressEventPointBSelected(:final point):
+          emit(
+            state.copyWith(
+              pointB: point,
+              failureOrNull: null,
+              amount: BigInt.from(0),
+              resource: '',
+              path: null,
+            ),
+          );
+        case DoggieExpressEventPointBDeselected():
+          emit(
+            state.copyWith(
+              pointB: null,
+              failureOrNull: null,
+              amount: BigInt.from(0),
+              resource: '',
+              path: null,
+            ),
+          );
+        case DoggieExpressEventScheduleDurationUpdated(:final duration):
+          emit(
+            state.copyWith(
+              scheduleDuration: duration,
+              failureOrNull: null,
+              path: null,
+            ),
+          );
+        case DoggieExpressEventCalculate():
           emit(state.copyWith(isLoading: true, failureOrNull: null));
 
           if (state.pointA == null) {
@@ -145,8 +153,7 @@ class DoggieExpressBloc extends Bloc<DoggieExpressEvent, DoggieExpressState> {
               ),
             ),
           );
-        },
-        confirm: (e) async {
+        case DoggieExpressEventConfirm():
           emit(
             state.copyWith(
               isLoading: true,
@@ -178,9 +185,9 @@ class DoggieExpressBloc extends Bloc<DoggieExpressEvent, DoggieExpressState> {
               ),
             ),
           );
-        },
-        reset: (_) async => emit(DoggieExpressState.initial()),
-      );
+        case DoggieExpressEventReset():
+          emit(DoggieExpressState.initial());
+      }
     });
   }
 }

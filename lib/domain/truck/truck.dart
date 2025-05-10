@@ -5,7 +5,7 @@ part 'truck.freezed.dart';
 part 'truck.g.dart';
 
 @freezed
-class Truck with _$Truck {
+abstract class Truck with _$Truck {
   const factory Truck({
     required int id,
     required DateTime startTime,

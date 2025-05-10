@@ -17,12 +17,11 @@ class _DestroyModeMenuState extends State<DestroyModeMenu> {
   Widget build(BuildContext context) {
     return BlocListener<BuildModeBloc, BuildModeState>(
       listener: (context, state) {
-        state.map(
-          buildMode: (_) {
+        switch (state) {
+          case BuildModeStateBuildMode():
             destroyModeController?.close();
             destroyModeController = null;
-          },
-          destroyMode: (_) {
+          case BuildModeStateDestroyMode():
             destroyModeController = showBottomSheet(
               context: context,
               shape: const RoundedRectangleBorder(
@@ -43,12 +42,13 @@ class _DestroyModeMenuState extends State<DestroyModeMenu> {
               ),
             );
             destroyModeController!.closed.then((_) {
-              context
-                  .read<BuildModeBloc>()
-                  .add(const BuildModeEvent.exitedDestroyMode());
+              if (context.mounted) {
+                context
+                    .read<BuildModeBloc>()
+                    .add(const BuildModeEvent.exitedDestroyMode());
+              }
             });
-          },
-        );
+        }
       },
       child: Container(),
     );

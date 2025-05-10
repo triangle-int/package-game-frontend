@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
 import 'package:package_flutter/domain/core/firebase_analytics_provider.dart';
@@ -13,7 +14,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'tutorial_repository.g.dart';
 
 @riverpod
-TutorialRepository tutorialRepository(TutorialRepositoryRef ref) {
+TutorialRepository tutorialRepository(Ref ref) {
   return TutorialRepository(
     ref.watch(dioProvider),
     ref.watch(firebaseAnalyticsProvider),

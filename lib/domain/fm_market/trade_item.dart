@@ -5,7 +5,7 @@ part 'trade_item.freezed.dart';
 part 'trade_item.g.dart';
 
 @freezed
-class TradeItem with _$TradeItem {
+abstract class TradeItem with _$TradeItem {
   factory TradeItem({
     required int id,
     required String name,

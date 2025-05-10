@@ -1,4 +1,5 @@
 import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'map_bounds_provider.g.dart';
@@ -7,7 +8,10 @@ part 'map_bounds_provider.g.dart';
 class MapBounds extends _$MapBounds {
   @override
   LatLngBounds build() {
-    return LatLngBounds();
+    return LatLngBounds(
+      LatLng(0, 0),
+      LatLng(0, 0),
+    );
   }
 
   void setBounds(LatLngBounds bounds) {

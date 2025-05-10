@@ -37,46 +37,55 @@ class BusinessMenu extends HookConsumerWidget {
       ],
       child: BlocListener<BusinessUpgradeBloc, BusinessUpgradeState>(
         listener: (context, state) {
-          state.maybeMap(
-            loadSuccess: (s) async {
+          switch (state) {
+            case LoadSuccess(:final building):
               context.read<BusinessBloc>().add(
-                    BusinessEvent.businessGot(s.building),
+                    BusinessEvent.businessGot(building),
                   );
               final player = AudioPlayer();
-              await player.setVolume(ref.read(sfxVolumeProvider));
+              player.setVolume(ref.read(sfxVolumeProvider));
               AudioPlayer().play(
                 AssetSource(
                   'sounds/upgrade_business.wav',
                 ),
               );
-            },
-            loadFailure: (s) {
+            case LoadFailure(:final failure):
               context
                   .read<NotificationsBloc>()
-                  .add(NotificationsEvent.warningAdded(s.failure.getMessage()));
-            },
-            orElse: () {},
-          );
+                  .add(NotificationsEvent.warningAdded(failure.getMessage()));
+            case Initial():
+              break;
+            case LoadInProgress():
+              break;
+          }
         },
         child: BlocConsumer<BusinessBloc, BusinessState>(
           listener: (context, state) {
-            state.mapOrNull(
-              loadFailure: (s) => context
-                  .read<NotificationsBloc>()
-                  .add(NotificationsEvent.warningAdded(s.failure.getMessage())),
-            );
+            switch (state) {
+              case BusinessStateLoadFailure(:final failure):
+                context
+                    .read<NotificationsBloc>()
+                    .add(NotificationsEvent.warningAdded(failure.getMessage()));
+              case BusinessStateInitial():
+                break;
+              case BusinessStateLoadInProgress():
+                break;
+              case BusinessStateLoadSuccess():
+                break;
+            }
           },
           builder: (context, state) {
             return AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
-              child: state.map(
-                initial: (_) => const BusinessLoading(),
-                loadInProgress: (_) => const BusinessLoading(),
-                loadFailure: (_) => const BusinessLoading(),
-                loadSuccess: (s) => s.businessAndTax.business.ownerId == user.id
-                    ? const BusinessBody()
-                    : const BusinessBodyOther(),
-              ),
+              child: switch (state) {
+                BusinessStateInitial() => const BusinessLoading(),
+                BusinessStateLoadInProgress() => const BusinessLoading(),
+                BusinessStateLoadFailure() => const BusinessLoading(),
+                BusinessStateLoadSuccess() =>
+                  state.businessAndTax.business.ownerId == user.id
+                      ? const BusinessBody()
+                      : const BusinessBodyOther(),
+              },
             );
           },
         ),

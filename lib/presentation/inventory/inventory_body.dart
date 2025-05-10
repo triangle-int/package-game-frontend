@@ -38,10 +38,10 @@ class InventoryBodyState extends State<InventoryBody>
 
     return BlocListener<InventoryBloc, InventoryState>(
       listener: (context, state) {
-        final inv = state.maybeMap(
-          orElse: () => {},
-          loadSuccess: (i) => i.inventory.inventory,
-        );
+        final inv = switch (state) {
+          InventoryStateLoadSuccess(:final inventory) => inventory.inventory,
+          _ => {},
+        };
         _tabController = TabController(length: max(inv.length, 1), vsync: this);
       },
       child: Expanded(

@@ -14,6 +14,7 @@ import 'package:package_flutter/bloc/pin_marker/pin_marker_bloc.dart';
 import 'package:package_flutter/bloc/tutorial/tutorial_bloc.dart';
 import 'package:package_flutter/bloc/user/user_provider.dart';
 import 'package:package_flutter/domain/building/building_repository.dart';
+import 'package:package_flutter/domain/tutorial/tutorial_step.dart';
 import 'package:package_flutter/domain/user/user.dart';
 import 'package:package_flutter/presentation/core/root/sfx_volume.dart';
 import 'package:package_flutter/presentation/core/transformers/currency_transformer.dart';
@@ -28,6 +29,7 @@ import 'package:package_flutter/presentation/tutorial/dialogue_window.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+// TODO: This is a mess, refactor it
 class MapPage extends ConsumerStatefulWidget {
   const MapPage({super.key});
 
@@ -75,19 +77,19 @@ class _MapPageState extends ConsumerState<MapPage> {
           value: SystemUiOverlayStyle.light,
           child: BlocBuilder<EmojiBloc, EmojiState>(
             builder: (context, emojiState) {
-              final emojis = emojiState.maybeMap(
-                loadSuccess: (e) => e.emojis,
-                orElse: () => throw const UnexpectedValueError(),
-              );
+              final emojis = switch (emojiState) {
+                EmojiStateLoadSuccess(:final emojis) => emojis,
+                _ => throw const UnexpectedValueError(),
+              };
               return BlocBuilder<GeolocationBloc, GeolocationState>(
                 builder: (context, geoState) {
-                  final geolocation = geoState.maybeMap(
-                    loadSuccess: (geoState) => LatLng(
-                      geoState.position.latitude,
-                      geoState.position.longitude,
-                    ),
-                    orElse: () => LatLng(0, 0),
-                  );
+                  final geolocation = switch (geoState) {
+                    GeolocationStateLoadSuccess() => LatLng(
+                        geoState.position.latitude,
+                        geoState.position.longitude,
+                      ),
+                    _ => LatLng(0, 0),
+                  };
 
                   return BlocListener<PinMarkerBloc, PinMarkerState>(
                     listener: (context, state) async {
@@ -104,144 +106,141 @@ class _MapPageState extends ConsumerState<MapPage> {
                     child: ShowCaseWidget(
                       enableAutoScroll: true,
                       disableBarrierInteraction: true,
-                      builder: Builder(
-                        builder: (context) {
-                          return BlocListener<TutorialBloc, TutorialState>(
-                            listener: (context, tutorialState) {
-                              tutorialState.step.maybeMap(
-                                openDoggyExpress: (_) =>
-                                    ShowCaseWidget.of(context)
-                                        .startShowCase([_sidebar]),
-                                openFMMarket: (_) => ShowCaseWidget.of(context)
-                                    .startShowCase([_sidebar]),
-                                orElse: () {},
-                              );
-                            },
-                            child: Scaffold(
-                              key: scaffoldKey,
-                              drawer: const Sidebar(),
-                              body: Stack(
-                                alignment: Alignment.topCenter,
-                                children: [
-                                  SlidingUpPanel(
-                                    controller: _buildPanelController,
-                                    slideDirection: SlideDirection.DOWN,
+                      builder: (context) {
+                        return BlocListener<TutorialBloc, TutorialState>(
+                          listener: (context, tutorialState) {
+                            switch (tutorialState.step) {
+                              case OpenDoggyExpress():
+                                ShowCaseWidget.of(context)
+                                    .startShowCase([_sidebar]);
+                              case OpenFMMarket():
+                                ShowCaseWidget.of(context)
+                                    .startShowCase([_sidebar]);
+                              default:
+                                break;
+                            }
+                          },
+                          child: Scaffold(
+                            key: scaffoldKey,
+                            drawer: const Sidebar(),
+                            body: Stack(
+                              alignment: Alignment.topCenter,
+                              children: [
+                                SlidingUpPanel(
+                                  controller: _buildPanelController,
+                                  slideDirection: SlideDirection.DOWN,
+                                  color:
+                                      Theme.of(context).colorScheme.background,
+                                  panel: BuildPanel(
+                                    panelController: _buildPanelController,
+                                  ),
+                                  minHeight: 0,
+                                  maxHeight:
+                                      185 + MediaQuery.of(context).padding.top,
+                                  onPanelClosed: () =>
+                                      context.read<PinMarkerBloc>().add(
+                                            const PinMarkerEvent.hidden(),
+                                          ),
+                                  onPanelOpened: () {
+                                    context.read<TutorialBloc>().add(
+                                          const TutorialEvent.buildMenuOpened(),
+                                        );
+                                  },
+                                  backdropEnabled: true,
+                                  body: SlidingUpPanel(
+                                    controller: _inventoryPanelController,
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(37),
+                                    ),
                                     color: Theme.of(context)
                                         .colorScheme
                                         .background,
-                                    panel: BuildPanel(
-                                      panelController: _buildPanelController,
-                                    ),
-                                    minHeight: 0,
-                                    maxHeight: 185 +
-                                        MediaQuery.of(context).padding.top,
-                                    onPanelClosed: () => context
-                                        .read<PinMarkerBloc>()
-                                        .add(
-                                          const PinMarkerEvent.markerHidden(),
-                                        ),
+                                    maxHeight:
+                                        MediaQuery.of(context).size.height -
+                                            162,
+                                    panel: const Inventory(),
+                                    backdropEnabled: true,
+                                    // TODO(P5ina): Add sound
                                     onPanelOpened: () {
                                       context.read<TutorialBloc>().add(
                                             const TutorialEvent
-                                                .buildMenuOpened(),
+                                                .inventoryOpened(),
                                           );
                                     },
-                                    backdropEnabled: true,
-                                    body: SlidingUpPanel(
-                                      controller: _inventoryPanelController,
-                                      borderRadius: const BorderRadius.vertical(
-                                        top: Radius.circular(37),
-                                      ),
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .background,
-                                      maxHeight:
-                                          MediaQuery.of(context).size.height -
-                                              162,
-                                      panel: const Inventory(),
-                                      backdropEnabled: true,
-                                      // TODO(P5ina): Add sound
-                                      onPanelOpened: () {
-                                        context.read<TutorialBloc>().add(
-                                              const TutorialEvent
-                                                  .inventoryOpened(),
-                                            );
-                                      },
-                                      body: Stack(
-                                        alignment: Alignment.topCenter,
-                                        children: [
-                                          MapWidget(
-                                            geolocation: geolocation,
-                                            emojis: emojis,
-                                            user: user,
-                                          ),
-                                          Positioned(
-                                            top: MediaQuery.of(context)
-                                                .padding
-                                                .top,
-                                            left: 10,
-                                            child: Column(
-                                              children: [
-                                                Showcase(
-                                                  key: _sidebar,
-                                                  description: 'Open sidebar',
-                                                  disposeOnTap: true,
-                                                  onTargetClick: () =>
-                                                      scaffoldKey.currentState!
-                                                          .openDrawer(),
-                                                  child: IconButton(
-                                                    onPressed: () => scaffoldKey
-                                                        .currentState!
-                                                        .openDrawer(),
-                                                    iconSize: 45,
-                                                    color:
-                                                        const Color(0xFF979797),
-                                                    icon:
-                                                        const Icon(Icons.menu),
-                                                  ),
+                                    body: Stack(
+                                      alignment: Alignment.topCenter,
+                                      children: [
+                                        MapWidget(
+                                          geolocation: geolocation,
+                                          emojis: emojis,
+                                          user: user,
+                                        ),
+                                        Positioned(
+                                          top: MediaQuery.of(context)
+                                              .padding
+                                              .top,
+                                          left: 10,
+                                          child: Column(
+                                            children: [
+                                              Showcase(
+                                                key: _sidebar,
+                                                description: 'Open sidebar',
+                                                disposeOnTap: true,
+                                                onTargetClick: () => scaffoldKey
+                                                    .currentState!
+                                                    .openDrawer(),
+                                                child: IconButton(
+                                                  onPressed: () => scaffoldKey
+                                                      .currentState!
+                                                      .openDrawer(),
+                                                  iconSize: 45,
+                                                  color:
+                                                      const Color(0xFF979797),
+                                                  icon: const Icon(Icons.menu),
                                                 ),
-                                                const BoostersColumn(),
-                                              ],
-                                            ),
+                                              ),
+                                              const BoostersColumn(),
+                                            ],
                                           ),
-                                          BlocBuilder<TutorialBloc,
-                                              TutorialState>(
-                                            builder: (context, tutorialState) =>
-                                                tutorialState.step.maybeMap(
-                                              orElse: () =>
-                                                  const DialogueWindow(),
-                                              hidden: (_) => Container(),
-                                              hidden2: (_) => Container(),
-                                            ),
-                                          ),
-                                          BlocBuilder<TutorialBloc,
-                                              TutorialState>(
-                                            builder: (
-                                              context,
-                                              tutorialState,
-                                            ) =>
-                                                tutorialState.step.maybeMap(
-                                              initial: (_) => Container(),
-                                              hidden: (_) => Container(),
-                                              hidden2: (_) => Container(),
-                                              businessBuilt: (_) => Container(),
-                                              ending: (_) => Container(),
-                                              orElse: () =>
-                                                  const SkipTutorialButton(),
-                                            ),
-                                          ),
-                                          const CurrencyUpdateText(),
-                                        ],
-                                      ),
+                                        ),
+                                        BlocBuilder<TutorialBloc,
+                                            TutorialState>(
+                                          builder: (context, tutorialState) =>
+                                              switch (tutorialState.step) {
+                                            Hidden() => Container(),
+                                            Hidden2TutorialStep() =>
+                                              Container(),
+                                            _ => const DialogueWindow(),
+                                          },
+                                        ),
+                                        BlocBuilder<TutorialBloc,
+                                            TutorialState>(
+                                          builder: (
+                                            context,
+                                            tutorialState,
+                                          ) =>
+                                              switch (tutorialState.step) {
+                                            InitialTutorialStep() =>
+                                              Container(),
+                                            Hidden() => Container(),
+                                            Hidden2TutorialStep() =>
+                                              Container(),
+                                            BusinessBuilt() => Container(),
+                                            Ending() => Container(),
+                                            _ => const SkipTutorialButton(),
+                                          },
+                                        ),
+                                        const CurrencyUpdateText(),
+                                      ],
                                     ),
                                   ),
-                                  const DestroyModeMenu(),
-                                ],
-                              ),
+                                ),
+                                const DestroyModeMenu(),
+                              ],
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },

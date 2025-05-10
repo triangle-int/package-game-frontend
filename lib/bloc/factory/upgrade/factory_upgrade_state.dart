@@ -1,11 +1,12 @@
 part of 'factory_upgrade_bloc.dart';
 
 @freezed
-class FactoryUpgradeState with _$FactoryUpgradeState {
-  const factory FactoryUpgradeState.initial() = _Initial;
-  const factory FactoryUpgradeState.loadInProgress() = _LoadInProgress;
+sealed class FactoryUpgradeState with _$FactoryUpgradeState {
+  const factory FactoryUpgradeState.initial() = FactoryUpgradeStateInitial;
+  const factory FactoryUpgradeState.loadInProgress() =
+      FactoryUpgradeStateLoadInProgress;
   const factory FactoryUpgradeState.loadSuccess(FactoryBuilding building) =
-      _LoadSuccess;
+      FactoryUpgradeStateLoadSuccess;
   const factory FactoryUpgradeState.loadFailure(ServerFailure failure) =
-      _LoadFailure;
+      FactoryUpgradeStateLoadFailure;
 }

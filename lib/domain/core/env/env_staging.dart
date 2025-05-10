@@ -3,7 +3,7 @@ import 'package:package_flutter/domain/core/env/env.dart';
 
 part 'env_staging.g.dart';
 
-@Envied(obfuscate: true, path: '.env.staging')
+@Envied(obfuscate: false, path: '.env.staging')
 class EnvStaging implements Env {
   @override
   @EnviedField(varName: 'SERVER_URL')

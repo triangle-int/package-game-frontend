@@ -5,7 +5,7 @@ import 'package:package_flutter/domain/satellite/satellite_line.dart';
 part 'lines_and_hexes.freezed.dart';
 
 @freezed
-class LinesAndHexes with _$LinesAndHexes {
+abstract class LinesAndHexes with _$LinesAndHexes {
   const factory LinesAndHexes({
     required List<SatelliteLine> lines,
     required List<Zone> firstLayer,

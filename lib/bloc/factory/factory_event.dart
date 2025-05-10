@@ -1,9 +1,9 @@
 part of 'factory_bloc.dart';
 
 @freezed
-class FactoryEvent with _$FactoryEvent {
+sealed class FactoryEvent with _$FactoryEvent {
   const factory FactoryEvent.factoryRequested(int factoryId) =
-      _FactoryRequested;
+      FactoryEventFactoryRequested;
   const factory FactoryEvent.factoryGot(FactoryBuilding factoryBuilding) =
-      _FactoryGot;
+      FactoryEventFactoryGot;
 }

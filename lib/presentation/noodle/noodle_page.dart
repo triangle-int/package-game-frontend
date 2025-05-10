@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_flutter/app_router.dart';
 import 'package:package_flutter/bloc/tutorial/tutorial_bloc.dart';
+import 'package:package_flutter/domain/tutorial/tutorial_step.dart';
 import 'package:package_flutter/presentation/noodle/browser_bar.dart';
 import 'package:package_flutter/presentation/noodle/noodle_site.dart';
 import 'package:showcaseview/showcaseview.dart';
@@ -16,11 +17,9 @@ class NoodlePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ShowCaseWidget(
       disableBarrierInteraction: true,
-      builder: Builder(
-        builder: (context) {
-          return const NoodleBody();
-        },
-      ),
+      builder: (context) {
+        return const NoodleBody();
+      },
     );
   }
 }
@@ -41,14 +40,14 @@ class _NoodleBodyState extends State<NoodleBody> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await context.read<TutorialBloc>().state.step.maybeMap(
-            openFMMarket: (_) async {
-              await Future.delayed(const Duration(milliseconds: 400));
-              if (!context.mounted) return;
-              ShowCaseWidget.of(context).startShowCase([_fmMarketKey]);
-            },
-            orElse: () async {},
-          );
+      switch (context.read<TutorialBloc>().state.step) {
+        case OpenFMMarket():
+          await Future.delayed(const Duration(milliseconds: 400));
+          if (!context.mounted) return;
+          ShowCaseWidget.of(context).startShowCase([_fmMarketKey]);
+        default:
+          break;
+      }
     });
   }
 

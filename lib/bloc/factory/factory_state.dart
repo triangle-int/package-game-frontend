@@ -1,10 +1,12 @@
 part of 'factory_bloc.dart';
 
+// Change to Either
 @freezed
-class FactoryState with _$FactoryState {
-  const factory FactoryState.initial() = _Initial;
-  const factory FactoryState.loadInProgress() = _LoadInProgress;
-  const factory FactoryState.loadFailure(ServerFailure f) = _LoadFailure;
+sealed class FactoryState with _$FactoryState {
+  const factory FactoryState.initial() = FactoryStateInitial;
+  const factory FactoryState.loadInProgress() = FactoryStateLoadInProgress;
+  const factory FactoryState.loadFailure(ServerFailure f) =
+      FactoryStateLoadFailure;
   const factory FactoryState.loadSuccess(FactoryBuilding factoryBuilding) =
-      _LoadSuccess;
+      FactoryStateLoadSuccess;
 }

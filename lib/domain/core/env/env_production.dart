@@ -3,7 +3,7 @@ import 'package:package_flutter/domain/core/env/env.dart';
 
 part 'env_production.g.dart';
 
-@Envied(obfuscate: true, path: '.env.production')
+@Envied(obfuscate: false, path: '.env.production')
 class EnvProduction implements Env {
   @override
   @EnviedField(varName: 'SERVER_URL')

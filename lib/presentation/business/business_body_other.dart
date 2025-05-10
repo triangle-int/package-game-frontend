@@ -18,21 +18,21 @@ class BusinessBodyOther extends HookConsumerWidget {
 
     return BlocBuilder<BusinessBloc, BusinessState>(
       builder: (context, businessState) {
-        final businessAndTaxes = businessState.maybeMap(
-          loadSuccess: (s) => s.businessAndTax,
-          orElse: () => GetBusinessResponse(
-            business: Building.business(
-              id: 0,
-              geohex: '',
-              geohash: '',
-              level: 0,
-              ownerId: 0,
-              updatedAt: DateTime.now(),
-              resourceToUpgrade1: 'wheel',
-            ) as BusinessBuilding,
-            tax: 0,
-          ),
-        );
+        final businessAndTaxes = switch (businessState) {
+          BusinessStateLoadSuccess(:final businessAndTax) => businessAndTax,
+          _ => GetBusinessResponse(
+              business: Building.business(
+                id: 0,
+                geohex: '',
+                geohash: '',
+                level: 0,
+                ownerId: 0,
+                updatedAt: DateTime.now(),
+                resourceToUpgrade1: 'wheel',
+              ) as BusinessBuilding,
+              tax: 0,
+            ),
+        };
 
         final businessEmoji =
             config.getBusinessEmoji(businessAndTaxes.business.level);

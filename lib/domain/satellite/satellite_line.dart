@@ -4,7 +4,7 @@ import 'package:latlong2/latlong.dart';
 part 'satellite_line.freezed.dart';
 
 @freezed
-class SatelliteLine with _$SatelliteLine {
+abstract class SatelliteLine with _$SatelliteLine {
   const factory SatelliteLine({
     required int fromId,
     required int toId,

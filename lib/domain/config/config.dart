@@ -7,7 +7,7 @@ part 'config.freezed.dart';
 part 'config.g.dart';
 
 @freezed
-class Config with _$Config {
+abstract class Config with _$Config {
   const Config._();
 
   const factory Config({

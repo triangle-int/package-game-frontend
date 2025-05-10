@@ -6,7 +6,7 @@ part 'truck_schedule.freezed.dart';
 part 'truck_schedule.g.dart';
 
 @freezed
-class TruckSchedule with _$TruckSchedule {
+abstract class TruckSchedule with _$TruckSchedule {
   const factory TruckSchedule({
     required int id,
     required DateTime nextTime,

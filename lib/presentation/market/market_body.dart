@@ -15,32 +15,31 @@ class MarketBody extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return BlocConsumer<MarketBloc, MarketState>(
-      listener: (context, state) => state.map(
-        initial: (_) {
-          return null;
-        },
-        loadInProgress: (_) {
-          return null;
-        },
-        loadFailure: (s) => context.read<NotificationsBloc>().add(
-              NotificationsEvent.warningAdded(s.failure.toString()),
-            ),
-        loadSuccess: (_) {
-          return null;
-        },
-      ),
+      listener: (context, state) {
+        switch (state) {
+          case MarketStateLoadFailure(:final failure):
+            context.read<NotificationsBloc>().add(
+                  NotificationsEvent.warningAdded(failure.toString()),
+                );
+          default:
+            break;
+        }
+      },
       builder: (context, state) {
-        return state.map(
-          initial: (_) => const MarketLoading(),
-          loadInProgress: (_) => const MarketLoading(),
-          loadFailure: (_) => const MarketLoading(),
-          loadSuccess: (s) {
+        switch (state) {
+          case MarketStateInitial():
+            return const MarketLoading();
+          case MarketStateLoadInProgress():
+            return const MarketLoading();
+          case MarketStateLoadFailure():
+            return MarketLoading();
+          case MarketStateLoadSuccess(:final market):
             final config = ref.watch(configProvider).value!;
 
             final color = config.items
                 .whereType<ItemResource>()
                 .firstWhere(
-                  (i) => i.group == s.market.level && i.level == 8,
+                  (i) => i.group == market.level && i.level == 8,
                 )
                 .color;
             final branchName = [
@@ -49,7 +48,7 @@ class MarketBody extends HookConsumerWidget {
               'Tech',
               'Boat',
               'Bread',
-            ][s.market.level - 1];
+            ][market.level - 1];
             return Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -117,7 +116,7 @@ class MarketBody extends HookConsumerWidget {
                   ],
                 ),
                 Text(
-                  'weekly commission ${(s.market.commission! * 100).floor()}%',
+                  'weekly commission ${(market.commission! * 100).floor()}%',
                   style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 20,
@@ -125,8 +124,7 @@ class MarketBody extends HookConsumerWidget {
                 ),
               ],
             );
-          },
-        );
+        }
       },
     );
   }

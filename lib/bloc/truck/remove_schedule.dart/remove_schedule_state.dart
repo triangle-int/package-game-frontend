@@ -1,10 +1,12 @@
 part of 'remove_schedule_bloc.dart';
 
 @freezed
-class RemoveScheduleState with _$RemoveScheduleState {
-  const factory RemoveScheduleState.initial() = _Initial;
-  const factory RemoveScheduleState.loadInProgress() = _LoadInProgress;
+sealed class RemoveScheduleState with _$RemoveScheduleState {
+  const factory RemoveScheduleState.initial() = RemoveScheduleStateInitial;
+  const factory RemoveScheduleState.loadInProgress() =
+      RemoveScheduleStateLoadInProgress;
   const factory RemoveScheduleState.loadFailure(ServerFailure failure) =
-      _LoadFailure;
-  const factory RemoveScheduleState.loadSuccess() = _LoadSuccess;
+      RemoveScheduleStateLoadFailure;
+  const factory RemoveScheduleState.loadSuccess() =
+      RemoveScheduleStateLoadSuccess;
 }

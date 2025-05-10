@@ -21,20 +21,21 @@ class InventoryResource extends HookConsumerWidget {
       (i) => i.name == item.name,
       orElse: () => const Item.unknown(name: 'unknown'),
     );
-    final color = itemConfig.map(
-      resource: (r) => Color(
-        0xFF000000 + int.parse(r.color, radix: 16),
-      ),
-      booster: (b) => Theme.of(context).colorScheme.background,
-      unknown: (_) => Colors.white,
-    );
+    final color = switch (itemConfig) {
+      ItemResource(:final color) => Color(
+          0xFF000000 + int.parse(color, radix: 16),
+        ),
+      ItemBooster() => Theme.of(context).colorScheme.background,
+      ItemUnknown() => Colors.white,
+    };
 
     ref.listen<AsyncValue>(
       boosterActivateProvider(itemConfig.name),
       (previous, next) {
         next.when(
           data: (_) => Logger().d('Booster activated!'),
-          error: (e, st) => Logger().e('Booster activation error!', e, st),
+          error: (e, st) =>
+              Logger().e('Booster activation error!', error: e, stackTrace: st),
           loading: () {},
         );
       },

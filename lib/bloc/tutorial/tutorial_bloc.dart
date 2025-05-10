@@ -12,63 +12,90 @@ class TutorialBloc extends Bloc<TutorialEvent, TutorialState> {
 
   TutorialBloc(this._repository) : super(TutorialState.initial()) {
     on<TutorialEvent>((event, emit) async {
-      await event.map(
-        started: (_) async {
+      switch (event) {
+        case TutorialEventStarted():
           final failureOrStep = await _repository.getTutorialStep();
           failureOrStep.fold(
             (f) => emit(state.copyWith(step: const TutorialStep.initial())),
             (step) => emit(state.copyWith(step: step)),
           );
-        },
-        next: (_) async {
+        case TutorialEventNext():
           final nextStep = state.step.next();
           await _repository.setStep(nextStep);
           emit(state.copyWith(step: nextStep));
-        },
-        skip: (_) {
+        case TutorialEventSkip():
           _repository.setStep(const TutorialStep.hidden());
           emit(state.copyWith(step: const TutorialStep.hidden()));
-        },
-        buildMenuOpened: (_) async => state.step.maybeMap(
-          orElse: () {},
-          openBuildMenu: (_) => add(const TutorialEvent.next()),
-          openBuildMenu2: (_) => add(const TutorialEvent.next()),
-        ),
-        factoryPlace: (_) async => state.step.maybeMap(
-          orElse: () {},
-          placeFactory: (_) => add(const TutorialEvent.next()),
-        ),
-        storagePlace: (_) async => state.step.maybeMap(
-          orElse: () {},
-          placeStorage: (_) => add(const TutorialEvent.next()),
-        ),
-        truckSent: (_) async => state.step.maybeMap(
-          orElse: () {},
-          openDoggyExpress: (_) => add(const TutorialEvent.next()),
-          openDoggyExpress2: (_) => add(const TutorialEvent.next()),
-        ),
-        resourceSelected: (_) async => state.step.maybeMap(
-          orElse: () {},
-          selectResource: (_) => add(const TutorialEvent.next()),
-        ),
-        truckArrived: (_) async => state.step.maybeMap(
-          orElse: () {},
-          waitTruck: (_) => add(const TutorialEvent.next()),
-          waitTruck2: (_) => add(const TutorialEvent.next()),
-        ),
-        inventoryOpened: (_) async => state.step.maybeMap(
-          orElse: () {},
-          resourceInfo: (_) => add(const TutorialEvent.next()),
-        ),
-        businessPlace: (_) async => state.step.maybeMap(
-          orElse: () {},
-          hidden: (_) => add(const TutorialEvent.next()),
-        ),
-        priceSet: (_) async => state.step.maybeMap(
-          orElse: () {},
-          openFMMarket: (_) => add(const TutorialEvent.next()),
-        ),
-      );
+        case TutorialEventBuildMenuOpened():
+          switch (state.step) {
+            case OpenBuildMenu():
+              add(const TutorialEvent.next());
+            case OpenBuildMenu2():
+              add(const TutorialEvent.next());
+            default:
+              break;
+          }
+        case TutorialEventFactoryPlace():
+          switch (state.step) {
+            case PlaceFactory():
+              add(const TutorialEvent.next());
+            default:
+              break;
+          }
+        case TutorialEventStoragePlace():
+          switch (state.step) {
+            case PlaceStorage():
+              add(const TutorialEvent.next());
+            default:
+              break;
+          }
+        case TutorialEventTruckSent():
+          switch (state.step) {
+            case OpenDoggyExpress():
+              add(const TutorialEvent.next());
+            case OpenDoggyExpress2():
+              add(const TutorialEvent.next());
+            default:
+              break;
+          }
+        case TutorialEventResourceSelected():
+          switch (state.step) {
+            case SelectResource():
+              add(const TutorialEvent.next());
+            default:
+              break;
+          }
+        case TutorialEventTruckArrived():
+          switch (state.step) {
+            case WaitTruck():
+              add(const TutorialEvent.next());
+            case WaitTruck2():
+              add(const TutorialEvent.next());
+            default:
+              break;
+          }
+        case TutorialEventInventoryOpened():
+          switch (state.step) {
+            case ResourceInfo():
+              add(const TutorialEvent.next());
+            default:
+              break;
+          }
+        case TutorialEventBusinessPlace():
+          switch (state.step) {
+            case Hidden():
+              add(const TutorialEvent.next());
+            default:
+              break;
+          }
+        case TutorialEventPriceSet():
+          switch (state.step) {
+            case OpenFMMarket():
+              add(const TutorialEvent.next());
+            default:
+              break;
+          }
+      }
     });
   }
 }

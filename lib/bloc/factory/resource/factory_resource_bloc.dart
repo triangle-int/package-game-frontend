@@ -15,17 +15,16 @@ class FactoryResourceBloc
   FactoryResourceBloc(this._factoryRepository)
       : super(FactoryResourceState.initial()) {
     on<FactoryResourceEvent>((event, emit) async {
-      await event.map(
-        resourceSelected: (e) async {
+      switch (event) {
+        case FactoryResourceEventResourceSelected(resource: final resource):
           emit(
             state.copyWith(
-              resource: e.resource,
+              resource: resource,
               failureOrNull: null,
               factoryOrNull: null,
             ),
           );
-        },
-        confirmed: (e) async {
+        case FactoryResourceEventConfirmed(factoryId: final factoryId):
           emit(
             state.copyWith(
               isLoading: true,
@@ -43,7 +42,7 @@ class FactoryResourceBloc
             return;
           }
           final factoryOrFailure = await _factoryRepository.selectResource(
-            e.factoryId,
+            factoryId,
             state.resource,
           );
           emit(
@@ -60,8 +59,7 @@ class FactoryResourceBloc
               ),
             ),
           );
-        },
-      );
+      }
     });
   }
 }

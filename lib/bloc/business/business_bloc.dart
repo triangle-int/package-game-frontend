@@ -19,12 +19,12 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
   BusinessBloc(this._buildingRepository, this._businessRepository)
       : super(const BusinessState.initial()) {
     on<BusinessEvent>((event, emit) async {
-      await event.map(
-        businessRequested: (e) async {
+      switch (event) {
+        case BusinessRequested(:final businessId, :final user):
           emit(const BusinessState.loadInProgress());
           Logger().d('Send event');
           final businessOrFailure =
-              await _buildingRepository.getBusiness(businessId: e.businessId);
+              await _buildingRepository.getBusiness(businessId: businessId);
           businessOrFailure.fold((l) => null, (r) => null);
           Logger().d(businessOrFailure);
 
@@ -35,40 +35,45 @@ class BusinessBloc extends Bloc<BusinessEvent, BusinessState> {
             ),
           );
 
-          add(BusinessEvent.collectMoney(e.user));
-        },
-        collectMoney: (e) => state.map(
-          initial: (_) {},
-          loadInProgress: (_) {},
-          loadFailure: (_) {},
-          loadSuccess: (s) async {
-            if (e.user.id != s.businessAndTax.business.ownerId) return;
-            final businessOrFailure = await _businessRepository.collectMoney(
-              businessId: s.businessAndTax.business.id,
-            );
-            emit(
-              businessOrFailure.fold(
-                (f) => BusinessState.loadFailure(f),
-                (business) => BusinessState.loadSuccess(
-                  s.businessAndTax.copyWith(business: business),
+          add(BusinessEvent.collectMoney(user));
+        case CollectMoney(:final user):
+          switch (state) {
+            case BusinessStateInitial():
+              break;
+            case BusinessStateLoadInProgress():
+              break;
+            case BusinessStateLoadFailure():
+              break;
+            case BusinessStateLoadSuccess(:final businessAndTax):
+              if (user.id != businessAndTax.business.ownerId) return;
+              final businessOrFailure = await _businessRepository.collectMoney(
+                businessId: businessAndTax.business.id,
+              );
+              emit(
+                businessOrFailure.fold(
+                  (f) => BusinessState.loadFailure(f),
+                  (business) => BusinessState.loadSuccess(
+                    businessAndTax.copyWith(business: business),
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
-        businessGot: (e) => state.map(
-          initial: (s) {},
-          loadInProgress: (s) {},
-          loadFailure: (s) {},
-          loadSuccess: (s) {
-            emit(
-              BusinessState.loadSuccess(
-                s.businessAndTax.copyWith(business: e.businessBuilding),
-              ),
-            );
-          },
-        ),
-      );
+              );
+          }
+        case BusinessGot(:final businessBuilding):
+          switch (state) {
+            case BusinessStateInitial():
+              break;
+            case BusinessStateLoadInProgress():
+              break;
+            case BusinessStateLoadFailure():
+              break;
+            case BusinessStateLoadSuccess(:final businessAndTax):
+              emit(
+                BusinessState.loadSuccess(
+                  businessAndTax.copyWith(business: businessBuilding),
+                ),
+              );
+          }
+      }
     });
   }
 }

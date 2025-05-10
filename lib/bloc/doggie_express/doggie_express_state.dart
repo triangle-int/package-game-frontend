@@ -1,7 +1,7 @@
 part of 'doggie_express_bloc.dart';
 
 @freezed
-class DoggieExpressState with _$DoggieExpressState {
+abstract class DoggieExpressState with _$DoggieExpressState {
   const factory DoggieExpressState({
     required Building? pointA,
     required Building? pointB,

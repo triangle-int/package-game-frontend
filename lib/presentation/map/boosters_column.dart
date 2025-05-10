@@ -36,7 +36,8 @@ class BoostersColumnState extends ConsumerState<ConsumerStatefulWidget> {
       (previous, next) {
         next.when(
           data: (_) {},
-          error: (e, st) => Logger().e("Can't load activated boosters", e, st),
+          error: (e, st) => Logger()
+              .e("Can't load activated boosters", error: e, stackTrace: st),
           loading: () {},
         );
       },

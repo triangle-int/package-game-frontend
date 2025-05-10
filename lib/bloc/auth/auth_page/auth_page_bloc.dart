@@ -12,8 +12,8 @@ class AuthPageBloc extends Bloc<AuthPageEvent, AuthPageState> {
 
   AuthPageBloc(this._auth) : super(AuthPageState.initial()) {
     on<AuthPageEvent>((event, emit) async {
-      await event.map(
-        signedInWithGoogle: (e) async {
+      switch (event) {
+        case SignedInWithGoogle():
           emit(state.copyWith(isSubmitting: true, failureOrNull: null));
           final failureOrUnit = await _auth.signInWithGoogle();
           emit(
@@ -22,8 +22,7 @@ class AuthPageBloc extends Bloc<AuthPageEvent, AuthPageState> {
               failureOrNull: failureOrUnit.fold((l) => l, (r) => null),
             ),
           );
-        },
-        signedInWithApple: (e) async {
+        case SignedInWithApple():
           emit(state.copyWith(isSubmitting: true, failureOrNull: null));
           final failureOrUnit = await _auth.signInWithApple();
           emit(
@@ -32,8 +31,7 @@ class AuthPageBloc extends Bloc<AuthPageEvent, AuthPageState> {
               failureOrNull: failureOrUnit.fold((l) => l, (r) => null),
             ),
           );
-        },
-      );
+      }
     });
   }
 }

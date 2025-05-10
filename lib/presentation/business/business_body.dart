@@ -25,21 +25,21 @@ class BusinessBody extends HookConsumerWidget {
 
     return BlocBuilder<BusinessBloc, BusinessState>(
       builder: (context, businessState) {
-        final businessAndTaxes = businessState.maybeMap(
-          loadSuccess: (s) => s.businessAndTax,
-          orElse: () => GetBusinessResponse(
-            business: Building.business(
-              id: 0,
-              geohex: '',
-              geohash: '',
-              level: 0,
-              ownerId: 0,
-              updatedAt: DateTime.now(),
-              resourceToUpgrade1: 'wheel',
-            ) as BusinessBuilding,
-            tax: 0,
-          ),
-        );
+        final businessAndTaxes = switch (businessState) {
+          BusinessStateLoadSuccess(:final businessAndTax) => businessAndTax,
+          _ => GetBusinessResponse(
+              business: Building.business(
+                id: 0,
+                geohex: '',
+                geohash: '',
+                level: 0,
+                ownerId: 0,
+                updatedAt: DateTime.now(),
+                resourceToUpgrade1: 'wheel',
+              ) as BusinessBuilding,
+              tax: 0,
+            ),
+        };
 
         final income = ref
             .read(activatedBoostersProvider.notifier)
@@ -93,16 +93,15 @@ class BusinessBody extends HookConsumerWidget {
                     const SizedBox(height: 15),
                     BlocBuilder<BusinessUpgradeBloc, BusinessUpgradeState>(
                       builder: (context, upgradeState) {
-                        return upgradeState.maybeMap(
-                          orElse: () => UpgradeButton(
-                            businessAndTaxes: businessAndTaxes,
-                            businessCost: businessCost,
-                            isMaxLevel: isMaxLevel,
-                            resourceToUpgradeEmoji: resourceToUpgrade,
-                          ),
-                          loadInProgress: (s) =>
-                              const CircularProgressIndicator(),
-                        );
+                        return switch (upgradeState) {
+                          LoadInProgress() => const CircularProgressIndicator(),
+                          _ => UpgradeButton(
+                              businessAndTaxes: businessAndTaxes,
+                              businessCost: businessCost,
+                              isMaxLevel: isMaxLevel,
+                              resourceToUpgradeEmoji: resourceToUpgrade,
+                            ),
+                        };
                       },
                     ),
                   ],
@@ -151,10 +150,11 @@ class UpgradeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<InventoryBloc, InventoryState>(
       builder: (context, inventoryState) {
-        final inventory = inventoryState.maybeMap(
-          loadSuccess: (s) => s.inventory.combineInventory(),
-          orElse: () => throw const UnexpectedValueError(),
-        );
+        final inventory = switch (inventoryState) {
+          InventoryStateLoadSuccess(:final inventory) =>
+            inventory.combineInventory(),
+          _ => throw const UnexpectedValueError(),
+        };
         final resourceCount = inventory.firstWhere(
           (i) => i.name == businessAndTaxes.business.resourceToUpgrade1,
           orElse: () => InventoryItem(

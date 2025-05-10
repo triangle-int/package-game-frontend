@@ -20,16 +20,16 @@ class UpgradeResource extends HookConsumerWidget {
 
     return BlocBuilder<FactoryBloc, FactoryState>(
       builder: (context, factoryState) {
-        final factoryBuilding = factoryState.maybeMap(
-          loadSuccess: (s) => s.factoryBuilding,
-          orElse: () => throw const UnexpectedValueError(),
-        );
+        final factoryBuilding = switch (factoryState) {
+          FactoryStateLoadSuccess(:final factoryBuilding) => factoryBuilding,
+          _ => throw const UnexpectedValueError(),
+        };
         return BlocBuilder<InventoryBloc, InventoryState>(
           builder: (context, inventoryState) {
             final needResources =
                 config.factoryUpgradeCosts[factoryBuilding.level - 1];
-            final currentResources = inventoryState.maybeMap(
-              loadSuccess: (inventoryState) => inventoryState.inventory
+            final currentResources = switch (inventoryState) {
+              InventoryStateLoadSuccess(:final inventory) => inventory
                   .combineInventory()
                   .firstWhere(
                     (i) => i.name == resourceName,
@@ -39,8 +39,8 @@ class UpgradeResource extends HookConsumerWidget {
                     ),
                   )
                   .count,
-              orElse: () => BigInt.from(0),
-            );
+              _ => BigInt.from(0),
+            };
             return Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [

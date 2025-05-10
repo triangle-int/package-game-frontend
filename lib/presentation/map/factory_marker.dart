@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:logger/logger.dart';
 import 'package:package_flutter/bloc/factory/upgrade/factory_upgrade_bloc.dart';
 import 'package:package_flutter/bloc/user/user_provider.dart';
 import 'package:package_flutter/domain/building/building.dart';
-import 'package:rive/rive.dart';
 
 class FactoryMarker extends StatefulHookConsumerWidget {
   const FactoryMarker(
@@ -22,9 +20,9 @@ class FactoryMarker extends StatefulHookConsumerWidget {
 
 class _FactoryMarkerState extends ConsumerState<FactoryMarker> {
   bool isUpgrading = false;
-  StateMachineController? controller;
+  // StateMachineController? controller;
 
-  SMITrigger? _upgradeTrigger;
+  // SMITrigger? _upgradeTrigger;
 
   // Future<void> _onRiveInit(Artboard artboard) async {
   //   Logger().d('Rive marker Factory initializing...');
@@ -46,7 +44,7 @@ class _FactoryMarkerState extends ConsumerState<FactoryMarker> {
   Widget build(BuildContext context) {
     useEffect(
       () {
-        controller?.isActive = widget.factoryBuilding.enabled;
+        // controller?.isActive = widget.factoryBuilding.enabled;
         return null;
       },
       [widget.factoryBuilding],
@@ -55,19 +53,19 @@ class _FactoryMarkerState extends ConsumerState<FactoryMarker> {
 
     return BlocListener<FactoryUpgradeBloc, FactoryUpgradeState>(
       listener: (context, upgradeState) {
-        upgradeState.map(
-          initial: (_) {},
-          loadInProgress: (_) {},
-          loadSuccess: (s) {
-            if (s.building.id != widget.factoryBuilding.id) {
-              return;
-            }
-            Logger()
-                .d('Playing upgrade animation, trigger is $_upgradeTrigger');
-            _upgradeTrigger?.fire();
-          },
-          loadFailure: (s) {},
-        );
+        // upgradeState.map(
+        //   initial: (_) {},
+        //   loadInProgress: (_) {},
+        //   loadSuccess: (s) {
+        //     if (s.building.id != widget.factoryBuilding.id) {
+        //       return;
+        //     }
+        //     Logger()
+        //         .d('Playing upgrade animation, trigger is $_upgradeTrigger');
+        //     _upgradeTrigger?.fire();
+        //   },
+        //   loadFailure: (s) {},
+        // );
       },
       child: Builder(
         builder: (context) {

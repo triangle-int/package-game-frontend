@@ -14,14 +14,14 @@ class SidebarRoutes extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<RemoveScheduleBloc, RemoveScheduleState>(
       listener: (context, state) {
-        state.maybeMap(
-          loadSuccess: (_) {
+        switch (state) {
+          case RemoveScheduleStateLoadSuccess():
             context
                 .read<SidebarBloc>()
                 .add(const SidebarEvent.routesSelected());
-          },
-          orElse: () {},
-        );
+          default:
+            break;
+        }
       },
       child: Expanded(
         child: ListView(
@@ -47,12 +47,16 @@ class SidebarRoutes extends StatelessWidget {
               padding: const EdgeInsets.only(left: 40, right: 20),
               child: BlocBuilder<SidebarBloc, SidebarState>(
                 builder: (context, sidebarState) {
-                  return sidebarState.map(
-                    initial: (_) => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    routes: (s) {
-                      if (s.isLoading && s.schedulesOrFailure == null) {
+                  switch (sidebarState) {
+                    case SidebarStateInitial():
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    case SidebarStateRoutes(
+                        :final isLoading,
+                        :final schedulesOrFailure,
+                      ):
+                      if (isLoading && schedulesOrFailure == null) {
                         return const Center(
                           child: CircularProgressIndicator(),
                         );
@@ -64,7 +68,7 @@ class SidebarRoutes extends StatelessWidget {
                           const SidebarRouteCategory('scheduled routes'),
                           const SizedBox(height: 18),
                           SeparatedColumn(
-                            children: s.schedulesOrFailure!.fold(
+                            children: schedulesOrFailure!.fold(
                               (f) => [
                                 Text('Routes loading failed: ${f.getMessage()}')
                               ],
@@ -91,7 +95,7 @@ class SidebarRoutes extends StatelessWidget {
                           const SidebarRouteCategory('one time routes'),
                           const SizedBox(height: 18),
                           SeparatedColumn(
-                            children: s.schedulesOrFailure!.fold(
+                            children: schedulesOrFailure.fold(
                               (f) => [
                                 Text('Routes loading failed: ${f.getMessage()}')
                               ],
@@ -117,8 +121,7 @@ class SidebarRoutes extends StatelessWidget {
                           ),
                         ],
                       );
-                    },
-                  );
+                  }
                 },
               ),
             ),

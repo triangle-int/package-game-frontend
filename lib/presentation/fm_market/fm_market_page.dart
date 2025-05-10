@@ -26,33 +26,31 @@ class FMMarketPage extends HookWidget {
 
     return ShowCaseWidget(
       disableBarrierInteraction: true,
-      builder: Builder(
-        builder: (context) {
-          return const Scaffold(
-            backgroundColor: Color(0xFFEEEEEE),
-            appBar: BrowserBar(
-              icon: Icons.arrow_back,
-              link: 'httgs://razvoda.net/F&M-Market',
-            ),
-            body: Column(
-              children: [
-                Stack(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(top: 89),
-                      child: search.SearchBar(),
-                    ),
-                    FMMarketLogo(),
-                  ],
-                ),
-                Expanded(
-                  child: FMMarketTrades(),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+      builder: (context) {
+        return const Scaffold(
+          backgroundColor: Color(0xFFEEEEEE),
+          appBar: BrowserBar(
+            icon: Icons.arrow_back,
+            link: 'httgs://razvoda.net/F&M-Market',
+          ),
+          body: Column(
+            children: [
+              Stack(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 89),
+                    child: search.SearchBar(),
+                  ),
+                  FMMarketLogo(),
+                ],
+              ),
+              Expanded(
+                child: FMMarketTrades(),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

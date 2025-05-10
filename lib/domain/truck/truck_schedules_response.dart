@@ -6,7 +6,7 @@ part 'truck_schedules_response.freezed.dart';
 part 'truck_schedules_response.g.dart';
 
 @freezed
-class TruckSchedulesResponse with _$TruckSchedulesResponse {
+abstract class TruckSchedulesResponse with _$TruckSchedulesResponse {
   const factory TruckSchedulesResponse({
     required List<TruckSchedule> schedules,
     required List<Truck> trucks,

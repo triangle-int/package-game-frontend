@@ -19,8 +19,8 @@ class TruckBloc extends Bloc<TruckEvent, TruckState> {
 
   TruckBloc(this._repository) : super(const TruckState.initial()) {
     on<TruckEvent>((event, emit) async {
-      event.map(
-        listenTrucksRequested: (_) {
+      switch (event) {
+        case TruckEventListenTrucksRequested():
           emit(const TruckState.loadInProgress());
 
           Logger().d('Loading trucks 🚚');
@@ -30,20 +30,17 @@ class TruckBloc extends Bloc<TruckEvent, TruckState> {
                 (trucksOrFailure) =>
                     add(TruckEvent.trucksReceived(trucksOrFailure)),
               );
-        },
-        trucksReceived: (e) {
+        case TruckEventTrucksReceived(:final trucksOrFailure):
           Logger().d('Trucks loaded 🚚');
           emit(
-            e.trucksOrFailure.fold(
+            trucksOrFailure.fold(
               (f) => TruckState.loadFailure(f),
               (trucks) => TruckState.loadSuccess(trucks),
             ),
           );
-        },
-        truckArrived: (e) {
-          _repository.removeTruck(e.truck.id);
-        },
-      );
+        case TruckEventTruckArrived(:final truck):
+          _repository.removeTruck(truck.id);
+      }
     });
   }
 

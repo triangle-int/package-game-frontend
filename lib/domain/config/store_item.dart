@@ -4,7 +4,7 @@ part 'store_item.freezed.dart';
 part 'store_item.g.dart';
 
 @Freezed(unionKey: 'type')
-class StoreItem with _$StoreItem {
+sealed class StoreItem with _$StoreItem {
   const factory StoreItem.iap({
     required String id,
     required String icon,

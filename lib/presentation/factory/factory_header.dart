@@ -26,14 +26,12 @@ class FactoryHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocConsumer<FactoryToggleBloc, FactoryToggleState>(
       listener: (context, state) {
-        state.maybeMap(
-          loadSuccess: (s) {
-            context
-                .read<FactoryBloc>()
-                .add(FactoryEvent.factoryGot(s.building));
-          },
-          orElse: () {},
-        );
+        switch (state) {
+          case FactoryToggleStateLoadSuccess(:final building):
+            context.read<FactoryBloc>().add(FactoryEvent.factoryGot(building));
+          default:
+            break;
+        }
       },
       builder: (context, state) {
         return Row(

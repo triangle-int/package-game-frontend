@@ -12,12 +12,12 @@ class CreateUserBloc extends Bloc<CreateUserEvent, CreateUserState> {
 
   CreateUserBloc(this._repository) : super(CreateUserState.initial()) {
     on<CreateUserEvent>((event, emit) async {
-      await event.map(
-        avatarChanged: (e) async =>
-            emit(state.copyWith(avatar: e.avatar, failureOrNull: null)),
-        nicknameChanged: (e) async =>
-            emit(state.copyWith(nickname: e.nickname, failureOrNull: null)),
-        confirmed: (e) async {
+      switch (event) {
+        case CreateUserEventAvatarChanged(:final avatar):
+          emit(state.copyWith(avatar: avatar, failureOrNull: null));
+        case CreateUserEventNicknameChanged(:final nickname):
+          emit(state.copyWith(nickname: nickname, failureOrNull: null));
+        case CreateUserEventConfirmed():
           emit(
             state.copyWith(
               isSubmitting: true,
@@ -36,8 +36,7 @@ class CreateUserBloc extends Bloc<CreateUserEvent, CreateUserState> {
               failureOrNull: failureOrUnit.fold((f) => f, (_) => null),
             ),
           );
-        },
-      );
+      }
     });
   }
 }

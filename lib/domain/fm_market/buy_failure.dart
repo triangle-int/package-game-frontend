@@ -4,8 +4,8 @@ import 'package:package_flutter/domain/core/server_failure.dart';
 part 'buy_failure.freezed.dart';
 
 @freezed
-class BuyFailure with _$BuyFailure {
-  const factory BuyFailure.invalidAmount() = _InvalidAmount;
+sealed class BuyFailure with _$BuyFailure {
+  const factory BuyFailure.invalidAmount() = BuyFailureInvalidAmount;
   const factory BuyFailure.serverFailure(ServerFailure failure) =
-      _ServerFailure;
+      BuyFailureServerFailure;
 }

@@ -28,7 +28,7 @@ class FactoryToggleButton extends StatelessWidget {
             onChanged: hasProductionItem
                 ? (_) {
                     context.read<FactoryToggleBloc>().add(
-                          FactoryToggleEvent.factoryToggled(factoryBuilding),
+                          FactoryToggleEvent.toggled(factoryBuilding),
                         );
                   }
                 : null,

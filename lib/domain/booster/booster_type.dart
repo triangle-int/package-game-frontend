@@ -4,7 +4,7 @@ part 'booster_type.freezed.dart';
 part 'booster_type.g.dart';
 
 @freezed
-class BoosterTypes with _$BoosterTypes {
+abstract class BoosterTypes with _$BoosterTypes {
   const factory BoosterTypes({
     required String businessIncome,
     required String priceDecrease,

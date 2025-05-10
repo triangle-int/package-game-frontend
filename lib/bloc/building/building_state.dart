@@ -1,7 +1,7 @@
 part of 'building_bloc.dart';
 
 @freezed
-class BuildingState with _$BuildingState {
+abstract class BuildingState with _$BuildingState {
   const factory BuildingState({
     required List<Building> buildings,
     required bool isLoading,

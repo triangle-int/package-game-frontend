@@ -14,30 +14,24 @@ class FmSearchBloc extends Bloc<FmSearchEvent, FmSearchState> {
 
   FmSearchBloc(this._fmMarketRepository) : super(FmSearchState.initial()) {
     on<FmSearchEvent>((event, emit) async {
-      await event.map(
-        openSearch: (e) async {
+      switch (event) {
+        case FmSearchEventOpenSearch():
           emit(state.copyWith(isSearchOpen: true, failureOrNull: null));
-        },
-        closeSearch: (e) async {
+        case FmSearchEventCloseSearch():
           emit(state.copyWith(isSearchOpen: false, failureOrNull: null));
-        },
-        nicknameChanged: (e) async {
-          emit(state.copyWith(nickname: e.nickname, failureOrNull: null));
-        },
-        addFilter: (e) async {
-          final filters = List<String>.from(state.filters)..add(e.resourceName);
+        case FmSearchEventNicknameChanged(:final nickname):
+          emit(state.copyWith(nickname: nickname, failureOrNull: null));
+        case FmSearchEventAddFilter(:final resourceName):
+          final filters = List<String>.from(state.filters)..add(resourceName);
           emit(state.copyWith(filters: filters, failureOrNull: null));
-        },
-        removeFilter: (e) async {
+        case FmSearchEventRemoveFilter(:final resourceName):
           final filters = List<String>.from(state.filters)
-            ..remove(e.resourceName);
+            ..remove(resourceName);
           emit(state.copyWith(filters: filters, failureOrNull: null));
-        },
-        clearFilters: (e) async {
+        case FmSearchEventClearFilters():
           emit(state.copyWith(filters: [], nickname: '', failureOrNull: null));
           add(const FmSearchEvent.search());
-        },
-        search: (e) async {
+        case FmSearchEventSearch():
           if (state.isSearching) return;
 
           emit(
@@ -62,8 +56,7 @@ class FmSearchBloc extends Bloc<FmSearchEvent, FmSearchState> {
                   state.copyWith(isSearching: false, searchResults: trades),
             ),
           );
-        },
-        loadMore: (_) async {
+        case FmSearchEventLoadMore():
           if (state.isSearching || state.isLastPage) return;
 
           Logger().d('load more');
@@ -92,8 +85,7 @@ class FmSearchBloc extends Bloc<FmSearchEvent, FmSearchState> {
               ),
             ),
           );
-        },
-      );
+      }
     });
   }
 }

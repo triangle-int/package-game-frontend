@@ -18,15 +18,15 @@ class MarketResource extends HookConsumerWidget {
     return BlocBuilder<MarketBloc, MarketState>(
       builder: (context, marketState) {
         final config = ref.watch(configProvider).value!;
-        final group = marketState.maybeMap(
-          loadSuccess: (state) => state.market.level,
-          orElse: () => throw const UnexpectedValueError(),
-        );
+        final group = switch (marketState) {
+          MarketStateLoadSuccess(:final market) => market.level,
+          _ => throw const UnexpectedValueError(),
+        };
         final item = config.items.whereType<ItemResource>().firstWhere(
               (i) => i.level == resourceLevel && i.group == group,
             );
-        final count = marketState.maybeMap(
-          loadSuccess: (state) => state.market.inventory!
+        final count = switch (marketState) {
+          MarketStateLoadSuccess(:final market) => market.inventory!
               .firstWhere(
                 (i) => i.name == item.name,
                 orElse: () => InventoryItem(
@@ -35,8 +35,7 @@ class MarketResource extends HookConsumerWidget {
                 ),
               )
               .count,
-          orElse: () => throw const UnexpectedValueError(),
-        );
+        };
 
         return Row(
           crossAxisAlignment: CrossAxisAlignment.end,

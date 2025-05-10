@@ -15,17 +15,16 @@ class FactoryUpgradeBloc
   FactoryUpgradeBloc(this._factoryRepository)
       : super(const FactoryUpgradeState.initial()) {
     on<FactoryUpgradeEvent>((event, emit) async {
-      await event.map(
-        factoryUpgraded: (e) async {
+      switch (event) {
+        case FactoryUpgradeEventFactoryUpgraded(:final factoryBuilding):
           emit(const FactoryUpgradeState.loadInProgress());
           final buildingOrFailure =
-              await _factoryRepository.upgradeFactory(e.factoryBuilding.id);
+              await _factoryRepository.upgradeFactory(factoryBuilding.id);
           buildingOrFailure.fold(
             (f) => emit(FactoryUpgradeState.loadFailure(f)),
             (building) => emit(FactoryUpgradeState.loadSuccess(building)),
           );
-        },
-      );
+      }
     });
   }
 }

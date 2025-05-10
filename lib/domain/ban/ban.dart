@@ -4,7 +4,7 @@ part 'ban.freezed.dart';
 part 'ban.g.dart';
 
 @freezed
-class Ban with _$Ban {
+abstract class Ban with _$Ban {
   const factory Ban({
     required String reason,
   }) = _Ban;

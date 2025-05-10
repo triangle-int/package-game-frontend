@@ -16,11 +16,12 @@ class SatelliteMenu extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return BlocConsumer<SatelliteBloc, SatelliteState>(
       listener: (context, satelliteState) {
-        satelliteState.map(
-          initial: (_) {},
-          loading: (_) {},
-          showLines: (_) => context.router.pop(),
-        );
+        switch (satelliteState) {
+          case SatelliteStateShowLines():
+            context.router.pop();
+          default:
+            break;
+        }
       },
       builder: (context, satelliteState) {
         final config = ref.watch(configProvider).value!;
@@ -73,53 +74,53 @@ class SatelliteMenu extends HookConsumerWidget {
                   ],
                 ),
                 const Spacer(),
-                satelliteState.map(
-                  initial: (_) => ElevatedButton(
-                    onPressed: () {
-                      context.read<SatelliteBloc>().add(
-                            SatelliteEvent.collectedMoney(building.id),
-                          );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(100, 49),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(37),
+                switch (satelliteState) {
+                  SatelliteStateInitial() => ElevatedButton(
+                      onPressed: () {
+                        context.read<SatelliteBloc>().add(
+                              SatelliteEvent.collectedMoney(building.id),
+                            );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(100, 49),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(37),
+                        ),
+                      ),
+                      child: const Text(
+                        'collect',
+                        style: TextStyle(
+                          fontSize: 24,
+                        ),
                       ),
                     ),
-                    child: const Text(
-                      'collect',
-                      style: TextStyle(
-                        fontSize: 24,
+                  SatelliteStateLoading() => const Center(
+                      child: SizedBox(
+                        width: 30,
+                        height: 30,
+                        child: CircularProgressIndicator(),
                       ),
                     ),
-                  ),
-                  loading: (_) => const Center(
-                    child: SizedBox(
-                      width: 30,
-                      height: 30,
-                      child: CircularProgressIndicator(),
-                    ),
-                  ),
-                  showLines: (_) => ElevatedButton(
-                    onPressed: () {
-                      context.read<SatelliteBloc>().add(
-                            SatelliteEvent.collectedMoney(building.id),
-                          );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(100, 49),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(37),
+                  SatelliteStateShowLines() => ElevatedButton(
+                      onPressed: () {
+                        context.read<SatelliteBloc>().add(
+                              SatelliteEvent.collectedMoney(building.id),
+                            );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(100, 49),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(37),
+                        ),
+                      ),
+                      child: const Text(
+                        'collect',
+                        style: TextStyle(
+                          fontSize: 24,
+                        ),
                       ),
                     ),
-                    child: const Text(
-                      'collect',
-                      style: TextStyle(
-                        fontSize: 24,
-                      ),
-                    ),
-                  ),
-                ),
+                },
                 const Spacer(),
                 const Text(
                   'weekly commission 0%',

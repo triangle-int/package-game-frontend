@@ -7,6 +7,7 @@ import 'package:package_flutter/bloc/sidebar/sidebar_bloc.dart';
 import 'package:package_flutter/bloc/tutorial/tutorial_bloc.dart';
 import 'package:package_flutter/bloc/user/user_provider.dart';
 import 'package:package_flutter/domain/truck/truck_repository.dart';
+import 'package:package_flutter/domain/tutorial/tutorial_step.dart';
 import 'package:package_flutter/domain/user/user.dart';
 import 'package:package_flutter/presentation/core/transformers/currency_transformer.dart';
 import 'package:package_flutter/presentation/sidebar/sidebar_body.dart';
@@ -24,20 +25,22 @@ class _SidebarState extends ConsumerState<Sidebar> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await context.read<TutorialBloc>().state.step.maybeMap(
-            openDoggyExpress: (_) async {
-              await Future.delayed(const Duration(milliseconds: 400));
-              if (!context.mounted) return;
-              ShowCaseWidget.of(context).startShowCase([_doggyExpress]);
-            },
-            openFMMarket: (_) async {
-              await Future.delayed(const Duration(milliseconds: 400));
-              if (!context.mounted) return;
-              ShowCaseWidget.of(context).startShowCase([_noodle]);
-            },
-            orElse: () async {},
-          );
+      if (context.mounted) {
+        switch (context.read<TutorialBloc>().state.step) {
+          case OpenDoggyExpress():
+            await Future.delayed(const Duration(milliseconds: 400));
+            if (!context.mounted) return;
+            ShowCaseWidget.of(context).startShowCase([_doggyExpress]);
+          case OpenFMMarket():
+            await Future.delayed(const Duration(milliseconds: 400));
+            if (!context.mounted) return;
+            ShowCaseWidget.of(context).startShowCase([_noodle]);
+          default:
+            break;
+        }
+      }
     });
   }
 
@@ -89,13 +92,15 @@ class _SidebarState extends ConsumerState<Sidebar> {
                       ),
                       BlocBuilder<SidebarBloc, SidebarState>(
                         builder: (context, sidebarState) {
-                          return sidebarState.map(
-                            initial: (_) => SidebarBody(
-                              noodleKey: _noodle,
-                              doggyExpressKey: _doggyExpress,
-                            ),
-                            routes: (_) => const SidebarRoutes(),
-                          );
+                          switch (sidebarState) {
+                            case SidebarStateInitial():
+                              return SidebarBody(
+                                noodleKey: _noodle,
+                                doggyExpressKey: _doggyExpress,
+                              );
+                            case SidebarStateRoutes():
+                              return const SidebarRoutes();
+                          }
                         },
                       ),
                     ],
@@ -104,19 +109,18 @@ class _SidebarState extends ConsumerState<Sidebar> {
               ),
               BlocBuilder<SidebarBloc, SidebarState>(
                 builder: (context, sidebarState) {
-                  if (sidebarState.map(
-                    initial: (_) => false,
-                    routes: (_) => true,
-                  )) {
-                    return Container();
+                  switch (sidebarState) {
+                    case SidebarStateInitial():
+                      return BottomSidebar(
+                        user: user,
+                        level: level,
+                        nextLevel: nextLevel,
+                        gems: gems,
+                        money: money,
+                      );
+                    case SidebarStateRoutes():
+                      return Container();
                   }
-                  return BottomSidebar(
-                    user: user,
-                    level: level,
-                    nextLevel: nextLevel,
-                    gems: gems,
-                    money: money,
-                  );
                 },
               ),
             ],

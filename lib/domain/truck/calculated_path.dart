@@ -4,7 +4,7 @@ part 'calculated_path.freezed.dart';
 part 'calculated_path.g.dart';
 
 @freezed
-class CalculatedPath with _$CalculatedPath {
+abstract class CalculatedPath with _$CalculatedPath {
   factory CalculatedPath({
     required int costPerTruck,
     required BigInt cost,

@@ -1,6 +1,6 @@
 part of 'map_bloc.dart';
 
 @freezed
-class MapEvent with _$MapEvent {
-  const factory MapEvent.movedToPlayer() = _MovedToPlayer;
+sealed class MapEvent with _$MapEvent {
+  const factory MapEvent.movedToPlayer() = MapEventMovedToPlayer;
 }

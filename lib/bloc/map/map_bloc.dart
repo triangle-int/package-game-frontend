@@ -7,13 +7,12 @@ part 'map_bloc.freezed.dart';
 
 class MapBloc extends Bloc<MapEvent, MapState> {
   MapBloc() : super(const MapState.idle()) {
-    on<MapEvent>((event, emit) async {
-      await event.map(
-        movedToPlayer: (e) async {
+    on<MapEvent>((event, emit) {
+      switch (event) {
+        case MapEventMovedToPlayer():
           emit(const MapState.moveToPlayer());
           emit(const MapState.idle());
-        },
-      );
+      }
     });
   }
 }

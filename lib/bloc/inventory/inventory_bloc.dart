@@ -18,8 +18,8 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
 
   InventoryBloc(this._repository) : super(const InventoryState.initial()) {
     on<InventoryEvent>((event, emit) async {
-      await event.map(
-        listenInventoryRequested: (e) async {
+      switch (event) {
+        case InventoryEventListenInventoryRequested():
           emit(const InventoryState.loadInProgress());
           _inventorySubscription?.cancel();
           _inventorySubscription =
@@ -29,17 +29,14 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
               (items) => add(InventoryEvent.itemsReceived(right(items))),
             );
           });
-        },
-        itemsReceived: (e) async {
-          e.item.fold(
+        case InventoryEventItemsReceived(:final item):
+          item.fold(
             (f) => emit(InventoryState.loadFailure(f)),
             (inventory) => emit(InventoryState.loadSuccess(inventory)),
           );
-        },
-        reset: (e) {
+        case InventoryEventReset():
           emit(const InventoryState.initial());
-        },
-      );
+      }
     });
   }
 

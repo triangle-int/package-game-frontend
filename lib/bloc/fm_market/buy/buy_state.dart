@@ -1,7 +1,7 @@
 part of 'buy_bloc.dart';
 
 @freezed
-class BuyState with _$BuyState {
+abstract class BuyState with _$BuyState {
   const factory BuyState({
     required BigInt amount,
     required bool isLoading,

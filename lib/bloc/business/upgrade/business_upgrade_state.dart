@@ -1,12 +1,12 @@
 part of 'business_upgrade_bloc.dart';
 
 @freezed
-class BusinessUpgradeState with _$BusinessUpgradeState {
-  const factory BusinessUpgradeState.initial() = _Initial;
-  const factory BusinessUpgradeState.loadInProgress() = _LoadInProgress;
+sealed class BusinessUpgradeState with _$BusinessUpgradeState {
+  const factory BusinessUpgradeState.initial() = Initial;
+  const factory BusinessUpgradeState.loadInProgress() = LoadInProgress;
   const factory BusinessUpgradeState.loadFailure(ServerFailure failure) =
-      _LoadFailure;
+      LoadFailure;
   const factory BusinessUpgradeState.loadSuccess(
     BusinessBuilding building,
-  ) = _LoadSuccess;
+  ) = LoadSuccess;
 }

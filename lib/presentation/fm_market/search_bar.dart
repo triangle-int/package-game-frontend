@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_flutter/app_router.dart';
 import 'package:package_flutter/bloc/fm_market/fm_search_bloc.dart';
 import 'package:package_flutter/bloc/tutorial/tutorial_bloc.dart';
+import 'package:package_flutter/domain/tutorial/tutorial_step.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 class SearchBar extends StatefulWidget {
@@ -23,14 +24,16 @@ class _SearchBarState extends State<SearchBar> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await context.read<TutorialBloc>().state.step.maybeMap(
-            openFMMarket: (_) async {
-              await Future.delayed(const Duration(milliseconds: 400));
-              if (!context.mounted) return;
-              ShowCaseWidget.of(context).startShowCase([_profileKey]);
-            },
-            orElse: () async {},
-          );
+      if (context.mounted) {
+        switch (context.read<TutorialBloc>().state.step) {
+          case OpenFMMarket():
+            await Future.delayed(const Duration(milliseconds: 400));
+            if (!context.mounted) return;
+            ShowCaseWidget.of(context).startShowCase([_profileKey]);
+          default:
+            break;
+        }
+      }
     });
   }
 
