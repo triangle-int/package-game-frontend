@@ -58,8 +58,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '869744813970',
     projectId: 'package-legacy',
     storageBucket: 'package-legacy.firebasestorage.app',
-    iosClientId: '869744813970-bf9439fj9dn1m3cl81p9t9bchvfgbte6.apps.googleusercontent.com',
+    iosClientId:
+        '869744813970-bf9439fj9dn1m3cl81p9t9bchvfgbte6.apps.googleusercontent.com',
     iosBundleId: 'com.triangle-interactive.package',
   );
-
 }
