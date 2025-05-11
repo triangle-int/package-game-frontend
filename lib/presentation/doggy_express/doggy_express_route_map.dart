@@ -11,7 +11,7 @@ import 'package:package_flutter/bloc/notifications/notifications_bloc.dart';
 import 'package:package_flutter/bloc/tutorial/tutorial_bloc.dart';
 import 'package:package_flutter/bloc/user/user_provider.dart';
 import 'package:package_flutter/domain/building/building.dart';
-import 'package:package_flutter/domain/core/env_provider.dart';
+import 'package:package_flutter/domain/core/env/env.dart';
 import 'package:package_flutter/domain/tutorial/tutorial_step.dart';
 import 'package:package_flutter/presentation/core/cached_tile_provider.dart';
 import 'package:package_flutter/presentation/core/root/map_dark_mode.dart';
@@ -174,11 +174,10 @@ class _DoggyExpressRouteMapState extends ConsumerState<DoggyExpressRouteMap> {
                             children: [
                               TileLayer(
                                 urlTemplate: ref.watch(mapDarkModeProvider)
-                                    ? ref.watch(envProvider).mapDarkUrl
-                                    : ref.watch(envProvider).mapWhiteUrl,
+                                    ? Env.getMapDarkUrl()
+                                    : Env.getMapWhiteUrl(),
                                 additionalOptions: {
-                                  'api_key':
-                                      ref.watch(envProvider).mapAccessKey,
+                                  'api_key': Env.getMapAccessKey(),
                                 },
                                 tileProvider: CachedTileProvider(),
                               ),

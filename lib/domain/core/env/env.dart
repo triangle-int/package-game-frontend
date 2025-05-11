@@ -1,18 +1,33 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-part 'env.freezed.dart';
+abstract class Env {
+  static String getServerUrl() {
+    return dotenv.env['SERVER_URL'] ?? '';
+  }
 
-@freezed
-abstract class Env with _$Env {
-  const factory Env({
-    required String serverUrl,
-    required String mapAccessKey,
-    required String mapDarkUrl,
-    required String mapWhiteUrl,
-    required String wiredashSecretToken,
-    required String wiredashProjectId,
-    required String serverCertificate,
-  }) = _Env;
+  static String getMapAccessKey() {
+    return dotenv.env['MAP_ACCESS_KEY'] ?? '';
+  }
+
+  static String getMapDarkUrl() {
+    return dotenv.env['MAP_URL_DARK'] ?? '';
+  }
+
+  static String getMapWhiteUrl() {
+    return dotenv.env['MAP_URL_WHITE'] ?? '';
+  }
+
+  static String getWiredashSecretToken() {
+    return dotenv.env['WIREDASH_SECRET_TOKEN'] ?? '';
+  }
+
+  static String getWiredashProjectId() {
+    return dotenv.env['WIREDASH_PROJECT_ID'] ?? '';
+  }
+
+  static String getServerCertificate() {
+    return dotenv.env['SERVER_CERTIFICATE'] ?? '';
+  }
 
   static const String stagingEnvironment = 'STAGING';
   static const String productionEnvironment = 'PROD';

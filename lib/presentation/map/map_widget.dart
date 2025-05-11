@@ -23,7 +23,7 @@ import 'package:package_flutter/bloc/user/user_provider.dart';
 import 'package:package_flutter/bloc/user/users_in_bounds_provider.dart';
 import 'package:package_flutter/data/latlng/lat_lng_extension.dart';
 import 'package:package_flutter/domain/building/building.dart';
-import 'package:package_flutter/domain/core/env_provider.dart';
+import 'package:package_flutter/domain/core/env/env.dart';
 import 'package:package_flutter/domain/emoji/emoji.dart';
 import 'package:package_flutter/domain/truck/truck.dart';
 import 'package:package_flutter/domain/user/user.dart';
@@ -108,6 +108,8 @@ class _MapWidgetState extends ConsumerState<MapWidget>
   Widget build(BuildContext context) {
     final usersInBounds = ref.watch(usersInBoundsProvider);
     final user = ref.watch(userProvider).value!;
+
+    // print(Env.getMapDarkUrl());
 
     ref.listen<AsyncValue<List<UserOnMap>>>(usersInBoundsProvider,
         (previous, next) {
@@ -246,12 +248,12 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                             children: [
                               TileLayer(
                                 urlTemplate: ref.watch(mapDarkModeProvider)
-                                    ? ref.watch(envProvider).mapDarkUrl
-                                    : ref.watch(envProvider).mapWhiteUrl,
+                                    ? Env.getMapDarkUrl()
+                                    : Env.getMapWhiteUrl(),
                                 additionalOptions: {
-                                  'api_key':
-                                      ref.watch(envProvider).mapAccessKey,
+                                  'api_key': Env.getMapAccessKey(),
                                 },
+                                retinaMode: RetinaMode.isHighDensity(context),
                                 tileProvider: CachedTileProvider(),
                               ),
                               PolylineLayer(

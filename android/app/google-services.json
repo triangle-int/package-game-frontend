@@ -1,77 +1,26 @@
 {
   "project_info": {
-    "project_number": "731781815007",
-    "firebase_url": "https://package-6031d.firebaseio.com",
-    "project_id": "package-6031d",
-    "storage_bucket": "package-6031d.appspot.com"
+    "project_number": "869744813970",
+    "project_id": "package-legacy",
+    "storage_bucket": "package-legacy.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:731781815007:android:c473818012ba0584a0676a",
+        "mobilesdk_app_id": "1:869744813970:android:f82ef10fcf4190a959434b",
         "android_client_info": {
           "package_name": "com.TriangleInteractive.Package"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "731781815007-6phju19k7ss0qe669vs2qfq17c8eihb7.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.TriangleInteractive.Package",
-            "certificate_hash": "8d68d0144a3d4766e9e178e6c2ee9a09af3c2447"
-          }
-        },
-        {
-          "client_id": "731781815007-jplr16ik9nlut2q92pavrhmi80n98ph8.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.TriangleInteractive.Package",
-            "certificate_hash": "b62aff68fe027870c4ad9df2b84dd9d85bdaefb5"
-          }
-        },
-        {
-          "client_id": "731781815007-nsb4uoq005192sggnq76adc00fuud2dm.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.TriangleInteractive.Package",
-            "certificate_hash": "944f31464d16ff09e44c30022fd01d486760da6d"
-          }
-        },
-        {
-          "client_id": "731781815007-t8erqju69m2u18s91l43pgl5ucttemcs.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.TriangleInteractive.Package",
-            "certificate_hash": "67e756d9c67c9e6ba04682ffe19967ee43a15bb0"
-          }
-        },
-        {
-          "client_id": "731781815007-b4bgtd0839pnmo6ajq8o7ic7cd6nkvqf.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCC1OExV0OixPN3Z3YRz_G2fgeavP6gjMs"
+          "current_key": "AIzaSyBkPZ9yGV8i7kBMR68pwrWjveM6l6b4OAA"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "731781815007-b4bgtd0839pnmo6ajq8o7ic7cd6nkvqf.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "731781815007-m9jepjvj8kcne9akssjah0jq2qtc9qkn.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.triangle-interactive.package",
-                "app_store_id": "1558946577"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
