@@ -11,7 +11,7 @@ final appTheme = ThemeData(
       backgroundColor: const Color(0xFFFFB800),
     ),
   ),
-  shadowColor: Colors.black.withOpacity(0.25),
+  shadowColor: Colors.black.withValues(alpha: 0.25),
   colorScheme: const ColorScheme(
     brightness: Brightness.dark,
     error: Colors.red,

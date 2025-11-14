@@ -99,9 +99,7 @@ class LandingPage extends HookConsumerWidget {
         // Only setup on initial user load, not subsequent updates
         if (previous?.hasValue ?? false) return;
 
-        context
-            .read<NotificationsBloc>()
-            .add(const NotificationsEvent.setup());
+        context.read<NotificationsBloc>().add(const NotificationsEvent.setup());
 
         if (context.read<InventoryBloc>().state is InventoryStateInitial) {
           context
@@ -151,8 +149,8 @@ class LandingPage extends HookConsumerWidget {
       (previous, next) {
         next.when(
           data: (purchases) => _handlePurchases(ref, context, purchases),
-          error: (error, stackTrace) => Logger()
-              .e('Purchase stream failure', error: error, stackTrace: stackTrace),
+          error: (error, stackTrace) => Logger().e('Purchase stream failure',
+              error: error, stackTrace: stackTrace),
           loading: () {},
         );
       },
@@ -193,9 +191,8 @@ class LandingPage extends HookConsumerWidget {
 
     if (purchase.status == PurchaseStatus.purchased ||
         purchase.status == PurchaseStatus.restored) {
-      final isValid = await ref
-          .read(purchaseRepositoryProvider)
-          .validateReceipt(purchase);
+      final isValid =
+          await ref.read(purchaseRepositoryProvider).validateReceipt(purchase);
 
       if (!isValid) {
         notificationsBloc.add(
@@ -297,8 +294,7 @@ class LandingPage extends HookConsumerWidget {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, authState) =>
           BlocBuilder<GeolocationBloc, GeolocationState>(
-        builder: (context, geoState) =>
-            BlocBuilder<EmojiBloc, EmojiState>(
+        builder: (context, geoState) => BlocBuilder<EmojiBloc, EmojiState>(
           builder: (context, emojiState) =>
               BlocBuilder<InventoryBloc, InventoryState>(
             builder: (context, inventoryState) {
@@ -350,8 +346,8 @@ class LandingPage extends HookConsumerWidget {
 
     // Step 2: Socket connection (connect immediately after auth)
     return socketState.when(
-      error: (error, _) => BootstrapStep.loading(
-          "Can't connect to the socket, reason: $error"),
+      error: (error, _) =>
+          BootstrapStep.loading("Can't connect to the socket, reason: $error"),
       loading: () =>
           BootstrapStep.connectingSocket('Connecting to the socket...'),
       data: (_) {

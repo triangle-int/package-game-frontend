@@ -70,7 +70,7 @@ class _SearchBarState extends State<SearchBar> {
                                   .add(const FmSearchEvent.clearFilters());
                             }),
                   color: Colors.black,
-                  disabledColor: Colors.black.withOpacity(0.25),
+                  disabledColor: Colors.black.withValues(alpha: 0.25),
                   iconSize: 30,
                   icon: const Icon(
                     Icons.close,

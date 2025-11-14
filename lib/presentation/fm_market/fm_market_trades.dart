@@ -79,7 +79,9 @@ class _FMMarketTradesState extends ConsumerState<FMMarketTrades> {
                       const FmSearchEvent.search(),
                     );
                 await Future.doWhile(
-                  () => context.read<FmSearchBloc>().state.isSearching,
+                  () =>
+                      context.mounted &&
+                      context.read<FmSearchBloc>().state.isSearching,
                 );
               },
               backgroundColor: Colors.white,

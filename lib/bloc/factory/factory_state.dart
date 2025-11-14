@@ -1,6 +1,5 @@
 part of 'factory_bloc.dart';
 
-// TODO: Change to Either
 @freezed
 sealed class FactoryState with _$FactoryState {
   const factory FactoryState.initial() = FactoryStateInitial;
