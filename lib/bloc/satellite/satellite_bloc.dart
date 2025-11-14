@@ -46,7 +46,9 @@ class SatelliteBloc extends Bloc<SatelliteEvent, SatelliteState> {
                   for (final neighbor in hex.neighbours!) {
                     for (final n in neighbor.neighbours!) {
                       if (firstLayer.any((h) => h.code == n.code) ||
-                          secondLayer.any((h) => h.code == n.code)) continue;
+                          secondLayer.any((h) => h.code == n.code)) {
+                        continue;
+                      }
 
                       secondLayer.add(n);
                     }

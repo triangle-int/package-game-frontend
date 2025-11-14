@@ -32,7 +32,7 @@ class SatelliteMenu extends HookConsumerWidget {
             height: 277,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(

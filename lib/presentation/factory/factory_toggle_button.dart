@@ -18,7 +18,7 @@ class FactoryToggleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.surface,
       child: SizedBox(
         width: 100,
         height: 50,

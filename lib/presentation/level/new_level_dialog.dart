@@ -25,7 +25,7 @@ class NewLevelDialog extends StatelessWidget {
               width: 334,
               height: 203,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(7),
               ),
               child: const Column(

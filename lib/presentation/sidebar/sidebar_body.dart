@@ -71,7 +71,7 @@ class SidebarBody extends StatelessWidget {
                 expandedHeaderPadding: EdgeInsets.zero,
                 children: [
                   ExpansionPanel(
-                    backgroundColor: Theme.of(context).colorScheme.background,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     headerBuilder: (context, isOpen) => Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       alignment: Alignment.centerLeft,

@@ -147,7 +147,7 @@ class _RouteMapPageState extends ConsumerState<RouteMapPage> {
                     child: Container(
                       height: 100,
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.background,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(37),
                         ),
