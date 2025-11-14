@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:logger/logger.dart';
 import 'package:package_flutter/bloc/inventory/inventory_bloc.dart';
 import 'package:package_flutter/domain/inventory/inventory.dart';
 import 'package:package_flutter/presentation/inventory/inventory_tab.dart';
@@ -34,8 +33,6 @@ class InventoryBodyState extends State<InventoryBody>
   Widget build(BuildContext context) {
     final buildingsId = widget.inventory.inventory.keys.toList();
 
-    Logger().d('Building id: $buildingsId');
-
     return BlocListener<InventoryBloc, InventoryState>(
       listener: (context, state) {
         final inv = switch (state) {
@@ -64,6 +61,8 @@ class InventoryBodyState extends State<InventoryBody>
                     ),
                     color: Theme.of(context).primaryColor,
                   ),
+                  dividerHeight: 0,
+                  indicatorSize: TabBarIndicatorSize.tab,
                   labelColor: Colors.black,
                   unselectedLabelColor: Colors.white,
                   onTap: (_) {
