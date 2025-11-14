@@ -1,6 +1,5 @@
 part of 'inventory_bloc.dart';
 
-// TODO: Convert to state with Either
 @freezed
 sealed class InventoryState with _$InventoryState {
   const factory InventoryState.initial() = InventoryStateInitial;

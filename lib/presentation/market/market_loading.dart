@@ -15,6 +15,7 @@ class MarketLoading extends StatelessWidget {
       baseColor: baseColor,
       highlightColor: highlightColor,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
@@ -54,6 +55,7 @@ class MarketLoading extends StatelessWidget {
               ),
             ],
           ),
+          SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -142,6 +144,7 @@ class MarketLoading extends StatelessWidget {
               ),
             ],
           ),
+          SizedBox(height: 10),
           Container(
             height: 37,
             width: 200,

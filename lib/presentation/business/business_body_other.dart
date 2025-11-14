@@ -43,7 +43,7 @@ class BusinessBodyOther extends HookConsumerWidget {
             alignment: Alignment.bottomCenter,
             children: [
               Container(
-                color: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.surface,
                 height: 312,
                 width: double.infinity,
                 padding: const EdgeInsets.only(top: 60 + 12),
@@ -79,7 +79,7 @@ class BusinessBodyOther extends HookConsumerWidget {
                   height: 120,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Theme.of(context).colorScheme.background,
+                    color: Theme.of(context).colorScheme.surface,
                     border: Border.all(
                       width: 12,
                       color: const Color(0xFF373EBA),

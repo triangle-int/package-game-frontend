@@ -67,9 +67,9 @@ dependencies:
   showcaseview: ^4.0.1
   sign_in_with_apple: ^7.0.1
   sliding_up_panel: ^2.0.0+1
-  socket_io_client: ^3.1.2
   touchable_opacity: ^1.2.0
   url_launcher: ^6.1.5
+  web_socket_channel: ^3.0.3
   wiredash: ^2.4.0
 
 dev_dependencies:

@@ -134,7 +134,7 @@ class BuyPage extends HookConsumerWidget {
                       borderRadius: BorderRadius.circular(4),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.25),
+                          color: Colors.black.withValues(alpha: 0.25),
                           offset: const Offset(-2, 4),
                           blurRadius: 4,
                         ),

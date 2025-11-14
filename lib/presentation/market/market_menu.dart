@@ -26,7 +26,7 @@ class MarketMenu extends HookConsumerWidget {
             bottom: 27,
           ),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(10),
           ),
           child: const MarketBody(),

@@ -42,10 +42,9 @@ class FactoryMenu extends HookConsumerWidget {
           return Center(
             child: Container(
               width: 334,
-              height: 470,
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Builder(builder: (context) {
@@ -94,6 +93,7 @@ class FactoryMenu extends HookConsumerWidget {
                       );
                     }
                     return Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         FactoryHeader(
                           productionItem: productionItem,

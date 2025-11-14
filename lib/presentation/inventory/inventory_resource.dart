@@ -25,7 +25,7 @@ class InventoryResource extends HookConsumerWidget {
       ItemResource(:final color) => Color(
           0xFF000000 + int.parse(color, radix: 16),
         ),
-      ItemBooster() => Theme.of(context).colorScheme.background,
+      ItemBooster() => Theme.of(context).colorScheme.surface,
       ItemUnknown() => Colors.white,
     };
 
@@ -46,7 +46,7 @@ class InventoryResource extends HookConsumerWidget {
         width: 371,
         height: 100,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: const BorderRadius.all(Radius.circular(11)),
         ),
         padding: const EdgeInsets.only(left: 10),

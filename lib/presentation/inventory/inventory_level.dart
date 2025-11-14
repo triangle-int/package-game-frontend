@@ -10,7 +10,7 @@ class InventoryLevel extends StatelessWidget {
         height: 35,
         width: 371,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: const BorderRadius.all(Radius.circular(11)),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 10),

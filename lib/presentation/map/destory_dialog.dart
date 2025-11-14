@@ -20,7 +20,7 @@ class DestroyDialog extends HookConsumerWidget {
         width: 359,
         height: 169,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.background,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Row(

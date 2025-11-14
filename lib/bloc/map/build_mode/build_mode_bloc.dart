@@ -16,7 +16,7 @@ class BuildModeBloc extends Bloc<BuildModeEvent, BuildModeState> {
         case BuildModeEventEnteredDestroyMode():
           emit(const BuildModeState.destroyMode());
         case BuildModeEventRemovedBuilding(:final id):
-          // TODO: Check usage of await here
+          // TODO(P5ina): Check usage of await here
           _buildingRepository.destroyBuilding(id);
         case BuildModeEventExitedDestroyMode():
           emit(const BuildModeState.buildMode());

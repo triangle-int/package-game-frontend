@@ -362,8 +362,8 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                                 )
                                                 .toList(),
                                             color: const Color(0xFFFFB800)
-                                                .withOpacity(
-                                              firstLayerOpacity.value,
+                                                .withValues(
+                                              alpha: firstLayerOpacity.value,
                                             ),
                                           );
                                         }),
@@ -403,8 +403,8 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                                 )
                                                 .toList(),
                                             color: const Color(0xFFFFB800)
-                                                .withOpacity(
-                                              secondLayerOpacity.value,
+                                                .withValues(
+                                              alpha: secondLayerOpacity.value,
                                             ),
                                           );
                                         }),

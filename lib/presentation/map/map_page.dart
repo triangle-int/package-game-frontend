@@ -129,8 +129,7 @@ class _MapPageState extends ConsumerState<MapPage> {
                                 SlidingUpPanel(
                                   controller: _buildPanelController,
                                   slideDirection: SlideDirection.DOWN,
-                                  color:
-                                      Theme.of(context).colorScheme.background,
+                                  color: Theme.of(context).colorScheme.surface,
                                   panel: BuildPanel(
                                     panelController: _buildPanelController,
                                   ),
@@ -152,9 +151,8 @@ class _MapPageState extends ConsumerState<MapPage> {
                                     borderRadius: const BorderRadius.vertical(
                                       top: Radius.circular(37),
                                     ),
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .background,
+                                    color:
+                                        Theme.of(context).colorScheme.surface,
                                     maxHeight:
                                         MediaQuery.of(context).size.height -
                                             162,

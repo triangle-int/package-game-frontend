@@ -84,7 +84,7 @@ class BuildPanel extends HookConsumerWidget {
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: SeparatedRow(
-                      includeOuterSeparators: true,
+                      outerSeparatorMode: OuterSeparatorMode.both,
                       separatorBuilder: (context, index) =>
                           const SizedBox(width: 20),
                       children: <Widget>[

@@ -57,7 +57,7 @@ class _SidebarState extends ConsumerState<Sidebar> {
 
     return Drawer(
       child: Material(
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.surface,
         child: BlocProvider(
           create: (context) => SidebarBloc(ref.watch(truckRepositoryProvider)),
           child: Column(
