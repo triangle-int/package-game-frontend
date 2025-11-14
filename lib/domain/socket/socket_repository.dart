@@ -22,7 +22,8 @@ SocketRepository socketRepository(Ref ref) {
 
 class SocketRepository {
   WebSocketChannel? _channel;
-  StreamController<Map<String, dynamic>>? _messagesController;
+  final StreamController<Map<String, dynamic>> _messagesController =
+      StreamController<Map<String, dynamic>>.broadcast();
 
   final AuthRepository authRepository;
 
@@ -48,8 +49,6 @@ class SocketRepository {
       );
       await _channel!.ready;
 
-      _messagesController = StreamController<Map<String, dynamic>>.broadcast();
-
       _channel!.stream.listen(
         (message) {
           try {
@@ -61,7 +60,7 @@ class SocketRepository {
               return;
             }
 
-            _messagesController?.add(data);
+            _messagesController.add(data);
           } catch (e) {
             Logger().e('Error parsing message: $e');
           }
@@ -90,18 +89,11 @@ class SocketRepository {
 
   Future<void> disconnect() async {
     await _channel?.sink.close();
-    await _messagesController?.close();
     _channel = null;
-    _messagesController = null;
   }
 
   Stream<User> getUserUpdates() async* {
-    if (_messagesController == null) {
-      Logger().w('Socket is not connected');
-      return;
-    }
-
-    yield* _messagesController!.stream
+    yield* _messagesController.stream
         .where((data) => data['channel'] == 'update')
         .map((data) {
       Logger().d('User parsed: ${data['data']}');
@@ -110,12 +102,7 @@ class SocketRepository {
   }
 
   Stream<Inventory> getInventoryUpdates() async* {
-    if (_messagesController == null) {
-      Logger().w('Socket is not connected');
-      return;
-    }
-
-    yield* _messagesController!.stream
+    yield* _messagesController.stream
         .where((data) => data['channel'] == 'update')
         .map((data) {
       final inventory =
@@ -126,17 +113,30 @@ class SocketRepository {
   }
 
   Stream<Ban?> getBanUpdates() async* {
-    if (_messagesController == null) {
-      Logger().w('Socket is not connected');
-      return;
-    }
-
-    yield* _messagesController!.stream
+    yield* _messagesController.stream
         .where((data) => data['channel'] == 'banUpdate')
         .map((data) {
       Logger().d('Ban received: ${data['data']}');
       if (data['data'] == null) return null;
       return Ban.fromJson(data['data'] as Map<String, dynamic>);
+    });
+  }
+
+  Stream<Map<String, dynamic>> getTruckCreatedUpdates() async* {
+    yield* _messagesController.stream
+        .where((data) => data['channel'] == 'truckCreated')
+        .map((data) {
+      Logger().d('Truck created: ${data['data']}');
+      return data['data'] as Map<String, dynamic>;
+    });
+  }
+
+  Stream<Map<String, dynamic>> getTruckArrivedUpdates() async* {
+    yield* _messagesController.stream
+        .where((data) => data['channel'] == 'truckArrived')
+        .map((data) {
+      Logger().d('Truck arrived: ${data['data']}');
+      return data['data'] as Map<String, dynamic>;
     });
   }
 }

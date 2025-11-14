@@ -1,14 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/domain/core/dio_provider.dart';
-import 'package:package_flutter/domain/core/firebase_messaging_provider.dart';
 import 'package:package_flutter/domain/core/server_failure.dart';
+import 'package:package_flutter/domain/socket/socket_repository.dart';
 import 'package:package_flutter/domain/truck/calculated_path.dart';
 import 'package:package_flutter/domain/truck/delivery_buildings.dart';
 import 'package:package_flutter/domain/truck/truck.dart';
@@ -21,17 +19,18 @@ part 'truck_repository.g.dart';
 TruckRepository truckRepository(Ref ref) {
   return TruckRepository(
     ref.watch(dioProvider),
-    ref.watch(firebaseMessagingProvider),
+    ref.watch(socketRepositoryProvider),
   );
 }
 
 class TruckRepository {
   final Dio _dio;
-  final FirebaseMessaging _messaging;
+  final SocketRepository _socketRepository;
 
-  StreamSubscription<RemoteMessage>? _subscription;
+  StreamSubscription<Map<String, dynamic>>? _truckCreatedSubscription;
+  StreamSubscription<Map<String, dynamic>>? _truckArrivedSubscription;
 
-  TruckRepository(this._dio, this._messaging);
+  TruckRepository(this._dio, this._socketRepository);
 
   final _streamController =
       StreamController<Either<ServerFailure, List<Truck>>>.broadcast();
@@ -124,23 +123,29 @@ class TruckRepository {
           .toList();
 
       Logger().d('Trucks: $trucksLocal');
+      trucks.clear();
       trucks.addAll(trucksLocal);
 
-      if (_subscription == null) {
-        await _messaging.subscribeToTopic('trucks');
-      }
-
-      _subscription?.cancel();
-      _subscription = FirebaseMessaging.onMessage
-          .where((message) => message.data.containsKey('truck'))
-          .listen((data) {
-        Logger().d('Truck received!');
-        final d = data.data['truck'] as String;
-        final json = jsonDecode(d) as Map<String, dynamic>;
-        final truck = Truck.fromJson(json);
+      // Listen for new trucks being created
+      _truckCreatedSubscription?.cancel();
+      _truckCreatedSubscription =
+          _socketRepository.getTruckCreatedUpdates().listen((data) {
+        Logger().d('Truck created via WebSocket!');
+        final truck = Truck.fromJson(data);
         trucks.add(truck);
         _streamController.add(right(trucks));
       });
+
+      // Listen for trucks arriving (and remove them from the list)
+      _truckArrivedSubscription?.cancel();
+      _truckArrivedSubscription =
+          _socketRepository.getTruckArrivedUpdates().listen((data) {
+        Logger().d('Truck arrived via WebSocket!');
+        final truckId = data['id'] as int;
+        trucks.removeWhere((t) => t.id == truckId);
+        _streamController.add(right(trucks));
+      });
+
       yield right(trucks);
       yield* _streamController.stream;
     } on DioException catch (e) {

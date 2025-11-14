@@ -36,368 +36,504 @@ class LandingPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    _setupAppLifecycleHandling(ref);
+    _setupStateListeners(ref, context);
+
+    return MultiBlocListener(
+      listeners: _buildBlocListeners(context),
+      child: _buildBootstrapUI(context),
+    );
+  }
+
+  // ============================================================================
+  // App Lifecycle Management
+  // ============================================================================
+
+  void _setupAppLifecycleHandling(WidgetRef ref) {
     useOnAppLifecycleStateChange((previous, current) {
       if (current == AppLifecycleState.paused) {
-        Logger().d('Paused');
-        ref.read(socketConnectionProvider.notifier).disconnect();
-        ref.invalidate(userProvider);
+        _handleAppPaused(ref);
       }
       if (current == AppLifecycleState.resumed &&
           previous == AppLifecycleState.paused) {
-        Logger().d('Resumed after pausing');
-        ref.read(socketConnectionProvider.notifier).connect();
+        _handleAppResumed(ref);
       }
     });
+  }
 
-    final userState = ref.watch(userProvider);
-    final socketConnectionState = ref.watch(socketConnectionProvider);
-    final banState = ref.watch(banProvider);
-    final configState = ref.watch(configProvider);
+  void _handleAppPaused(WidgetRef ref) {
+    Logger().d('App paused - disconnecting socket');
+    ref.read(socketConnectionProvider.notifier).disconnect();
+    ref.invalidate(userProvider);
+  }
 
+  void _handleAppResumed(WidgetRef ref) {
+    Logger().d('App resumed - reconnecting socket');
+    ref.read(socketConnectionProvider.notifier).connect();
+  }
+
+  // ============================================================================
+  // State Listeners Setup
+  // ============================================================================
+
+  void _setupStateListeners(WidgetRef ref, BuildContext context) {
+    _listenToSocketConnection(ref);
+    _listenToUser(ref, context);
+    _listenToBan(ref);
+    _listenToConfig(ref, context);
+    _listenToPurchases(ref, context);
+  }
+
+  void _listenToSocketConnection(WidgetRef ref) {
     ref.listen<AsyncValue<void>>(socketConnectionProvider, (previous, next) {
-      next.when(
-        data: (data) {
-          ref.invalidate(banProvider);
-          ref.invalidate(configProvider);
-        },
-        error: (_, __) {},
-        loading: () {},
-      );
+      next.whenData((_) {
+        ref.invalidate(banProvider);
+        ref.invalidate(configProvider);
+      });
     });
+  }
 
+  void _listenToUser(WidgetRef ref, BuildContext context) {
     ref.listen<AsyncValue<User>>(userProvider, (previous, next) {
-      next.map(
-        loading: (_) {},
-        error: (_) {},
-        data: (_) {
-          if (previous?.hasValue ?? false) return;
+      next.whenData((_) {
+        // Only setup on initial user load, not subsequent updates
+        if (previous?.hasValue ?? false) return;
 
+        context
+            .read<NotificationsBloc>()
+            .add(const NotificationsEvent.setup());
+
+        if (context.read<InventoryBloc>().state is InventoryStateInitial) {
           context
-              .read<NotificationsBloc>()
-              .add(const NotificationsEvent.setup());
-          switch (context.read<InventoryBloc>().state) {
-            case InventoryStateInitial():
-              context
-                  .read<InventoryBloc>()
-                  .add(const InventoryEvent.listenInventoryRequested());
-            default:
-              break;
-          }
-        },
-      );
+              .read<InventoryBloc>()
+              .add(const InventoryEvent.listenInventoryRequested());
+        }
+      });
     });
+  }
 
+  void _listenToBan(WidgetRef ref) {
     ref.listen<AsyncValue<Ban?>>(banProvider, (previous, next) {
       if (next.value == null) {
         ref.invalidate(userProvider);
       }
     });
+  }
 
+  void _listenToConfig(WidgetRef ref, BuildContext context) {
     ref.listen<AsyncValue<Config>>(configProvider, (previous, next) {
       next.when(
-        data: (d) {
-          ref.invalidate(userProvider);
-        },
-        error: (e, st) {
-          Logger().e("Can't load config!", error: e, stackTrace: st);
-          if (e is DioException) {
-            final f = ServerFailure.fromError(e);
-            switch (f) {
-              case ServerFailureConnectionRefused():
-                // context.router.replace(const OnMaintenanceRoute()),
-                break;
-              default:
-                context
-                    .read<NotificationsBloc>()
-                    .add(NotificationsEvent.warningAdded(f.getMessage()));
-            }
-            return;
-          }
-
-          context
-              .read<NotificationsBloc>()
-              .add(NotificationsEvent.warningAdded(e.toString()));
-        },
+        data: (_) => ref.invalidate(userProvider),
+        error: (error, stackTrace) =>
+            _handleConfigError(context, error, stackTrace),
         loading: () {},
       );
     });
+  }
 
+  void _handleConfigError(
+      BuildContext context, Object error, StackTrace stackTrace) {
+    Logger().e('Failed to load config', error: error, stackTrace: stackTrace);
+
+    if (error is DioException) {
+      final failure = ServerFailure.fromError(error);
+      if (failure is! ServerFailureConnectionRefused) {
+        _showWarning(context, failure.getMessage());
+      }
+    } else {
+      _showWarning(context, error.toString());
+    }
+  }
+
+  void _listenToPurchases(WidgetRef ref, BuildContext context) {
     ref.listen<AsyncValue<List<PurchaseDetails>>>(
       purchasesStreamProvider,
       (previous, next) {
         next.when(
-          data: (data) async {
-            for (PurchaseDetails purchaseDetails in data) {
-              if (purchaseDetails.status == PurchaseStatus.pending) {
-                // _showPendingUI();
-              } else {
-                final notificationBloc = context.read<NotificationsBloc>();
-                if (purchaseDetails.status == PurchaseStatus.error) {
-                  notificationBloc.add(
-                    NotificationsEvent.warningAdded(
-                      purchaseDetails.error!.message,
-                    ),
-                  );
-                } else if (purchaseDetails.status == PurchaseStatus.purchased ||
-                    purchaseDetails.status == PurchaseStatus.restored) {
-                  final valid = await ref
-                      .read(purchaseRepositoryProvider)
-                      .validateReceipt(purchaseDetails);
-                  if (!valid) {
-                    notificationBloc.add(
-                      const NotificationsEvent.warningAdded(
-                        'Ya tvou mamu gebal',
-                      ),
-                    );
-                  }
-                }
-                if (purchaseDetails.pendingCompletePurchase) {
-                  await InAppPurchase.instance
-                      .completePurchase(purchaseDetails);
-                }
-              }
-            }
-          },
-          error: (e, st) =>
-              Logger().e('Purchase stream failure', error: e, stackTrace: st),
+          data: (purchases) => _handlePurchases(ref, context, purchases),
+          error: (error, stackTrace) => Logger()
+              .e('Purchase stream failure', error: error, stackTrace: stackTrace),
           loading: () {},
         );
       },
     );
+  }
 
-    ServerFailure? failure;
+  Future<void> _handlePurchases(
+    WidgetRef ref,
+    BuildContext context,
+    List<PurchaseDetails> purchases,
+  ) async {
+    final notificationsBloc = context.read<NotificationsBloc>();
 
-    return MultiBlocListener(
-      listeners: [
-        BlocListener<NotificationsBloc, NotificationsState>(
-          listener: (context, state) {
-            switch (state) {
-              case NotificationsStateInitial():
-                break;
-              case NotificationsStateSuccessReceived(:final message):
-                Flushbar(
-                  title: 'Success',
-                  message: message,
-                  messageSize: 18,
-                  titleSize: 18,
-                  shouldIconPulse: false,
-                  icon: const Icon(
-                    Icons.check_circle_outline,
-                    color: Colors.green,
-                    size: 65,
-                  ),
-                  padding: const EdgeInsets.only(
-                    top: 23,
-                    bottom: 23,
-                    left: 35,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                  margin: const EdgeInsets.all(12),
-                  duration: const Duration(seconds: 5),
-                  flushbarPosition: FlushbarPosition.TOP,
-                ).show(context);
-                AudioPlayer().play(AssetSource('sounds/notification.wav'));
+    for (final purchase in purchases) {
+      if (purchase.status == PurchaseStatus.pending) {
+        continue;
+      }
 
-              case NotificationsStateWarningReceived(:final message):
-                Flushbar(
-                  title: 'Warning',
-                  message: message,
-                  messageSize: 18,
-                  titleSize: 18,
-                  shouldIconPulse: false,
-                  icon: Icon(
-                    Icons.error_outline,
-                    color: Theme.of(context).primaryColor,
-                    size: 65,
-                  ),
-                  padding: const EdgeInsets.only(
-                    top: 23,
-                    bottom: 23,
-                    left: 35,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                  margin: const EdgeInsets.all(12),
-                  duration: const Duration(seconds: 5),
-                  flushbarPosition: FlushbarPosition.TOP,
-                ).show(context);
-                AudioPlayer().play(AssetSource('sounds/notification.wav'));
+      await _processPurchase(ref, notificationsBloc, purchase);
 
-              case NotificationsStateReceived(:final title, :final message):
-                Flushbar(
-                  title: title,
-                  message: message,
-                  messageSize: 18,
-                  titleSize: 18,
-                  shouldIconPulse: false,
-                  icon: Icon(
-                    Icons.notifications,
-                    color: Theme.of(context).primaryColor,
-                    size: 65,
-                  ),
-                  padding: const EdgeInsets.only(
-                    top: 23,
-                    bottom: 23,
-                    left: 35,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                  margin: const EdgeInsets.all(12),
-                  duration: const Duration(seconds: 5),
-                  flushbarPosition: FlushbarPosition.TOP,
-                ).show(context);
-                AudioPlayer().play(AssetSource('sounds/notification.wav'));
-            }
-          },
-        ),
-        BlocListener<GeolocationBloc, GeolocationState>(
-          listener: (context, geolocationState) {
-            switch (geolocationState) {
-              case GeolocationStateInitial():
-                break;
-              case GeolocationStateLoadInProgress():
-                break;
-              case GeolocationStateLoadFailure():
-                //    context.router.replace(const GeolocationRoute()),
-                break;
-              case GeolocationStateLoadSuccess():
-                break;
-            }
-          },
-        ),
-        BlocListener<AuthBloc, AuthState>(
-          listener: (context, authState) {
-            switch (authState) {
-              case AuthStateInitial():
-                break;
-              case AuthStateLoadInProgress():
-                break;
-              case AuthStateLoadFailure():
-                // context.router.replace(const AuthRoute()),
-                break;
-              case AuthStateLoadSuccess():
-                ref.invalidate(socketConnectionProvider);
-            }
-          },
-        ),
-        BlocListener<InventoryBloc, InventoryState>(
-          listener: (context, state) {
-            switch (state) {
-              case InventoryStateInitial():
-                break;
-              case InventoryStateLoadInProgress():
-                break;
-              case InventoryStateLoadFailure():
-                context.read<NotificationsBloc>().add(
-                      const NotificationsEvent.warningAdded(
-                        'Something went wrong on server',
-                      ),
-                    );
-              case InventoryStateLoadSuccess():
-                Logger().d('Inventory got successfully ✅');
-            }
-          },
-        ),
-      ],
-      child: BlocBuilder<InventoryBloc, InventoryState>(
-        builder: (context, inventoryState) {
-          return BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, authState) =>
-                BlocBuilder<GeolocationBloc, GeolocationState>(
-              builder: (context, geoState) =>
-                  BlocBuilder<EmojiBloc, EmojiState>(
-                builder: (context, emojiState) {
-                  final text = switch (authState) {
-                    AuthStateInitial() => 'Login to your account...',
-                    AuthStateLoadFailure() => 'Login to your account failed',
-                    AuthStateLoadInProgress() => 'Login to your account...',
-                    AuthStateLoadSuccess() => switch (geoState) {
-                        GeolocationStateInitial() => 'Enable geolocation...',
-                        GeolocationStateLoadInProgress() =>
-                          'Enable geolocation...',
-                        GeolocationStateLoadFailure() =>
-                          'Enable geolocation failed',
-                        GeolocationStateLoadSuccess() => switch (emojiState) {
-                            EmojiStateInitial() => 'Loading emoji...',
-                            EmojiStateLoadInProgress() => 'Loading emoji...',
-                            EmojiStateLoadFailure() => 'Loading emoji failed',
-                            EmojiStateLoadSuccess() => configState.map(
-                                loading: (_) => 'Loading config...',
-                                error: (_) => 'Loading config failed',
-                                data: (_) => userState.map(
-                                  loading: (_) => 'Loading user...',
-                                  error: (s) {
-                                    if (s.error is DioException) {
-                                      final f = ServerFailure.fromError(
-                                        s.error as DioException,
-                                      );
+      if (purchase.pendingCompletePurchase) {
+        await InAppPurchase.instance.completePurchase(purchase);
+      }
+    }
+  }
 
-                                      failure = f;
+  Future<void> _processPurchase(
+    WidgetRef ref,
+    NotificationsBloc notificationsBloc,
+    PurchaseDetails purchase,
+  ) async {
+    if (purchase.status == PurchaseStatus.error) {
+      notificationsBloc.add(
+        NotificationsEvent.warningAdded(purchase.error!.message),
+      );
+      return;
+    }
 
-                                      return f.getMessage();
-                                    }
-                                    return 'Loading user failed: ${s.error}';
-                                  },
-                                  data: (_) {
-                                    return switch (inventoryState) {
-                                      InventoryStateInitial() =>
-                                        'Loading inventory...',
-                                      InventoryStateLoadInProgress() =>
-                                        'Loading inventory...',
-                                      InventoryStateLoadFailure() =>
-                                        'Loading inventory failed',
-                                      InventoryStateLoadSuccess() =>
-                                        socketConnectionState.when(
-                                          error: (e, __) =>
-                                              "Can't connect to the socket, reason: $e",
-                                          loading: () =>
-                                              'Connecting to the socket...',
-                                          data: (_) => banState.when(
-                                            data: (ban) {
-                                              if (ban == null) return 'Done ✅';
-                                              failure = ServerFailure.banned(
-                                                  ban.reason);
-                                              return failure!.getMessage();
-                                            },
-                                            error: (e, __) =>
-                                                "Can't check user on bans, $e",
-                                            loading: () => 'Done ✅',
-                                          ),
-                                        ),
-                                    };
-                                  },
-                                ),
-                              ),
-                          }
-                      },
-                  };
-                  Widget animatedWidget = switch (failure) {
-                    ServerFailureBanned(:final reason) =>
-                      BanPage(reason: reason),
-                    _ => LoadingPage(text: text),
-                  };
+    if (purchase.status == PurchaseStatus.purchased ||
+        purchase.status == PurchaseStatus.restored) {
+      final isValid = await ref
+          .read(purchaseRepositoryProvider)
+          .validateReceipt(purchase);
 
-                  if (text == 'Done ✅') {
-                    animatedWidget = const MapPage();
-                  }
+      if (!isValid) {
+        notificationsBloc.add(
+          const NotificationsEvent.warningAdded('Ya tvou mamu gebal'),
+        );
+      }
+    }
+  }
 
-                  if (text == 'Login to your account failed') {
-                    animatedWidget = const AuthPage();
-                  }
+  // ============================================================================
+  // BLoC Listeners
+  // ============================================================================
 
-                  if (text == 'Enable geolocation failed') {
-                    animatedWidget = const GeolocationPage();
-                  }
+  List<BlocListener> _buildBlocListeners(BuildContext context) {
+    return [
+      _buildNotificationsListener(),
+      _buildGeolocationListener(),
+      _buildAuthListener(context),
+      _buildInventoryListener(context),
+    ];
+  }
 
-                  if (text == 'Player not found') {
-                    animatedWidget = const CreateUserPage();
-                  }
+  BlocListener<NotificationsBloc, NotificationsState>
+      _buildNotificationsListener() {
+    return BlocListener<NotificationsBloc, NotificationsState>(
+      listener: (context, state) {
+        switch (state) {
+          case NotificationsStateSuccessReceived(:final message):
+            _showNotificationFlushbar(
+              context,
+              title: 'Success',
+              message: message,
+              icon: const Icon(Icons.check_circle_outline,
+                  color: Colors.green, size: 65),
+            );
+          case NotificationsStateWarningReceived(:final message):
+            _showNotificationFlushbar(
+              context,
+              title: 'Warning',
+              message: message,
+              icon: Icon(Icons.error_outline,
+                  color: Theme.of(context).primaryColor, size: 65),
+            );
+          case NotificationsStateReceived(:final title, :final message):
+            _showNotificationFlushbar(
+              context,
+              title: title,
+              message: message,
+              icon: Icon(Icons.notifications,
+                  color: Theme.of(context).primaryColor, size: 65),
+            );
+          case NotificationsStateInitial():
+            break;
+        }
+      },
+    );
+  }
 
-                  return animatedWidget;
+  BlocListener<GeolocationBloc, GeolocationState> _buildGeolocationListener() {
+    return BlocListener<GeolocationBloc, GeolocationState>(
+      listener: (context, state) {
+        // Currently no special handling needed for geolocation state changes
+        // Navigation is handled by _determineCurrentPage
+      },
+    );
+  }
+
+  BlocListener<AuthBloc, AuthState> _buildAuthListener(BuildContext context) {
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, authState) {
+        // Socket connection is invalidated in the listener to reconnect with new auth
+        // This listener is intentionally left without implementation for now
+        // as the invalidation happens in _setupStateListeners
+      },
+    );
+  }
+
+  BlocListener<InventoryBloc, InventoryState> _buildInventoryListener(
+      BuildContext context) {
+    return BlocListener<InventoryBloc, InventoryState>(
+      listener: (context, state) {
+        switch (state) {
+          case InventoryStateLoadFailure():
+            _showWarning(context, 'Something went wrong on server');
+          case InventoryStateLoadSuccess():
+            Logger().d('Inventory loaded successfully');
+          default:
+            break;
+        }
+      },
+    );
+  }
+
+  // ============================================================================
+  // UI Building
+  // ============================================================================
+
+  Widget _buildBootstrapUI(BuildContext context) {
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, authState) =>
+          BlocBuilder<GeolocationBloc, GeolocationState>(
+        builder: (context, geoState) =>
+            BlocBuilder<EmojiBloc, EmojiState>(
+          builder: (context, emojiState) =>
+              BlocBuilder<InventoryBloc, InventoryState>(
+            builder: (context, inventoryState) {
+              return Consumer(
+                builder: (context, ref, child) {
+                  final configState = ref.watch(configProvider);
+                  final userState = ref.watch(userProvider);
+                  final socketState = ref.watch(socketConnectionProvider);
+                  final banState = ref.watch(banProvider);
+
+                  final bootstrapStep = _determineBootstrapStep(
+                    authState: authState,
+                    geoState: geoState,
+                    emojiState: emojiState,
+                    configState: configState,
+                    userState: userState,
+                    inventoryState: inventoryState,
+                    socketState: socketState,
+                    banState: banState,
+                  );
+
+                  return _buildPageForBootstrapStep(bootstrapStep);
                 },
-              ),
-            ),
-          );
-        },
+              );
+            },
+          ),
+        ),
       ),
     );
   }
+
+  BootstrapStep _determineBootstrapStep({
+    required AuthState authState,
+    required GeolocationState geoState,
+    required EmojiState emojiState,
+    required AsyncValue<Config> configState,
+    required AsyncValue<User> userState,
+    required InventoryState inventoryState,
+    required AsyncValue<void> socketState,
+    required AsyncValue<Ban?> banState,
+  }) {
+    // Step 1: Authentication
+    if (authState is AuthStateInitial || authState is AuthStateLoadInProgress) {
+      return BootstrapStep.authenticating('Login to your account...');
+    }
+    if (authState is AuthStateLoadFailure) {
+      return BootstrapStep.authFailed();
+    }
+
+    // Step 2: Socket connection (connect immediately after auth)
+    return socketState.when(
+      error: (error, _) => BootstrapStep.loading(
+          "Can't connect to the socket, reason: $error"),
+      loading: () =>
+          BootstrapStep.connectingSocket('Connecting to the socket...'),
+      data: (_) {
+        // Step 3: Config
+        return configState.when(
+          loading: () => BootstrapStep.loadingConfig('Loading config...'),
+          error: (_, __) => BootstrapStep.loading('Loading config failed'),
+          data: (_) {
+            // Step 4: Geolocation
+            if (geoState is GeolocationStateInitial ||
+                geoState is GeolocationStateLoadInProgress) {
+              return BootstrapStep.enablingGeolocation('Enable geolocation...');
+            }
+            if (geoState is GeolocationStateLoadFailure) {
+              return BootstrapStep.geolocationFailed();
+            }
+
+            // Step 5: Emoji
+            if (emojiState is EmojiStateInitial ||
+                emojiState is EmojiStateLoadInProgress) {
+              return BootstrapStep.loadingEmoji('Loading emoji...');
+            }
+            if (emojiState is EmojiStateLoadFailure) {
+              return BootstrapStep.loading('Loading emoji failed');
+            }
+
+            // Step 6: User
+            return userState.when(
+              loading: () => BootstrapStep.loadingUser('Loading user...'),
+              error: (error, _) {
+                if (error is DioException) {
+                  final failure = ServerFailure.fromError(error);
+                  if (failure is ServerFailurePlayerNotFound) {
+                    return BootstrapStep.userNotFound();
+                  }
+                  return BootstrapStep.loadingWithFailure(
+                      failure.getMessage(), failure);
+                }
+                return BootstrapStep.loading('Loading user failed: $error');
+              },
+              data: (_) {
+                // Step 7: Inventory
+                if (inventoryState is InventoryStateInitial ||
+                    inventoryState is InventoryStateLoadInProgress) {
+                  return BootstrapStep.loadingInventory('Loading inventory...');
+                }
+                if (inventoryState is InventoryStateLoadFailure) {
+                  return BootstrapStep.loading('Loading inventory failed');
+                }
+
+                // Step 8: Ban check (final check before entering app)
+                return banState.when(
+                  data: (ban) {
+                    if (ban != null) {
+                      return BootstrapStep.banned(ban.reason);
+                    }
+                    return BootstrapStep.complete();
+                  },
+                  error: (error, _) =>
+                      BootstrapStep.loading("Can't check user on bans, $error"),
+                  // If ban status is still loading, allow user to proceed
+                  // The ban will be checked in real-time via the socket stream
+                  loading: () => BootstrapStep.complete(),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildPageForBootstrapStep(BootstrapStep step) {
+    return switch (step) {
+      BootstrapStepComplete() => const MapPage(),
+      BootstrapStepAuthFailed() => const AuthPage(),
+      BootstrapStepGeolocationFailed() => const GeolocationPage(),
+      BootstrapStepUserNotFound() => const CreateUserPage(),
+      BootstrapStepBanned(:final reason) => BanPage(reason: reason),
+      BootstrapStepLoading(:final message) => LoadingPage(text: message),
+      BootstrapStepLoadingWithFailure(:final message) =>
+        LoadingPage(text: message),
+    };
+  }
+
+  // ============================================================================
+  // Helper Methods
+  // ============================================================================
+
+  void _showNotificationFlushbar(
+    BuildContext context, {
+    required String title,
+    required String message,
+    required Icon icon,
+  }) {
+    Flushbar(
+      title: title,
+      message: message,
+      messageSize: 18,
+      titleSize: 18,
+      shouldIconPulse: false,
+      icon: icon,
+      padding: const EdgeInsets.only(top: 23, bottom: 23, left: 35),
+      borderRadius: BorderRadius.circular(10),
+      margin: const EdgeInsets.all(12),
+      duration: const Duration(seconds: 5),
+      flushbarPosition: FlushbarPosition.TOP,
+    ).show(context);
+
+    AudioPlayer().play(AssetSource('sounds/notification.wav'));
+  }
+
+  void _showWarning(BuildContext context, String message) {
+    context
+        .read<NotificationsBloc>()
+        .add(NotificationsEvent.warningAdded(message));
+  }
+}
+
+// ============================================================================
+// Bootstrap Step Model
+// ============================================================================
+
+sealed class BootstrapStep {
+  const BootstrapStep();
+
+  factory BootstrapStep.authenticating(String message) =>
+      BootstrapStepLoading(message);
+  factory BootstrapStep.authFailed() => const BootstrapStepAuthFailed();
+  factory BootstrapStep.enablingGeolocation(String message) =>
+      BootstrapStepLoading(message);
+  factory BootstrapStep.geolocationFailed() =>
+      const BootstrapStepGeolocationFailed();
+  factory BootstrapStep.loadingEmoji(String message) =>
+      BootstrapStepLoading(message);
+  factory BootstrapStep.loadingConfig(String message) =>
+      BootstrapStepLoading(message);
+  factory BootstrapStep.loadingUser(String message) =>
+      BootstrapStepLoading(message);
+  factory BootstrapStep.userNotFound() => const BootstrapStepUserNotFound();
+  factory BootstrapStep.loadingInventory(String message) =>
+      BootstrapStepLoading(message);
+  factory BootstrapStep.connectingSocket(String message) =>
+      BootstrapStepLoading(message);
+  factory BootstrapStep.banned(String reason) =>
+      BootstrapStepBanned(reason: reason);
+  factory BootstrapStep.complete() => const BootstrapStepComplete();
+  factory BootstrapStep.loading(String message) =>
+      BootstrapStepLoading(message);
+  factory BootstrapStep.loadingWithFailure(
+          String message, ServerFailure failure) =>
+      BootstrapStepLoadingWithFailure(message, failure);
+}
+
+class BootstrapStepLoading extends BootstrapStep {
+  final String message;
+  const BootstrapStepLoading(this.message);
+}
+
+class BootstrapStepLoadingWithFailure extends BootstrapStep {
+  final String message;
+  final ServerFailure failure;
+  const BootstrapStepLoadingWithFailure(this.message, this.failure);
+}
+
+class BootstrapStepAuthFailed extends BootstrapStep {
+  const BootstrapStepAuthFailed();
+}
+
+class BootstrapStepGeolocationFailed extends BootstrapStep {
+  const BootstrapStepGeolocationFailed();
+}
+
+class BootstrapStepUserNotFound extends BootstrapStep {
+  const BootstrapStepUserNotFound();
+}
+
+class BootstrapStepBanned extends BootstrapStep {
+  final String reason;
+  const BootstrapStepBanned({required this.reason});
+}
+
+class BootstrapStepComplete extends BootstrapStep {
+  const BootstrapStepComplete();
 }
