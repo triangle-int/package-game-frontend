@@ -21,6 +21,43 @@ class GeolocationBloc extends Bloc<GeolocationEvent, GeolocationState> {
 
   StreamSubscription? _geolocationStream;
   Position? _lastSendedLocation;
+  Position? _currentLocation;
+  bool _userAvailable = false;
+  bool _sendingLocation = false;
+
+  void setUserAvailable(bool available) {
+    _userAvailable = available;
+    if (!available) {
+      _lastSendedLocation = null;
+    } else {
+      unawaited(_sendCurrentLocation());
+    }
+  }
+
+  Future<void> _sendCurrentLocation() async {
+    final position = _currentLocation;
+    if (!_userAvailable || _sendingLocation || position == null) return;
+    if (_lastSendedLocation != null &&
+        Geolocator.distanceBetween(
+              _lastSendedLocation!.latitude,
+              _lastSendedLocation!.longitude,
+              position.latitude,
+              position.longitude,
+            ) <=
+            10) return;
+
+    _sendingLocation = true;
+    try {
+      await _userRepository
+          .setLocation(LatLng(position.latitude, position.longitude));
+      if (_userAvailable) _lastSendedLocation = position;
+    } catch (error, stackTrace) {
+      Logger()
+          .w('Could not update location', error: error, stackTrace: stackTrace);
+    } finally {
+      _sendingLocation = false;
+    }
+  }
 
   GeolocationBloc(this._geo, this._userRepository)
       : super(const GeolocationState.initial()) {
@@ -49,19 +86,8 @@ class GeolocationBloc extends Bloc<GeolocationEvent, GeolocationState> {
             positionOrFailure.fold(
               (f) => GeolocationState.loadFailure(f),
               (pos) {
-                if (_lastSendedLocation == null ||
-                    Geolocator.distanceBetween(
-                          _lastSendedLocation!.latitude,
-                          _lastSendedLocation!.longitude,
-                          pos.latitude,
-                          pos.longitude,
-                        ) >
-                        10) {
-                  Logger().d('Distance is greater than 10');
-                  _userRepository
-                      .setLocation(LatLng(pos.latitude, pos.longitude));
-                  _lastSendedLocation = pos;
-                }
+                _currentLocation = pos;
+                unawaited(_sendCurrentLocation());
                 return GeolocationState.loadSuccess(pos);
               },
             ),

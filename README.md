@@ -120,3 +120,19 @@ TODO
 ## 💩 Shitty moments disclaimer
 
 Some parts of code are still not refactored and contains many dublications. In free time I will refactor this parts, but if you want speed up the process - submit a pull request or an issue. Please 🙏. Help me...
+# Local Android development login
+
+Run `make dev` in the backend directory to start its isolated database and
+server. Run `make dev` here to launch a connected Android device or iOS
+simulator. If several devices are available, select one with
+`make dev DEVICE=<device-id>`; `flutter devices` lists the IDs. Android ports
+are forwarded through ADB. `make stop` stops the Flutter session started by
+this Makefile. The **Dev Login** button signs in as `dev_user_1`.
+
+For a physical iPhone, start the development backend with
+`DEV_BIND_ADDRESS=<mac-lan-ip> make dev` in the backend directory, and run
+`make dev DEVICE=<device-id> SERVER_URL=http://<mac-lan-ip>:3005/` here.
+Both devices must be on a trusted network. The fixed development login token
+is exposed on the selected network interface. iOS device builds also require
+valid Xcode signing. The simulator uses localhost by default.
+Never enable this option on a public server: the development token is fixed.

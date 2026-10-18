@@ -2,7 +2,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 abstract class Env {
   static String getServerUrl() {
-    return dotenv.env['SERVER_URL'] ?? '';
+    const override = String.fromEnvironment('SERVER_URL');
+    return override.isNotEmpty ? override : dotenv.env['SERVER_URL'] ?? '';
   }
 
   static String getMapAccessKey() {
