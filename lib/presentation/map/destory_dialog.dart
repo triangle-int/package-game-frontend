@@ -1,4 +1,4 @@
-import 'package:auto_route/auto_route.dart';
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -28,11 +28,11 @@ class DestroyDialog extends HookConsumerWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(left: 6, right: 28 - 13),
-                child: Text(
+                child: AppText(
                   'Are you sure you want to destroy ${building.getEmoji(config)}?',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -44,7 +44,7 @@ class DestroyDialog extends HookConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   ElevatedButton(
-                    onPressed: () => context.router.pop(),
+                    onPressed: () => Navigator.of(context).pop(false),
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero,
                       backgroundColor: const Color(0xFFE53D1F),
@@ -66,7 +66,7 @@ class DestroyDialog extends HookConsumerWidget {
                           .read<BuildModeBloc>()
                           .add(BuildModeEvent.removedBuilding(building.id));
 
-                      context.router.pop();
+                      Navigator.of(context).pop(true);
                     },
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.zero,

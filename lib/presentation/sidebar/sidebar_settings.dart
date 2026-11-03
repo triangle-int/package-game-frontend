@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/presentation/core/emoji_image.dart';
+import 'package:package_flutter/presentation/core/language_selector.dart';
 import 'package:package_flutter/presentation/core/root/map_dark_mode.dart';
 import 'package:package_flutter/presentation/core/root/sfx_volume.dart';
 import 'package:package_flutter/presentation/sidebar/sidebar_item.dart';
@@ -53,6 +54,10 @@ class SidebarSettings extends HookConsumerWidget {
                 ),
               ],
             ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: LanguageSelector(),
           ),
           const SizedBox(height: 16),
           SidebarItem(

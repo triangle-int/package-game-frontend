@@ -1,4 +1,6 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
+import 'package:package_flutter/l10n/translations.dart';
 
 class SidebarItem extends StatelessWidget {
   final Function()? onTap;
@@ -15,10 +17,10 @@ class SidebarItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: Text(
-        '$emoji $text',
+      title: AppText(
+        '$emoji ${translate(context, text)}',
         style: const TextStyle(
-          fontSize: 24,
+          fontSize: 18,
           fontWeight: FontWeight.w400,
           fontFamily: 'Montserrat',
         ),

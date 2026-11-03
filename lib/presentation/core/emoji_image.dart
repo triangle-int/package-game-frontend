@@ -1,5 +1,3 @@
-// TODO(P5ina): Emoji image with placeholder and quality settings
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,6 +17,19 @@ class EmojiImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget fallback() => SizedBox(
+          width: size,
+          height: size,
+          child: Center(
+            child: Text(
+              emoji,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: size == null ? null : size! * .8, height: 1),
+            ),
+          ),
+        );
+
     return BlocBuilder<EmojiBloc, EmojiState>(
       builder: (context, emojiState) {
         final emojiFound = emojiState.getEmoji(emoji);
@@ -29,17 +40,8 @@ class EmojiImage extends StatelessWidget {
           height: size,
           fadeInDuration: Duration.zero,
           imageUrl: emojiFound.imageUrlHigh,
-          errorWidget: (ctx, url, error) => Column(
-            children: [
-              Text(
-                emojiFound.image,
-                style: const TextStyle(
-                  fontSize: 10,
-                  color: Colors.red,
-                ),
-              ),
-            ],
-          ),
+          placeholder: (_, __) => fallback(),
+          errorWidget: (_, __, ___) => fallback(),
         );
       },
     );

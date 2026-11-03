@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -8,53 +9,51 @@ import 'package:package_flutter/presentation/core/emoji_image.dart';
 class SelectResourceButton extends HookConsumerWidget {
   final String resourceName;
 
-  const SelectResourceButton({
-    super.key,
-    required this.resourceName,
-  });
+  const SelectResourceButton({super.key, required this.resourceName});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final config = ref.watch(configProvider).value!;
-
     return BlocBuilder<FactoryResourceBloc, FactoryResourceState>(
-      builder: (context, factoryResourceState) {
-        final isSelected = factoryResourceState.resource == resourceName;
+      builder: (context, state) {
+        final isSelected = state.resource == resourceName;
         final emoji =
             config.items.firstWhere((i) => i.name == resourceName).emoji;
+        final label = resourceName.replaceAll('_', ' ');
         return SizedBox(
-          width: 80,
-          height: 80,
-          child: Stack(
-            children: [
-              Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(100),
-                  onTap: () => context.read<FactoryResourceBloc>().add(
+          width: 82,
+          child: Material(
+            color: isSelected
+                ? Theme.of(context).colorScheme.primaryContainer
+                : Colors.white.withValues(alpha: .05),
+            borderRadius: BorderRadius.circular(14),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: state.isLoading
+                  ? null
+                  : () => context.read<FactoryResourceBloc>().add(
                         FactoryResourceEvent.resourceSelected(resourceName),
                       ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: EmojiImage(emoji: emoji),
-                  ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                child: Column(
+                  children: [
+                    EmojiImage(emoji: emoji, size: 36),
+                    const SizedBox(height: 4),
+                    AppText(label,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        style: TextStyle(
+                            fontSize: 11,
+                            color: isSelected
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer
+                                : null)),
+                  ],
                 ),
               ),
-              if (isSelected) ...[
-                Positioned(
-                  right: 10,
-                  bottom: 10,
-                  width: 19,
-                  height: 19,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ]
-            ],
+            ),
           ),
         );
       },

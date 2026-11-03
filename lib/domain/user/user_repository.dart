@@ -60,15 +60,21 @@ class UserRepository {
   Future<Either<CreateUserFailure, Unit>> createUser({
     required String nickname,
     required String avatar,
+    Position? position,
   }) async {
-    final geolocation = await Geolocator.getLastKnownPosition();
     try {
+      final geolocation = position ?? await Geolocator.getLastKnownPosition();
+      if (geolocation == null) {
+        return left(const CreateUserFailure.serverFailure(
+          'Location is unavailable. Please enable location and try again.',
+        ));
+      }
       final response = await _dio.post(
         '/user/create',
         data: {
           'nickname': nickname,
           'avatar': avatar,
-          'location': '${geolocation!.latitude},${geolocation.longitude}'
+          'location': '${geolocation.latitude},${geolocation.longitude}'
         },
       );
       Logger().d(response.data);

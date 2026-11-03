@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -32,11 +33,11 @@ class TruckTypeHelpPage extends HookConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                AppText(
                   'Doggie',
                   style: TextStyle(
                     fontFamily: 'Piazzolla',
-                    fontSize: 36,
+                    fontSize: 26,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF333363),
                   ),
@@ -47,11 +48,11 @@ class TruckTypeHelpPage extends HookConsumerWidget {
                   size: 73,
                 ),
                 SizedBox(width: 10),
-                Text(
+                AppText(
                   'Express',
                   style: TextStyle(
                     fontFamily: 'Piazzolla',
-                    fontSize: 36,
+                    fontSize: 26,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF333363),
                   ),
@@ -70,15 +71,15 @@ class TruckTypeHelpPage extends HookConsumerWidget {
             ),
             child: Column(
               children: [
-                Text(
+                AppText(
                   'Сost of 1 km: $cybertruckPrice 💵',
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 33),
-                const Text(
+                const AppText(
                   'Cybertrucks drive at real speed and take into account traffic congestion',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -100,15 +101,15 @@ class TruckTypeHelpPage extends HookConsumerWidget {
             ),
             child: Column(
               children: [
-                Text(
+                AppText(
                   'Сost of 1 km: $doggyPrice 💵',
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 33),
-                const Text(
+                const AppText(
                   'The doggies speed is 75% of the cars speed and they doesn’t take into account traffic',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -130,15 +131,15 @@ class TruckTypeHelpPage extends HookConsumerWidget {
             ),
             child: Column(
               children: [
-                Text(
+                AppText(
                   'Сost of 1 km: $planePrice 💵',
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 33),
-                const Text(
+                const AppText(
                   'Planes fly in a straight line at extremely high speed',
                   textAlign: TextAlign.center,
                   style: TextStyle(

@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +54,7 @@ class BrowserBar extends StatelessWidget implements PreferredSizeWidget {
                 borderRadius: BorderRadius.circular(25),
               ),
               alignment: Alignment.centerLeft,
-              child: Text(
+              child: AppText(
                 link,
                 style: const TextStyle(
                   color: Color(0xFF5B5B5B),

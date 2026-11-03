@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:package_flutter/l10n/language.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -186,6 +188,9 @@ class App extends HookConsumerWidget {
             child: SfxVolumeWidget(
               child: MaterialApp.router(
                 theme: appTheme,
+                locale: ref.watch(languageProvider),
+                supportedLocales: const [Locale('en'), Locale('ru')],
+                localizationsDelegates: GlobalMaterialLocalizations.delegates,
                 routerDelegate: _appRouter.delegate(),
                 routeInformationParser: _appRouter.defaultRouteParser(),
               ),

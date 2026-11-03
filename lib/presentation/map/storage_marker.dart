@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/bloc/user/user_provider.dart';
@@ -21,7 +22,7 @@ class StorageMarker extends HookConsumerWidget {
       alignment: AlignmentDirectional.topCenter,
       children: [
         if (user.id == storage.ownerId)
-          Text(
+          AppText(
             (storage.level + 1).toString(),
             style: const TextStyle(
               fontSize: 10,

@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 
 class PackageTitle extends StatelessWidget {
@@ -16,7 +17,7 @@ class PackageTitle extends StatelessWidget {
       child: Column(
         children: <Widget>[
           const SizedBox(height: 30),
-          const Text(
+          const AppText(
             'Package',
             style: TextStyle(
               fontFamily: 'Sansation',

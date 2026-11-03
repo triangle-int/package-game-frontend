@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -41,27 +42,33 @@ class UpgradeResource extends HookConsumerWidget {
                   .count,
               _ => BigInt.from(0),
             };
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                EmojiImage(
-                  emoji: config.items
-                      .firstWhere((i) => i.name == resourceName)
-                      .emoji,
-                  size: 42,
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  '${currentResources.toCurrency()} / ${needResources.toCurrency()}',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w500,
-                    color: currentResources >= BigInt.from(needResources)
-                        ? Colors.white
-                        : const Color(0xFF9F9F9F),
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 6),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  EmojiImage(
+                      emoji: config.getItemByName(resourceName).emoji,
+                      size: 22),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: AppText(
+                      '${currentResources.toCurrency()}/${needResources.toCurrency()}',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: currentResources >= BigInt.from(needResources)
+                            ? Colors.white
+                            : const Color(0xFF9F9F9F),
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
           },
         );

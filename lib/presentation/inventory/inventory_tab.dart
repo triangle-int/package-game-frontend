@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_flutter/bloc/inventory/inventory_bloc.dart';
@@ -36,13 +37,13 @@ class InventoryTab extends StatelessWidget {
               padding: EdgeInsets.only(
                   bottom: MediaQuery.of(context).padding.bottom),
               child: Center(
-                child: Text(
+                child: AppText(
                   'Something went wrong, message: ${switch (failure) {
                     InventoryFailureServerFailure(:final message) => message
                   }}',
                   style: const TextStyle(
                     fontWeight: FontWeight.w500,
-                    fontSize: 24,
+                    fontSize: 18,
                   ),
                 ),
               ),
@@ -59,22 +60,28 @@ class InventoryTab extends StatelessWidget {
                   bottom: MediaQuery.of(context).padding.bottom,
                 ),
                 child: const Center(
-                  child: Text(
+                  child: AppText(
                     'No resources 👎',
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      fontSize: 24,
+                      fontSize: 18,
                     ),
                   ),
                 ),
               );
             }
-            return ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              separatorBuilder: (context, index) => const SizedBox(height: 35),
-              itemCount: filteredItems.length,
-              itemBuilder: (context, index) =>
-                  InventoryResource(filteredItems[index]),
+            return LayoutBuilder(
+              builder: (context, constraints) => ListView.separated(
+                padding: EdgeInsets.symmetric(
+                  vertical: constraints.maxWidth * .025,
+                ),
+                separatorBuilder: (context, index) => SizedBox(
+                  height: constraints.maxWidth * .04,
+                ),
+                itemCount: filteredItems.length,
+                itemBuilder: (context, index) =>
+                    InventoryResource(filteredItems[index]),
+              ),
             );
         }
       },

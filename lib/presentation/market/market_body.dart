@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -59,10 +60,10 @@ class MarketBody extends HookConsumerWidget {
                       children: [
                         const EmojiImage(
                           emoji: '🏬',
-                          size: 120,
+                          size: 64,
                         ),
                         Container(
-                          width: 120,
+                          width: 64,
                           height: 11,
                           color: Color(
                             0xFF000000 + int.parse(color, radix: 16),
@@ -70,11 +71,11 @@ class MarketBody extends HookConsumerWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(width: 22),
-                    Text(
-                      '$branchName\nBranch',
+                    const SizedBox(width: 16),
+                    AppText(
+                      '$branchName market',
                       style: TextStyle(
-                        fontSize: 48,
+                        fontSize: 28,
                         fontFamily: 'Sansation',
                         color: Color(
                           0xFF000000 + int.parse(color, radix: 16),
@@ -83,6 +84,9 @@ class MarketBody extends HookConsumerWidget {
                     ),
                   ],
                 ),
+                const AppText('Deliver matching resources here to sell them.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 13, color: Colors.white70)),
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -115,7 +119,7 @@ class MarketBody extends HookConsumerWidget {
                     ),
                   ],
                 ),
-                Text(
+                AppText(
                   'weekly commission ${(market.commission! * 100).floor()}%',
                   style: const TextStyle(
                     fontWeight: FontWeight.w500,

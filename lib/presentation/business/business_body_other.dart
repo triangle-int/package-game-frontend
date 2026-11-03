@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -49,23 +50,23 @@ class BusinessBodyOther extends HookConsumerWidget {
                 padding: const EdgeInsets.only(top: 60 + 12),
                 child: Column(
                   children: [
-                    Text(
+                    AppText(
                       'Level ${businessAndTaxes.business.level}',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontFamily: 'Sansation',
-                        fontSize: 48,
+                        fontSize: 28,
                       ),
                     ),
                     EmojiImage(
                       emoji: businessAndTaxes.business.owner!.avatar,
                       size: 48,
                     ),
-                    Text(
+                    AppText(
                       businessAndTaxes.business.owner!.nickname,
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
-                        fontSize: 32,
+                        fontSize: 24,
                       ),
                     ),
                     const SizedBox(height: 15),

@@ -1,3 +1,5 @@
+import 'package:package_flutter/l10n/translations.dart';
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -107,19 +109,19 @@ class BuyPage extends HookConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 9),
-                  Text(
+                  AppText(
                     '${tradeItem.count} 📦',
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: FontWeight.w500,
                       color: Colors.black,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
+                  AppText(
                     tradeItem.owner.nickname,
                     style: const TextStyle(
-                      fontSize: 32,
+                      fontSize: 24,
                       fontWeight: FontWeight.w600,
                       color: Colors.black,
                     ),
@@ -173,7 +175,7 @@ class BuyPage extends HookConsumerWidget {
                               isEditing.value = false;
                             },
                             style: const TextStyle(
-                              fontSize: 32,
+                              fontSize: 24,
                               fontWeight: FontWeight.w500,
                               color: Colors.black,
                             ),
@@ -182,11 +184,11 @@ class BuyPage extends HookConsumerWidget {
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                             ],
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'amount',
+                              hintText: translate(context, 'amount'),
                               hintStyle: TextStyle(
-                                fontSize: 32,
+                                fontSize: 24,
                                 fontWeight: FontWeight.w500,
                                 color: Color(0xFF656565),
                               ),
@@ -217,10 +219,10 @@ class BuyPage extends HookConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 42),
-                  Text(
+                  AppText(
                     '${tradeItem.pricePerUnit.toCurrency()} 💵 per each',
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: FontWeight.w500,
                       color: Colors.black,
                     ),
@@ -266,10 +268,10 @@ class TextOrBuyButton extends StatelessWidget {
         }
 
         if (isEditing) {
-          return Text(
+          return AppText(
             'total $price 💵',
             style: const TextStyle(
-              fontSize: 32,
+              fontSize: 24,
               fontWeight: FontWeight.w500,
               color: Colors.black,
             ),
@@ -287,10 +289,10 @@ class TextOrBuyButton extends StatelessWidget {
             elevation: 4,
             fixedSize: const Size(327, 51),
           ),
-          child: Text(
+          child: AppText(
             'buy for $price 💵',
             style: const TextStyle(
-              fontSize: 32,
+              fontSize: 24,
               fontWeight: FontWeight.w500,
             ),
           ),

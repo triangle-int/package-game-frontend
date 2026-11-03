@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -43,10 +44,10 @@ class MarketResource extends HookConsumerWidget {
           children: [
             EmojiImage(emoji: item.emoji, size: 37),
             const SizedBox(width: 8),
-            Text(
+            AppText(
               count.toString(),
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
             ),

@@ -1,3 +1,5 @@
+import 'package:package_flutter/l10n/translations.dart';
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -144,21 +146,21 @@ class ProfileProduct extends HookConsumerWidget {
               const Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  AppText(
                     'average',
                     style: TextStyle(
                       color: Color(0xFF656565),
                       fontSize: 16,
                     ),
                   ),
-                  Text(
+                  AppText(
                     'minimal',
                     style: TextStyle(
                       color: Color(0xFF656565),
                       fontSize: 16,
                     ),
                   ),
-                  Text(
+                  AppText(
                     'yours',
                     style: TextStyle(
                       color: Color(0xFF656565),
@@ -170,7 +172,7 @@ class ProfileProduct extends HookConsumerWidget {
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  AppText(
                     '$averagePrice 💵',
                     style: const TextStyle(
                       color: Colors.black,
@@ -178,7 +180,7 @@ class ProfileProduct extends HookConsumerWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Text(
+                  AppText(
                     '$minPrice 💵',
                     style: const TextStyle(
                       color: Colors.black,
@@ -193,7 +195,7 @@ class ProfileProduct extends HookConsumerWidget {
                       controller: controller,
                       keyboardType: TextInputType.number,
                       maxLength: 6,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         counterText: '',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.all(
@@ -216,7 +218,7 @@ class ProfileProduct extends HookConsumerWidget {
                           fontSize: 16,
                           color: Colors.grey,
                         ),
-                        hintText: 'price',
+                        hintText: translate(context, 'price'),
                         contentPadding: EdgeInsets.zero,
                       ),
                       onChanged: (text) {
@@ -259,7 +261,7 @@ class ProfileProduct extends HookConsumerWidget {
             height: 35,
             width: double.infinity,
             child: Center(
-              child: Text(
+              child: AppText(
                 'you selling $amount',
                 style: const TextStyle(
                   color: Color(0xFF656565),

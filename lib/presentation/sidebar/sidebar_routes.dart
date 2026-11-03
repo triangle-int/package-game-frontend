@@ -1,5 +1,7 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:package_flutter/bloc/notifications/notifications_bloc.dart';
 import 'package:package_flutter/bloc/sidebar/sidebar_bloc.dart';
 import 'package:package_flutter/bloc/truck/remove_schedule.dart/remove_schedule_bloc.dart';
 import 'package:package_flutter/presentation/sidebar/schedule_item.dart';
@@ -19,6 +21,10 @@ class SidebarRoutes extends StatelessWidget {
             context
                 .read<SidebarBloc>()
                 .add(const SidebarEvent.routesSelected());
+          case RemoveScheduleStateLoadFailure(:final failure):
+            context.read<NotificationsBloc>().add(
+                  NotificationsEvent.warningAdded(failure.getMessage()),
+                );
           default:
             break;
         }
@@ -35,10 +41,10 @@ class SidebarRoutes extends StatelessWidget {
                       .read<SidebarBloc>()
                       .add(const SidebarEvent.initialPageSelected());
                 },
-                child: const Text(
+                child: const AppText(
                   '❌ 🚚 Routes',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 18,
                   ),
                 ),
               ),
@@ -70,7 +76,7 @@ class SidebarRoutes extends StatelessWidget {
                           SeparatedColumn(
                             children: schedulesOrFailure!.fold(
                               (f) => [
-                                Text('Routes loading failed: ${f.getMessage()}')
+                                AppText('Routes loading failed: ${f.getMessage()}')
                               ],
                               (schedules) => schedules.schedules.isNotEmpty
                                   ? schedules.schedules
@@ -79,7 +85,7 @@ class SidebarRoutes extends StatelessWidget {
                                       )
                                       .toList()
                                   : [
-                                      const Text(
+                                      const AppText(
                                         'No scheduled routes',
                                         style: TextStyle(
                                           fontSize: 16,
@@ -97,7 +103,7 @@ class SidebarRoutes extends StatelessWidget {
                           SeparatedColumn(
                             children: schedulesOrFailure.fold(
                               (f) => [
-                                Text('Routes loading failed: ${f.getMessage()}')
+                                AppText('Routes loading failed: ${f.getMessage()}')
                               ],
                               (schedulesAndTrucks) =>
                                   schedulesAndTrucks.trucks.isNotEmpty
@@ -107,7 +113,7 @@ class SidebarRoutes extends StatelessWidget {
                                           )
                                           .toList()
                                       : [
-                                          const Text(
+                                          const AppText(
                                             'No one time routes',
                                             style: TextStyle(
                                               fontSize: 16,

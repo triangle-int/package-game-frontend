@@ -1,3 +1,6 @@
+import 'package:package_flutter/l10n/app_text.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -36,17 +39,13 @@ class FactoryMenu extends HookConsumerWidget {
               FactoryToggleBloc(ref.watch(factoryRepositoryProvider)),
         ),
       ],
-      child: BlocBuilder<FactoryBloc, FactoryState>(
-        builder: (context, factoryState) {
-          final config = ref.watch(configProvider).value!;
-          return Center(
-            child: Container(
-              width: 334,
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(10),
-              ),
+      child: _FactoryAutoRefresh(
+        factoryId: factoryId,
+        child: BlocBuilder<FactoryBloc, FactoryState>(
+          builder: (context, factoryState) {
+            final config = ref.watch(configProvider).value!;
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
               child: Builder(builder: (context) {
                 switch (factoryState) {
                   case FactoryStateInitial():
@@ -55,7 +54,7 @@ class FactoryMenu extends HookConsumerWidget {
                     return const MarketLoading();
                   case FactoryStateLoadFailure():
                     return Center(
-                      child: Text(
+                      child: AppText(
                         "Something isn't right: ${factoryState.f.getMessage()}",
                       ),
                     );
@@ -77,22 +76,24 @@ class FactoryMenu extends HookConsumerWidget {
                         .read(activatedBoostersProvider.notifier)
                         .getBoostedFactoryProduction(
                           config.factoryResourcesPerMinute[
-                              factoryBuilding.level - 1],
+                              (factoryBuilding.level - 1).clamp(0,
+                                  config.factoryResourcesPerMinute.length - 1)],
                         );
 
                     if (factoryBuilding.ownerId != user.id) {
                       return Center(
-                        child: Text(
+                        child: AppText(
                           '${factoryBuilding.owner?.avatar} ${factoryBuilding.owner?.nickname}',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontWeight: FontWeight.w700,
-                            fontSize: 24,
+                            fontSize: 18,
                           ),
                         ),
                       );
                     }
-                    return Column(
+                    return SingleChildScrollView(
+                        child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         FactoryHeader(
@@ -108,13 +109,46 @@ class FactoryMenu extends HookConsumerWidget {
                           FactorySelectResource(factoryId: factoryId),
                         ]
                       ],
-                    );
+                    ));
                 }
               }),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
+}
+
+class _FactoryAutoRefresh extends StatefulWidget {
+  const _FactoryAutoRefresh({required this.factoryId, required this.child});
+
+  final int factoryId;
+  final Widget child;
+
+  @override
+  State<_FactoryAutoRefresh> createState() => _FactoryAutoRefreshState();
+}
+
+class _FactoryAutoRefreshState extends State<_FactoryAutoRefresh> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
+      context
+          .read<FactoryBloc>()
+          .add(FactoryEvent.factoryRequested(widget.factoryId));
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }

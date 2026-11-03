@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 
 class SidebarRouteCategory extends StatelessWidget {
@@ -17,7 +18,7 @@ class SidebarRouteCategory extends StatelessWidget {
         ),
       ),
       child: Center(
-        child: Text(
+        child: AppText(
           text,
           style: const TextStyle(
             fontSize: 17,

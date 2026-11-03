@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/bloc/auth/auth_page/auth_page_bloc.dart';
+import 'package:package_flutter/domain/auth/auth_repository.dart';
 import 'package:package_flutter/presentation/auth/auth_button.dart';
 import 'package:package_flutter/presentation/core/package_title.dart';
+import 'package:package_flutter/presentation/core/language_selector.dart';
 
-class AuthPageBody extends StatelessWidget {
+class AuthPageBody extends ConsumerWidget {
   const AuthPageBody({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: SafeArea(
         child: PackageTitle(
           child: Column(
             children: [
+              const LanguageSelector(),
+              const SizedBox(height: 16),
               AuthButton(
                 'Sign in with Google',
                 onPressed: () => context
@@ -27,6 +33,15 @@ class AuthPageBody extends StatelessWidget {
                     .read<AuthPageBloc>()
                     .add(const AuthPageEvent.signedInWithApple()),
               ),
+              if (kDebugMode) ...[
+                const SizedBox(height: 16),
+                AuthButton(
+                  'Dev Login',
+                  onPressed: () {
+                    ref.read(authRepositoryProvider).signInForDevelopment();
+                  },
+                ),
+              ],
             ],
           ),
         ),

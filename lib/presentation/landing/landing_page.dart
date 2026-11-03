@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/translations.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:auto_route/auto_route.dart';
@@ -9,6 +10,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:logger/logger.dart';
 import 'package:package_flutter/bloc/auth/auth_bloc.dart';
+import 'package:package_flutter/bloc/auth/auth_provider.dart';
 import 'package:package_flutter/bloc/ban/ban_provider.dart';
 import 'package:package_flutter/bloc/config/config_provider.dart';
 import 'package:package_flutter/bloc/emoji/emoji_bloc.dart';
@@ -19,6 +21,7 @@ import 'package:package_flutter/bloc/purchase/purchases_stream_provider.dart';
 import 'package:package_flutter/bloc/socket/socket_connection_provider.dart';
 import 'package:package_flutter/bloc/user/user_provider.dart';
 import 'package:package_flutter/domain/ban/ban.dart';
+import 'package:package_flutter/domain/auth/dev_user.dart';
 import 'package:package_flutter/domain/config/config.dart';
 import 'package:package_flutter/domain/core/server_failure.dart';
 import 'package:package_flutter/domain/purchase/purchase_repository.dart';
@@ -29,6 +32,7 @@ import 'package:package_flutter/presentation/geolocation/geolocation_page.dart';
 import 'package:package_flutter/presentation/loading/loading_page.dart';
 import 'package:package_flutter/presentation/map/map_page.dart';
 import 'package:package_flutter/presentation/user/create_user_page.dart';
+import 'package:package_flutter/presentation/user/create_dev_user_page.dart';
 
 @RoutePage()
 class LandingPage extends HookConsumerWidget {
@@ -98,6 +102,8 @@ class LandingPage extends HookConsumerWidget {
       next.whenData((_) {
         // Only setup on initial user load, not subsequent updates
         if (previous?.hasValue ?? false) return;
+
+        context.read<GeolocationBloc>().setUserAvailable(true);
 
         context.read<NotificationsBloc>().add(const NotificationsEvent.setup());
 
@@ -263,6 +269,9 @@ class LandingPage extends HookConsumerWidget {
   BlocListener<AuthBloc, AuthState> _buildAuthListener(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, authState) {
+        if (authState is AuthStateLoadFailure) {
+          context.read<GeolocationBloc>().setUserAvailable(false);
+        }
         // Socket connection is invalidated in the listener to reconnect with new auth
         // This listener is intentionally left without implementation for now
         // as the invalidation happens in _setupStateListeners
@@ -316,7 +325,7 @@ class LandingPage extends HookConsumerWidget {
                     banState: banState,
                   );
 
-                  return _buildPageForBootstrapStep(bootstrapStep);
+                  return _buildPageForBootstrapStep(bootstrapStep, ref);
                 },
               );
             },
@@ -420,12 +429,14 @@ class LandingPage extends HookConsumerWidget {
     );
   }
 
-  Widget _buildPageForBootstrapStep(BootstrapStep step) {
+  Widget _buildPageForBootstrapStep(BootstrapStep step, WidgetRef ref) {
     return switch (step) {
       BootstrapStepComplete() => const MapPage(),
       BootstrapStepAuthFailed() => const AuthPage(),
       BootstrapStepGeolocationFailed() => const GeolocationPage(),
-      BootstrapStepUserNotFound() => const CreateUserPage(),
+      BootstrapStepUserNotFound() => ref.watch(authProvider).value is DevUser
+          ? const CreateDevUserPage()
+          : const CreateUserPage(),
       BootstrapStepBanned(:final reason) => BanPage(reason: reason),
       BootstrapStepLoading(:final message) => LoadingPage(text: message),
       BootstrapStepLoadingWithFailure(:final message) =>
@@ -444,8 +455,8 @@ class LandingPage extends HookConsumerWidget {
     required Icon icon,
   }) {
     Flushbar(
-      title: title,
-      message: message,
+      title: translate(context, title),
+      message: translate(context, message),
       messageSize: 18,
       titleSize: 18,
       shouldIconPulse: false,

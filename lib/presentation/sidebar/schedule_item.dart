@@ -1,14 +1,13 @@
+import 'package:package_flutter/l10n/translations.dart';
+import 'package:package_flutter/l10n/app_text.dart';
 import 'dart:async';
 
-import 'package:auto_route/auto_route.dart';
-import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:logger/logger.dart';
-import 'package:package_flutter/app_router.dart';
 import 'package:package_flutter/bloc/config/config_provider.dart';
 import 'package:package_flutter/bloc/sidebar/sidebar_bloc.dart';
+import 'package:package_flutter/bloc/truck/remove_schedule.dart/remove_schedule_bloc.dart';
 import 'package:package_flutter/domain/truck/truck_schedule.dart';
 import 'package:package_flutter/presentation/core/emoji_image.dart';
 import 'package:package_flutter/presentation/core/transformers/currency_transformer.dart';
@@ -28,18 +27,31 @@ class ScheduleItem extends StatefulHookConsumerWidget {
 
 class _ScheduleItemState extends ConsumerState<ScheduleItem> {
   Timer? _timer;
+  DateTime? _lastRefresh;
 
   @override
   void initState() {
+    super.initState();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (widget.schedule.nextTime.isBefore(DateTime.now())) {
-        Logger().w('RELOAD SCHEDULES');
+      final now = DateTime.now();
+      if (!widget.schedule.nextTime.isAfter(now) &&
+          (_lastRefresh == null ||
+              now.difference(_lastRefresh!) >= const Duration(seconds: 10))) {
+        _lastRefresh = now;
         context.read<SidebarBloc>().add(const SidebarEvent.routesSelected());
       }
 
       setState(() {});
     });
-    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant ScheduleItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.schedule.id != widget.schedule.id ||
+        oldWidget.schedule.nextTime != widget.schedule.nextTime) {
+      _lastRefresh = null;
+    }
   }
 
   @override
@@ -50,13 +62,18 @@ class _ScheduleItemState extends ConsumerState<ScheduleItem> {
 
   @override
   Widget build(BuildContext context) {
-    final interval = [
+    const intervals = [
       '1h',
       '6h',
       '12h',
-    ][widget.schedule.interval];
+    ];
+    final intervalIndex = widget.schedule.interval;
+    final interval = intervalIndex >= 0 && intervalIndex < intervals.length
+        ? intervals[intervalIndex]
+        : 'Scheduled';
 
-    final untilNext = widget.schedule.nextTime.difference(DateTime.now()).abs();
+    final remaining = widget.schedule.nextTime.difference(DateTime.now());
+    final untilNext = remaining.isNegative ? Duration.zero : remaining;
     final untilNextString = untilNext.inHours > 0
         ? '${untilNext.inHours}h ${untilNext.inMinutes % 60}m'
         : untilNext.inMinutes > 0
@@ -65,9 +82,9 @@ class _ScheduleItemState extends ConsumerState<ScheduleItem> {
 
     final config = ref.watch(configProvider).value!;
 
-    final emojiResource = config.items
-        .firstWhere((i) => i.name == widget.schedule.resource)
-        .emoji;
+    final resources =
+        config.items.where((i) => i.name == widget.schedule.resource);
+    final emojiResource = resources.isEmpty ? '📦' : resources.first.emoji;
     final resourceCount = widget.schedule.resourceCount.toCurrency();
 
     final emojiStart = widget.schedule.start.getEmoji(config);
@@ -81,7 +98,7 @@ class _ScheduleItemState extends ConsumerState<ScheduleItem> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                AppText(
                   '$interval route\n$untilNextString till next\ncargo: $resourceCount $emojiResource',
                   style: const TextStyle(
                     fontSize: 17,
@@ -93,21 +110,42 @@ class _ScheduleItemState extends ConsumerState<ScheduleItem> {
             Expanded(
               child: Align(
                 alignment: Alignment.topRight,
-                child: ElevatedButton(
-                  onPressed: () => context.router.push(
-                    RouteMapRoute(
-                      truckOrSchedule: dartz.right(widget.schedule),
-                    ),
+                child: BlocBuilder<RemoveScheduleBloc, RemoveScheduleState>(
+                  builder: (context, state) => IconButton(
+                    tooltip: translate(context, 'Cancel schedule'),
+                    onPressed: state is RemoveScheduleStateLoadInProgress
+                        ? null
+                        : () async {
+                            final confirmed = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const AppText('Cancel schedule?'),
+                                content: const AppText(
+                                  'Future deliveries on this schedule will stop.',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, false),
+                                    child: const AppText('Keep schedule'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, true),
+                                    child: const AppText('Cancel schedule'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirmed == true && context.mounted) {
+                              context.read<RemoveScheduleBloc>().add(
+                                    RemoveScheduleEvent.remove(
+                                        widget.schedule.id),
+                                  );
+                            }
+                          },
+                    icon: const Icon(Icons.delete_outline),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    fixedSize: const Size(48, 48),
-                    minimumSize: const Size(48, 48),
-                    padding: const EdgeInsets.all(3),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(11),
-                    ),
-                  ),
-                  child: const EmojiImage(emoji: '📍'),
                 ),
               ),
             )

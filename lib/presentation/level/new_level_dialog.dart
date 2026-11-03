@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -30,7 +31,7 @@ class NewLevelDialog extends StatelessWidget {
               ),
               child: const Column(
                 children: [
-                  Text(
+                  AppText(
                     'Congratulations!',
                     style: TextStyle(),
                   ),

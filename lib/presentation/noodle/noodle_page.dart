@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/translations.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:package_flutter/bloc/tutorial/tutorial_bloc.dart';
 import 'package:package_flutter/domain/tutorial/tutorial_step.dart';
 import 'package:package_flutter/presentation/noodle/browser_bar.dart';
 import 'package:package_flutter/presentation/noodle/noodle_site.dart';
+import 'package:package_flutter/presentation/solo_market/solo_market_page.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 @RoutePage()
@@ -72,7 +74,7 @@ class _NoodleBodyState extends State<NoodleBody> {
             const SizedBox(height: 15),
             Showcase(
               key: _fmMarketKey,
-              description: 'Open FM Market',
+              description: translate(context, 'Open FM Market'),
               disposeOnTap: true,
               onTargetClick: () => context.router.push(const FMMarketRoute()),
               child: NoodleSite(
@@ -106,6 +108,19 @@ class _NoodleBodyState extends State<NoodleBody> {
               onPressed: () {
                 AudioPlayer().play(AssetSource('sounds/mouse_click.wav'));
                 context.router.push(const SNMRoute());
+              },
+            ),
+            const SizedBox(height: 15),
+            NoodleSite(
+              title: 'Survival Market',
+              description:
+                  'Emergency supplies for isolated players. Convenient, expensive and always available.',
+              link: '🛟 httgs://survival-market.net',
+              onPressed: () {
+                AudioPlayer().play(AssetSource('sounds/mouse_click.wav'));
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SoloMarketPage()),
+                );
               },
             ),
             // const SizedBox(height: 15),

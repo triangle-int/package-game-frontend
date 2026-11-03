@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:package_flutter/domain/building/building_owner.dart';
 import 'package:package_flutter/domain/config/config.dart';
 import 'package:package_flutter/domain/inventory/inventory_item.dart';
-import 'package:package_flutter/domain/user/user.dart';
 
 part 'building.freezed.dart';
 part 'building.g.dart';
@@ -18,7 +18,7 @@ sealed class Building with _$Building {
     required int level,
     required int ownerId,
     required DateTime updatedAt,
-    User? owner,
+    BuildingOwner? owner,
   }) = BusinessBuilding;
 
   const factory Building.storage({
@@ -27,6 +27,7 @@ sealed class Building with _$Building {
     required String geohex,
     required String? geohash,
     required int ownerId,
+    BuildingOwner? owner,
     List<InventoryItem>? inventory,
   }) = StorageBuilding;
 
@@ -41,7 +42,7 @@ sealed class Building with _$Building {
     required int level,
     required int ownerId,
     required bool enabled,
-    User? owner,
+    BuildingOwner? owner,
     List<InventoryItem>? inventory,
   }) = FactoryBuilding;
 
@@ -60,6 +61,7 @@ sealed class Building with _$Building {
     required String? geohash,
     required int level,
     required int? ownerId,
+    BuildingOwner? owner,
     required List<SatelliteBuilding>? children,
   }) = SatelliteBuilding;
 

@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:package_flutter/presentation/user/avatar_field.dart';
 import 'package:package_flutter/presentation/user/nickname_field.dart';
@@ -14,7 +15,7 @@ class CreateUserBody extends StatelessWidget {
           alignment: Alignment.topCenter,
           child: Column(
             children: <Widget>[
-              const Text(
+              const AppText(
                 'Choose your avatar',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -66,7 +67,7 @@ class CreateUserBody extends StatelessWidget {
               const SizedBox(height: 10),
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 30),
-                child: Text(
+                child: AppText(
                   'Company name can only contain letters, numbers, or underscores',
                   style: TextStyle(
                     fontFamily: 'Montserrat',

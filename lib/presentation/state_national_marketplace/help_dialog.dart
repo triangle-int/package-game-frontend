@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 
 class HelpDialog extends StatelessWidget {
@@ -19,15 +20,15 @@ class HelpDialog extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              const AppText(
                 'tip',
                 style: TextStyle(
                     color: Colors.black,
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 8),
-              Text(
+              AppText(
                 text,
                 textAlign: TextAlign.center,
                 style: const TextStyle(

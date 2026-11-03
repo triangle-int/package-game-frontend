@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 
 class DoggyExpressStep extends StatelessWidget {
@@ -10,7 +11,7 @@ class DoggyExpressStep extends StatelessWidget {
   const DoggyExpressStep({
     super.key,
     required this.text,
-    this.titleSize = 24,
+    this.titleSize = 18,
     this.padding,
     this.questionMark,
     this.child,
@@ -27,12 +28,13 @@ class DoggyExpressStep extends StatelessWidget {
           thickness: 4,
         ),
         SizedBox(
-          height: 70,
+          height: 56,
           child: Stack(
             children: [
               Center(
-                child: Text(
+                child: AppText(
                   text,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: titleSize,
                     fontWeight: FontWeight.w500,

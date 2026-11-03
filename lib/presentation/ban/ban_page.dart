@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/presentation/core/package_title.dart';
@@ -14,7 +15,7 @@ class BanPage extends HookConsumerWidget {
         child: PackageTitle(
           child: Column(
             children: [
-              const Text(
+              const AppText(
                 'Your account has been banned',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -24,7 +25,7 @@ class BanPage extends HookConsumerWidget {
                 ),
               ),
               const SizedBox(height: 30),
-              Text(
+              AppText(
                 'Reason: $reason',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
@@ -34,7 +35,7 @@ class BanPage extends HookConsumerWidget {
                 ),
               ),
               const SizedBox(height: 92),
-              const Text(
+              const AppText(
                 "If you think there's been an error",
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -58,7 +59,7 @@ class BanPage extends HookConsumerWidget {
                     borderRadius: BorderRadius.circular(130),
                   ),
                 ),
-                child: const Text(
+                child: const AppText(
                   'Appeal',
                   style: TextStyle(
                     fontFamily: 'Montserrat',

@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -68,13 +69,11 @@ class FactoryUpgradeButton extends HookConsumerWidget {
             final canUpgrade = hasResource1 && hasResource2 && hasResource3;
 
             return ElevatedButton(
-              onPressed: () {
-                if (canUpgrade) {
-                  context
+              onPressed: canUpgrade
+                  ? () => context
                       .read<FactoryUpgradeBloc>()
-                      .add(FactoryUpgradeEvent.factoryUpgraded(b));
-                }
-              },
+                      .add(FactoryUpgradeEvent.factoryUpgraded(b))
+                  : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: canUpgrade
                     ? Theme.of(context).primaryColor
@@ -84,10 +83,10 @@ class FactoryUpgradeButton extends HookConsumerWidget {
                 ),
                 fixedSize: const Size(240, 49),
               ),
-              child: const Text(
-                'upgrade',
+              child: const AppText(
+                'Upgrade factory',
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),
               ),

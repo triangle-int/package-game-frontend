@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -9,9 +10,11 @@ class AmountConfirm extends HookWidget {
   const AmountConfirm({
     super.key,
     required this.maxAmount,
+    required this.onConfirmed,
   });
 
   final BigInt maxAmount;
+  final VoidCallback onConfirmed;
 
   @override
   Widget build(BuildContext context) {
@@ -43,14 +46,17 @@ class AmountConfirm extends HookWidget {
               borderRadius: BorderRadius.circular(4),
             ),
           ),
-          onPressed: () => context
-              .read<AmountAndProductBloc>()
-              .add(const AmountAndProductEvent.initialOpened()),
-          child: const Text(
+          onPressed: () {
+            context
+                .read<AmountAndProductBloc>()
+                .add(const AmountAndProductEvent.initialOpened());
+            onConfirmed();
+          },
+          child: const AppText(
             'CONFIRM',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -65,12 +71,12 @@ class AmountConfirm extends HookWidget {
             textAlign: TextAlign.center,
             textAlignVertical: TextAlignVertical.center,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
             decoration: InputDecoration(
               hintStyle: const TextStyle(
-                fontSize: 24,
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF8D8D8D),
               ),

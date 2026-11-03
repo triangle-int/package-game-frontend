@@ -38,7 +38,8 @@ sealed class ServerFailure with _$ServerFailure {
       if (error.response?.statusCode == 502) {
         return const ServerFailure.serverIsDown();
       }
-      final message = (error.response!.data as Map<String, dynamic>)['message'];
+      final data = error.response!.data;
+      final message = data is Map ? data['message'] : data;
       if (error.response?.statusCode == 403) {
         if (message == 'tooManyFactories') {
           return const ServerFailure.tooManyFactories();
@@ -62,11 +63,10 @@ sealed class ServerFailure with _$ServerFailure {
           return const ServerFailure.notEnoughGems();
         }
         if (message == 'banned') {
-          final banObject =
-              (error.response!.data as Map<String, dynamic>)['ban'];
+          final banObject = data is Map ? data['ban'] : null;
           Logger().d('Ban object: $banObject');
           return ServerFailure.banned(
-            (banObject as Map<String, dynamic>)['reason'] as String,
+            banObject is Map ? (banObject['reason']?.toString() ?? '') : '',
           );
         }
       }
@@ -77,7 +77,9 @@ sealed class ServerFailure with _$ServerFailure {
       }
       return ServerFailure.unknown(message.toString());
     }
-    if (error.type == DioExceptionType.connectionTimeout) {
+    if (error.type == DioExceptionType.connectionTimeout ||
+        error.type == DioExceptionType.sendTimeout ||
+        error.type == DioExceptionType.receiveTimeout) {
       return const ServerFailure.connectionTimedOut();
     }
     if (error.type == DioExceptionType.connectionError) {

@@ -14,7 +14,7 @@ abstract class Truck with _$Truck {
     required int truckType,
     required int destinationId,
     required Building? destinationBuilding,
-    required int startId,
+    required int? startId,
     required Building? startBuilding,
     required String resource,
     required BigInt resourceCount,

@@ -1,3 +1,5 @@
+import 'package:package_flutter/l10n/translations.dart';
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_flutter/bloc/map/build_mode/build_mode_bloc.dart';
@@ -31,13 +33,19 @@ class _DestroyModeMenuState extends State<DestroyModeMenu> {
               ),
               builder: (context) => SizedBox(
                 height: 100,
-                child: Center(
-                  child: IconButton(
-                    onPressed: () => context
-                        .read<BuildModeBloc>()
-                        .add(const BuildModeEvent.exitedDestroyMode()),
-                    icon: const EmojiImage(emoji: '❌'),
-                  ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const AppText('Tap a building to demolish it',
+                        style: TextStyle(fontSize: 14)),
+                    IconButton(
+                      tooltip: translate(context, 'Exit demolition mode'),
+                      onPressed: () => context
+                          .read<BuildModeBloc>()
+                          .add(const BuildModeEvent.exitedDestroyMode()),
+                      icon: const EmojiImage(emoji: '❌', size: 28),
+                    ),
+                  ],
                 ),
               ),
             );

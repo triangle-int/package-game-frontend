@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:package_flutter/presentation/core/emoji_image.dart';
 import 'package:package_flutter/presentation/state_national_marketplace/help_dialog.dart';
@@ -55,11 +56,11 @@ class SNMProduct extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          Text(
+          AppText(
             '$amount x',
             style: const TextStyle(
               color: Colors.black,
-              fontSize: 24,
+              fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -80,7 +81,7 @@ class SNMProduct extends StatelessWidget {
                   borderRadius: BorderRadius.circular(100),
                 ),
               ),
-              child: Text(
+              child: AppText(
                 price,
                 style: const TextStyle(
                   fontSize: 20,

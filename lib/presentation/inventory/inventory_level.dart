@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 
 class InventoryLevel extends StatelessWidget {
@@ -26,7 +27,7 @@ class InventoryLevel extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            const Text(
+            const AppText(
               'Level 1',
               style: TextStyle(
                 fontSize: 18,

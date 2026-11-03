@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 
 class SNMCurrency extends StatelessWidget {
@@ -19,7 +20,7 @@ class SNMCurrency extends StatelessWidget {
         color: const Color(0xFFEBEBEB),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(
+      child: AppText(
         currency,
         style: const TextStyle(
           fontSize: 20,

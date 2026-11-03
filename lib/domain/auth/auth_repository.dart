@@ -1,12 +1,15 @@
 import 'dart:convert';
+import 'dart:async';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_flutter/domain/auth/auth_failure.dart';
+import 'package:package_flutter/domain/auth/dev_user.dart';
 import 'package:package_flutter/domain/core/firebase_auth_provider.dart';
 import 'package:package_flutter/domain/core/google_sign_in_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -25,25 +28,52 @@ AuthRepository authRepository(Ref ref) {
 class AuthRepository {
   final FirebaseAuth _auth;
   final GoogleSignIn _googleSignIn;
+  final _devChanges = StreamController<bool>.broadcast();
+  bool _devSignedIn = false;
+  String? _devUserId;
 
   AuthRepository(this._auth, this._googleSignIn);
 
   Future<String?> getToken() async {
+    if (kDebugMode && _devSignedIn) return 'dev_token:$_devUserId';
     return _auth.currentUser?.getIdToken();
   }
 
   Stream<Either<AuthFailure, User>> authStateChanges() {
-    return _auth.authStateChanges().map((u) {
-      if (u == null) {
-        return left(const AuthFailure.unauthenticated());
-      } else {
-        return right(u);
+    return Stream.multi((controller) {
+      void emit(User? user) {
+        if (kDebugMode && _devSignedIn) {
+          controller.add(right(DevUser(uid: _devUserId!)));
+        } else if (user == null) {
+          controller.add(left(const AuthFailure.unauthenticated()));
+        } else {
+          controller.add(right(user));
+        }
       }
+
+      final firebase =
+          _auth.authStateChanges().listen(emit, onError: controller.addError);
+      final dev = _devChanges.stream.listen((_) => emit(_auth.currentUser));
+      controller.onCancel = () async {
+        await firebase.cancel();
+        await dev.cancel();
+      };
     });
   }
 
-  Future signOut() {
-    return _auth.signOut();
+  void signInForDevelopment() {
+    if (!kDebugMode) return;
+    final random = Random.secure().nextInt(0x7fffffff).toRadixString(36);
+    _devUserId = 'dev_${DateTime.now().microsecondsSinceEpoch}_$random';
+    _devSignedIn = true;
+    _devChanges.add(true);
+  }
+
+  Future signOut() async {
+    _devSignedIn = false;
+    _devUserId = null;
+    _devChanges.add(false);
+    await _auth.signOut();
   }
 
   Future<Either<AuthFailure, Unit>> signInWithGoogle() async {

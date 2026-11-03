@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 
 class NoodleSite extends StatelessWidget {
@@ -21,7 +22,7 @@ class NoodleSite extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          AppText(
             link,
             style: const TextStyle(
               fontFamily: 'Mukta Mahee',
@@ -34,7 +35,7 @@ class NoodleSite extends StatelessWidget {
             style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
             ),
-            child: Text(
+            child: AppText(
               title,
               style: const TextStyle(
                 fontFamily: 'Mukta Mahee',
@@ -46,7 +47,7 @@ class NoodleSite extends StatelessWidget {
               ),
             ),
           ),
-          Text(
+          AppText(
             description,
             style: const TextStyle(
               fontFamily: 'Mukta Mahee',
