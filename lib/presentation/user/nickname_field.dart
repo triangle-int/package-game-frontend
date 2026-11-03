@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/translations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_flutter/bloc/user/create_user/create_user_bloc.dart';
@@ -17,7 +18,7 @@ class NicknameField extends StatelessWidget {
             Expanded(
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: 'Company name',
+                  hintText: translate(context, 'Company name'),
                   hintStyle: const TextStyle(
                     color: Color(0xFF646464),
                     fontFamily: 'Montserrat',

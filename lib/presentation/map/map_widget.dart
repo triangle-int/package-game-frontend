@@ -1,12 +1,9 @@
-import 'dart:async';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:dart_geohash/dart_geohash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geohex/geohex.dart';
-import 'package:google_polyline_algorithm/google_polyline_algorithm.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:logger/logger.dart';
@@ -15,29 +12,34 @@ import 'package:package_flutter/bloc/config/config_provider.dart';
 import 'package:package_flutter/bloc/map/build_mode/build_mode_bloc.dart';
 import 'package:package_flutter/bloc/map/map_bloc.dart';
 import 'package:package_flutter/bloc/map/map_bounds_provider.dart';
+import 'package:package_flutter/bloc/notifications/notifications_bloc.dart';
 import 'package:package_flutter/bloc/pin_marker/pin_marker_bloc.dart';
 import 'package:package_flutter/bloc/satellite/satellite_bloc.dart';
 import 'package:package_flutter/bloc/truck/truck_bloc.dart';
-import 'package:package_flutter/bloc/tutorial/tutorial_bloc.dart';
 import 'package:package_flutter/bloc/user/user_provider.dart';
 import 'package:package_flutter/bloc/user/users_in_bounds_provider.dart';
 import 'package:package_flutter/data/latlng/lat_lng_extension.dart';
 import 'package:package_flutter/domain/building/building.dart';
 import 'package:package_flutter/domain/core/env/env.dart';
+import 'package:package_flutter/domain/socket/socket_repository.dart';
 import 'package:package_flutter/domain/emoji/emoji.dart';
-import 'package:package_flutter/domain/truck/truck.dart';
 import 'package:package_flutter/domain/user/user.dart';
 import 'package:package_flutter/domain/user/user_on_map.dart';
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:package_flutter/presentation/business/business_menu.dart';
 import 'package:package_flutter/presentation/core/cached_tile_provider.dart';
+import 'package:package_flutter/presentation/core/currency_change.dart';
 import 'package:package_flutter/presentation/core/root/map_dark_mode.dart';
 import 'package:package_flutter/presentation/core/root/sfx_volume.dart';
 import 'package:package_flutter/presentation/factory/factory_menu.dart';
 import 'package:package_flutter/presentation/map/business_marker.dart';
 import 'package:package_flutter/presentation/map/destory_dialog.dart';
 import 'package:package_flutter/presentation/map/factory_marker.dart';
+import 'package:package_flutter/presentation/map/map_currency_change.dart';
 import 'package:package_flutter/presentation/map/pin_marker.dart';
 import 'package:package_flutter/presentation/map/storage_marker.dart';
+import 'package:package_flutter/presentation/map/truck_markers.dart';
+import 'package:package_flutter/presentation/map/building_menu_frame.dart';
 import 'package:package_flutter/presentation/market/market_menu.dart';
 import 'package:package_flutter/presentation/satellite/satellite_menu.dart';
 
@@ -47,11 +49,13 @@ class MapWidget extends ConsumerStatefulWidget {
     required this.geolocation,
     required this.emojis,
     required this.user,
+    required this.currencyChange,
   });
 
   final LatLng geolocation;
   final List<Emoji> emojis;
   final User user;
+  final MapCurrencyChange? currencyChange;
 
   @override
   ConsumerState<MapWidget> createState() => _MapWidgetState();
@@ -59,13 +63,15 @@ class MapWidget extends ConsumerStatefulWidget {
 
 class _MapWidgetState extends ConsumerState<MapWidget>
     with WidgetsBindingObserver, TickerProviderStateMixin {
-  Timer? timer;
   late AnimationController _linesAnimationController;
   late AnimationController _cameraAnimationController;
   late MapController _mapController;
+  VoidCallback? _cameraMoveListener;
+  final _mapKey = GlobalKey();
 
   @override
   void initState() {
+    super.initState();
     WidgetsBinding.instance.addObserver(this);
     _mapController = MapController();
     _cameraAnimationController = AnimationController(
@@ -74,18 +80,10 @@ class _MapWidgetState extends ConsumerState<MapWidget>
     );
     _linesAnimationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    );
-    timer = Timer.periodic(const Duration(milliseconds: 20), (timer) {
-      setState(() {});
-    });
-    _linesAnimationController = AnimationController(
-      vsync: this,
       duration: const Duration(seconds: 2),
     )..addListener(() {
         setState(() {});
       });
-    super.initState();
   }
 
   @override
@@ -97,9 +95,37 @@ class _MapWidgetState extends ConsumerState<MapWidget>
   }
 
   @override
+  void didUpdateWidget(covariant MapWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final currencyChange = widget.currencyChange;
+    if (currencyChange != null &&
+        currencyChange.id != oldWidget.currencyChange?.id) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showCurrencyChange(currencyChange);
+      });
+    }
+  }
+
+  void _showCurrencyChange(MapCurrencyChange currencyChange) {
+    final mapRenderObject = _mapKey.currentContext?.findRenderObject();
+    if (mapRenderObject is! RenderBox) return;
+    final mapPosition =
+        _mapController.camera.latLngToScreenOffset(currencyChange.location);
+    final globalPosition = mapRenderObject.localToGlobal(
+      mapPosition - const Offset(0, 32),
+    );
+    showCurrencyChangeAtGlobalPosition(
+      context,
+      currencyChange.amount,
+      globalPosition,
+    );
+  }
+
+  @override
   void dispose() {
+    _cameraAnimationController.dispose();
+    _linesAnimationController.dispose();
     _mapController.dispose();
-    timer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -154,24 +180,27 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                   curve: Curves.fastOutSlowIn,
                 );
 
-                _cameraAnimationController.addListener(
-                  () => _mapController.moveAndRotate(
-                    LatLng(
-                      mapLatitudeTween.evaluate(animation),
-                      mapLongitudeTween.evaluate(animation),
-                    ),
-                    mapZoomTween.evaluate(animation),
-                    mapRotationTween.evaluate(animation),
-                  ),
-                );
+                if (_cameraMoveListener != null) {
+                  _cameraAnimationController
+                      .removeListener(_cameraMoveListener!);
+                }
+                _cameraMoveListener = () => _mapController.moveAndRotate(
+                      LatLng(
+                        mapLatitudeTween.evaluate(animation),
+                        mapLongitudeTween.evaluate(animation),
+                      ),
+                      mapZoomTween.evaluate(animation),
+                      mapRotationTween.evaluate(animation),
+                    );
+                _cameraAnimationController.addListener(_cameraMoveListener!);
 
                 _cameraAnimationController.forward(from: 0);
             }
           },
           child: BlocBuilder<BuildModeBloc, BuildModeState>(
             builder: (context, buildModeState) {
-              return BlocBuilder<TruckBloc, TruckState>(
-                builder: (context, truckState) {
+              return Builder(
+                builder: (context) {
                   return BlocBuilder<BuildingBloc, BuildingState>(
                     builder: (context, buildingState) {
                       return BlocConsumer<SatelliteBloc, SatelliteState>(
@@ -201,6 +230,7 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                         },
                         builder: (context, satelliteState) {
                           return FlutterMap(
+                            key: _mapKey,
                             mapController: _mapController,
                             options: MapOptions(
                               initialCenter: widget.geolocation,
@@ -235,6 +265,20 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                     _mapController.camera.visibleBounds);
                               },
                               onTap: (event, location) {
+                                if (buildModeState
+                                    is BuildModeStateDestroyMode) {
+                                  return;
+                                }
+                                if (location
+                                        .calculateDistance(widget.geolocation) >
+                                    config.interactionRadiusKm) {
+                                  context.read<NotificationsBloc>().add(
+                                        const NotificationsEvent.warningAdded(
+                                          'Choose a location closer to you.',
+                                        ),
+                                      );
+                                  return;
+                                }
                                 context.read<PinMarkerBloc>().add(
                                       PinMarkerEvent.placed(
                                         location,
@@ -247,14 +291,24 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                             ),
                             children: [
                               TileLayer(
+                                userAgentPackageName:
+                                    'com.TriangleInteractive.Package',
                                 urlTemplate: ref.watch(mapDarkModeProvider)
                                     ? Env.getMapDarkUrl()
                                     : Env.getMapWhiteUrl(),
+                                tileBuilder: ref.watch(mapDarkModeProvider) &&
+                                        Env.getMapDarkUrl() ==
+                                            Env.getMapWhiteUrl()
+                                    ? darkModeTileBuilder
+                                    : null,
                                 additionalOptions: {
                                   'api_key': Env.getMapAccessKey(),
                                 },
                                 retinaMode: RetinaMode.isHighDensity(context),
                                 tileProvider: CachedTileProvider(),
+                              ),
+                              const SimpleAttributionWidget(
+                                source: Text('OpenStreetMap contributors'),
                               ),
                               PolylineLayer(
                                 polylines: <Polyline>[
@@ -430,12 +484,7 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                     radius:
                                         config.interactionRadiusKm.toDouble(),
                                     point: widget.geolocation,
-                                    color: const Color.fromARGB(
-                                      128,
-                                      71,
-                                      71,
-                                      71,
-                                    ),
+                                    color: const Color(0x30FFB800),
                                     useRadiusInMeter: true,
                                   ),
                                 ],
@@ -522,7 +571,6 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                             b.ownerId == user.id ? 1.0 : 0.5,
                                         },
                                     };
-
                                     return Marker(
                                       width: size,
                                       height: size,
@@ -532,103 +580,12 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                           opacity: opacity,
                                           child: GestureDetector(
                                             onTap: switch (buildModeState) {
-                                              BuildModeStateBuildMode() => () {
-                                                  switch (b) {
-                                                    case BusinessBuilding():
-                                                      () async {
-                                                        showModalBottomSheet(
-                                                          backgroundColor:
-                                                              Colors
-                                                                  .transparent,
-                                                          context: context,
-                                                          builder: (context) =>
-                                                              BusinessMenu(
-                                                                  b.id),
-                                                        );
-                                                        final player =
-                                                            AudioPlayer();
-                                                        await player.setVolume(
-                                                          ref.read(
-                                                            sfxVolumeProvider,
-                                                          ),
-                                                        );
-                                                        player.play(
-                                                          AssetSource(
-                                                            'sounds/business_click.wav',
-                                                          ),
-                                                        );
-                                                        return null;
-                                                      }();
-                                                      break;
-                                                    case StorageBuilding():
-                                                      () {
-                                                        return null;
-                                                      }();
-                                                      break;
-                                                    case SatelliteBuilding():
-                                                      () {
-                                                        if (b.ownerId !=
-                                                            user.id) {
-                                                          return;
-                                                        }
-                                                        showDialog(
-                                                          context: context,
-                                                          builder: (context) =>
-                                                              SatelliteMenu(b),
-                                                        );
-                                                        return null;
-                                                      }();
-                                                      break;
-                                                    case FactoryBuilding():
-                                                      () async {
-                                                        showDialog(
-                                                          context: context,
-                                                          builder: (context) =>
-                                                              FactoryMenu(
-                                                            factoryId: b.id,
-                                                          ),
-                                                        );
-                                                        final player =
-                                                            AudioPlayer();
-                                                        await player.setVolume(
-                                                          ref.read(
-                                                            sfxVolumeProvider,
-                                                          ),
-                                                        );
-                                                        player.play(
-                                                          AssetSource(
-                                                            'sounds/factory_click.wav',
-                                                          ),
-                                                        );
-                                                        return null;
-                                                      }();
-                                                      break;
-                                                    case MarketBuilding():
-                                                      () async {
-                                                        showDialog(
-                                                          context: context,
-                                                          builder: (context) =>
-                                                              MarketMenu(
-                                                            marketId: b.id,
-                                                          ),
-                                                        );
-                                                        final player =
-                                                            AudioPlayer();
-                                                        await player.setVolume(
-                                                          ref.read(
-                                                            sfxVolumeProvider,
-                                                          ),
-                                                        );
-                                                        AudioPlayer().play(
-                                                          AssetSource(
-                                                            'sounds/market_click.wav',
-                                                          ),
-                                                        );
-                                                        return null;
-                                                      }();
-                                                      break;
-                                                  }
-                                                },
+                                              BuildModeStateBuildMode() => () =>
+                                                  _openBuildingMenu(
+                                                    context,
+                                                    b,
+                                                    user,
+                                                  ),
                                               BuildModeStateDestroyMode() =>
                                                 () {
                                                   if (opacity < 1.0) {
@@ -675,13 +632,6 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                       );
                                     }),
                                   ),
-                                  ...switch (truckState) {
-                                    TruckStateInitial() => [],
-                                    TruckStateLoadInProgress() => [],
-                                    TruckStateLoadFailure() => [],
-                                    TruckStateLoadSuccess(:final trucks) =>
-                                      trucks.map((t) => truckMarker(user, t)),
-                                  },
                                   // Pin marker (Build marker)
                                   if (pinMarkerState.isShown)
                                     Marker(
@@ -690,7 +640,13 @@ class _MapWidgetState extends ConsumerState<MapWidget>
                                       child: const PinMarker(),
                                     ),
                                 ],
-                              )
+                              ),
+                              TruckMarkers(
+                                ownerId: widget.user.id,
+                                arrivedUpdates: ref
+                                    .read(socketRepositoryProvider)
+                                    .getTruckArrivedUpdates(),
+                              ),
                             ],
                           );
                         },
@@ -706,68 +662,54 @@ class _MapWidgetState extends ConsumerState<MapWidget>
     );
   }
 
-  Marker truckMarker(
+  Future<void> _openBuildingMenu(
+    BuildContext context,
+    Building building,
     User user,
-    Truck truck,
-  ) {
-    final points = decodePolyline(truck.path, accuracyExponent: 6)
-        .map((p) => LatLng(p[0].toDouble(), p[1].toDouble()))
-        .toList();
+  ) async {
+    final isOwner = switch (building) {
+      BusinessBuilding(:final ownerId) => ownerId == user.id,
+      StorageBuilding(:final ownerId) => ownerId == user.id,
+      FactoryBuilding(:final ownerId) => ownerId == user.id,
+      MarketBuilding() => false,
+      SatelliteBuilding(:final ownerId) => ownerId == user.id,
+    };
 
-    if (truck.endTime.millisecondsSinceEpoch <
-        DateTime.now().millisecondsSinceEpoch) {
-      Logger().d('Removing truck ${truck.id} from map');
-      if (truck.ownerId == user.id) {
-        context.read<TutorialBloc>().add(const TutorialEvent.truckArrived());
-      }
-      context.read<TruckBloc>().add(TruckEvent.truckArrived(truck));
+    final details = switch (building) {
+      BusinessBuilding(:final id) when isOwner => BusinessMenu(id),
+      StorageBuilding() when isOwner => const Padding(
+          padding: EdgeInsets.all(24),
+          child: AppText(
+            'Receive resources from factories with Doggie Express and keep them here for later use.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 15, color: Colors.white70),
+          ),
+        ),
+      FactoryBuilding(:final id) when isOwner => FactoryMenu(factoryId: id),
+      MarketBuilding(:final id) => MarketMenu(marketId: id),
+      SatelliteBuilding() when isOwner => SatelliteMenu(building),
+      _ => null,
+    };
+
+    final sound = switch (building) {
+      BusinessBuilding() => 'sounds/business_click.wav',
+      FactoryBuilding() => 'sounds/factory_click.wav',
+      MarketBuilding() => 'sounds/market_click.wav',
+      StorageBuilding() || SatelliteBuilding() => null,
+    };
+    if (sound != null) {
+      final player = AudioPlayer();
+      await player.setVolume(ref.read(sfxVolumeProvider));
+      await player.play(AssetSource(sound));
     }
 
-    return Marker(
-      point: interpolatePath(truck.startTime, truck.endTime, points),
-      child: Image.asset('assets/images/trucks/truck${truck.truckType}.png'),
-    );
-  }
-
-  LatLng interpolatePath(DateTime start, DateTime end, List<LatLng> points) {
-    final fullDuration = end.difference(start);
-    final elapsed = DateTime.now().difference(start);
-    final percent = elapsed.inMilliseconds / fullDuration.inMilliseconds;
-
-    final fullDistance = getFullDistance(points);
-    final distanceNow = fullDistance * percent.clamp(0, 1);
-
-    var currentWaypoint = 0;
-    var prevLength = 0.0;
-    var dist =
-        points[currentWaypoint].calculateDistance(points[currentWaypoint + 1]);
-    while (distanceNow > prevLength + dist) {
-      prevLength += dist;
-      currentWaypoint++;
-      dist = points[currentWaypoint]
-          .calculateDistance(points[currentWaypoint + 1]);
-    }
-
-    return lerp(
-      points[currentWaypoint],
-      points[currentWaypoint + 1],
-      (distanceNow - prevLength) / dist,
-    );
-  }
-
-  double getFullDistance(List<LatLng> points) {
-    double distanceTotal = 0;
-    for (var i = 0; i < points.length - 1; i++) {
-      distanceTotal += points[i].calculateDistance(points[i + 1]);
-    }
-    return distanceTotal;
-  }
-
-  LatLng lerp(LatLng a, LatLng b, double t) {
-    final tClamped = t.clamp(0, 1);
-    return LatLng(
-      a.latitude + (b.latitude - a.latitude) * tClamped,
-      a.longitude + (b.longitude - a.longitude) * tClamped,
+    if (!context.mounted) return;
+    await showBuildingMenuSheet(
+      context: context,
+      building: building,
+      currentUser: user,
+      buildingEmoji: building.getEmoji(ref.read(configProvider).value!),
+      details: details,
     );
   }
 }

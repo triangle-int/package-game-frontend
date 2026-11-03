@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/translations.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:auto_route/auto_route.dart';
@@ -454,8 +455,8 @@ class LandingPage extends HookConsumerWidget {
     required Icon icon,
   }) {
     Flushbar(
-      title: title,
-      message: message,
+      title: translate(context, title),
+      message: translate(context, message),
       messageSize: 18,
       titleSize: 18,
       shouldIconPulse: false,

@@ -15,21 +15,11 @@ class MarketMenu extends HookConsumerWidget {
     return BlocProvider(
       create: (context) => MarketBloc(ref.watch(buildingRepositoryProvider))
         ..add(MarketEvent.requested(marketId)),
-      child: Center(
-        child: Container(
-          width: 334,
-          height: 424,
-          padding: const EdgeInsets.only(
-            top: 27,
-            left: 18,
-            right: 18,
-            bottom: 27,
-          ),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: const MarketBody(),
+      child: const SizedBox(
+        height: 424,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(20, 20, 20, 12),
+          child: MarketBody(),
         ),
       ),
     );

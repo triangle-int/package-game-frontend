@@ -173,13 +173,23 @@ class _DoggyExpressRouteMapState extends ConsumerState<DoggyExpressRouteMap> {
                             ),
                             children: [
                               TileLayer(
+                                userAgentPackageName:
+                                    'com.TriangleInteractive.Package',
                                 urlTemplate: ref.watch(mapDarkModeProvider)
                                     ? Env.getMapDarkUrl()
                                     : Env.getMapWhiteUrl(),
+                                tileBuilder: ref.watch(mapDarkModeProvider) &&
+                                        Env.getMapDarkUrl() ==
+                                            Env.getMapWhiteUrl()
+                                    ? darkModeTileBuilder
+                                    : null,
                                 additionalOptions: {
                                   'api_key': Env.getMapAccessKey(),
                                 },
                                 tileProvider: CachedTileProvider(),
+                              ),
+                              const SimpleAttributionWidget(
+                                source: Text('OpenStreetMap contributors'),
                               ),
                               PolylineLayer(
                                 polylines: [

@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:package_flutter/presentation/core/package_title.dart';
 
@@ -9,7 +10,7 @@ class OnMaintenancePage extends StatelessWidget {
     return const Scaffold(
       body: SafeArea(
         child: PackageTitle(
-          child: Text(
+          child: AppText(
             'On Maintenance',
             style: TextStyle(
               fontSize: 32,

@@ -1,3 +1,5 @@
+import 'package:package_flutter/l10n/translations.dart';
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -95,13 +97,13 @@ class _SearchBarState extends State<SearchBar> {
                               borderRadius: BorderRadius.circular(24),
                             ),
                           ),
-                          child: const Text('Search'),
+                          child: const AppText('Search'),
                         ),
                 ),
                 const SizedBox(width: 20),
                 Showcase(
                   key: _profileKey,
-                  description: 'Tap on profile button',
+                  description: translate(context, 'Tap on profile button'),
                   disposeOnTap: true,
                   onTargetClick: () =>
                       context.router.push(const ProfileRoute()),

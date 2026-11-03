@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:package_flutter/presentation/core/emoji_image.dart';
 import 'package:shimmer/shimmer.dart';
@@ -27,12 +28,12 @@ class BusinessLoading extends StatelessWidget {
               highlightColor: highlightColor,
               child: Column(
                 children: [
-                  // const Text(
+                  // const AppText(
                   //   'Level 21',
                   //   textAlign: TextAlign.center,
                   //   style: TextStyle(
                   //     fontFamily: 'Sansation',
-                  //     fontSize: 48,
+                  //     fontSize: 28,
                   //   ),
                   // ),
                   const SizedBox(height: 10),
@@ -45,11 +46,11 @@ class BusinessLoading extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 15),
-                  // const Text(
+                  // const AppText(
                   //   'income: 20K(2K taxes)',
                   //   style: TextStyle(
                   //     fontWeight: FontWeight.w500,
-                  //     fontSize: 24,
+                  //     fontSize: 18,
                   //   ),
                   // ),
                   Container(
@@ -72,11 +73,11 @@ class BusinessLoading extends StatelessWidget {
                         borderRadius: BorderRadius.circular(37),
                       ),
                     ),
-                    child: const Text(
+                    child: const AppText(
                       'upgrade 999M🍄',
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
-                        fontSize: 24,
+                        fontSize: 18,
                       ),
                     ),
                   )

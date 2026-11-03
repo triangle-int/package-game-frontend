@@ -1,4 +1,4 @@
-import 'package:auto_route/auto_route.dart';
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -18,7 +18,7 @@ class SatelliteMenu extends HookConsumerWidget {
       listener: (context, satelliteState) {
         switch (satelliteState) {
           case SatelliteStateShowLines():
-            context.router.pop();
+            Navigator.of(context).pop();
           default:
             break;
         }
@@ -26,15 +26,10 @@ class SatelliteMenu extends HookConsumerWidget {
       builder: (context, satelliteState) {
         final config = ref.watch(configProvider).value!;
 
-        return Center(
-          child: Container(
-            width: 334,
-            height: 277,
+        return SizedBox(
+          height: 260,
+          child: Padding(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(10),
-            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -47,24 +42,24 @@ class SatelliteMenu extends HookConsumerWidget {
                         '🛰️',
                         '📡',
                       ][building.level - 1],
-                      size: 120,
+                      size: 64,
                     ),
                     const SizedBox(width: 7),
                     Expanded(
                       child: Column(
                         children: [
-                          Text(
+                          AppText(
                             'Level ${building.level}',
                             style: const TextStyle(
                               fontFamily: 'Sansation',
-                              fontSize: 48,
+                              fontSize: 28,
                             ),
                           ),
-                          Text(
-                            'in radius of ${config.satelliteRadius[building.level - 1]}',
+                          AppText(
+                            'Collects business income within ${config.satelliteRadius[building.level - 1]}',
                             textAlign: TextAlign.center,
                             style: const TextStyle(
-                              fontSize: 24,
+                              fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -87,10 +82,10 @@ class SatelliteMenu extends HookConsumerWidget {
                           borderRadius: BorderRadius.circular(37),
                         ),
                       ),
-                      child: const Text(
-                        'collect',
+                      child: const AppText(
+                        'Collect income',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 18,
                         ),
                       ),
                     ),
@@ -113,16 +108,16 @@ class SatelliteMenu extends HookConsumerWidget {
                           borderRadius: BorderRadius.circular(37),
                         ),
                       ),
-                      child: const Text(
-                        'collect',
+                      child: const AppText(
+                        'Collect income',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 18,
                         ),
                       ),
                     ),
                 },
                 const Spacer(),
-                const Text(
+                const AppText(
                   'weekly commission 0%',
                   textAlign: TextAlign.center,
                   style: TextStyle(

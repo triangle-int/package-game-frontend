@@ -1,3 +1,5 @@
+import 'package:package_flutter/l10n/translations.dart';
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -41,90 +43,126 @@ class InventoryResource extends HookConsumerWidget {
       },
     );
 
-    return Center(
-      child: Container(
-        width: 371,
-        height: 100,
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: const BorderRadius.all(Radius.circular(11)),
-        ),
-        padding: const EdgeInsets.only(left: 10),
-        child: Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 30),
-                child: Text(
-                  'On storage: ${item.count.toCurrency()}',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cardWidth = constraints.maxWidth * .9;
+        final cardHeight = cardWidth * .135;
+        final radius = BorderRadius.circular(cardHeight * .11);
+
+        return Center(
+          child: Container(
+            width: cardWidth,
+            height: cardHeight,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: radius,
+            ),
+            child: Row(
+              children: [
+                SizedBox(width: cardWidth * .05),
+                Expanded(
+                  child: FittedBox(
+                    alignment: Alignment.centerLeft,
+                    fit: BoxFit.scaleDown,
+                    child: AppText(
+                      'On storage: ${item.count.toCurrency()}',
+                      maxLines: 1,
+                      style: TextStyle(
+                        fontSize: cardHeight * .32,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            if (itemConfig is ItemBooster)
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                if (itemConfig is ItemBooster)
                   if (ref
                       .watch(boosterActivateProvider(itemConfig.name))
-                      .isLoading) ...[
-                    const CircularProgressIndicator(),
-                  ] else ...[
-                    ElevatedButton(
-                      onPressed: () {
-                        ref
-                            .read(
-                              boosterActivateProvider(itemConfig.name).notifier,
-                            )
-                            .activate();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        shape: const StadiumBorder(),
+                      .isLoading)
+                    SizedBox.square(
+                      dimension: cardHeight,
+                      child: Padding(
+                        padding: EdgeInsets.all(cardHeight * .25),
+                        child: const CircularProgressIndicator(),
                       ),
-                      child: const Text(
-                        'use',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
+                    )
+                  else ...[
+                    SizedBox.square(
+                      dimension: cardHeight,
+                      child: Tooltip(
+                        message: translate(context, 'Use booster'),
+                        child: Padding(
+                          padding: EdgeInsets.all(cardHeight * .08),
+                          child: Material(
+                            color: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(cardHeight),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(cardHeight),
+                              onTap: () => ref
+                                  .read(boosterActivateProvider(itemConfig.name)
+                                      .notifier)
+                                  .activate(),
+                              child: Center(
+                                child: AppText(
+                                  'use',
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                    fontSize: cardHeight * .3,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => HelpDialog(
-                            text: itemConfig.description.replaceAll(
-                              '{duration}',
-                              '${config.boosterDuration} hour',
+                    SizedBox.square(
+                      dimension: cardHeight,
+                      child: Tooltip(
+                        message: translate(context, 'About booster'),
+                        child: Padding(
+                          padding: EdgeInsets.all(cardHeight * .08),
+                          child: Material(
+                            color: Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(cardHeight),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(cardHeight),
+                              onTap: () => showDialog(
+                                context: context,
+                                builder: (context) => HelpDialog(
+                                  text: itemConfig.description.replaceAll(
+                                    '{duration}',
+                                    '${config.boosterDuration} hour',
+                                  ),
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.question_mark_rounded,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                size: cardHeight * .42,
+                              ),
                             ),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        shape: const StadiumBorder(),
+                        ),
                       ),
-                      child: const Icon(Icons.question_mark_rounded),
                     ),
                   ],
-                ],
-              ),
-            const SizedBox(width: 10),
-            // Emoji image
-            Container(
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(11),
-              ),
-              padding: const EdgeInsets.all(10),
-              child: EmojiImage(emoji: itemConfig.emoji),
+                SizedBox(width: cardHeight * .1),
+                SizedBox.square(
+                  dimension: cardHeight,
+                  child: Container(
+                    decoration:
+                        BoxDecoration(color: color, borderRadius: radius),
+                    padding: EdgeInsets.all(cardHeight * .1),
+                    child: EmojiImage(emoji: itemConfig.emoji),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

@@ -25,7 +25,7 @@ class TruckBloc extends Bloc<TruckEvent, TruckState> {
 
           Logger().d('Loading trucks 🚚');
 
-          streamSubscription?.cancel();
+          await streamSubscription?.cancel();
           streamSubscription = _repository.getTrucks().listen(
                 (trucksOrFailure) =>
                     add(TruckEvent.trucksReceived(trucksOrFailure)),

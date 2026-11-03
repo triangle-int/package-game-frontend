@@ -1,3 +1,5 @@
+import 'package:package_flutter/l10n/translations.dart';
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,13 +25,14 @@ import 'package:package_flutter/presentation/inventory/inventory.dart';
 import 'package:package_flutter/presentation/map/boosters_column.dart';
 import 'package:package_flutter/presentation/map/build_panel.dart';
 import 'package:package_flutter/presentation/map/destroy_mode_menu.dart';
+import 'package:package_flutter/presentation/map/map_currency_change.dart';
 import 'package:package_flutter/presentation/map/map_widget.dart';
 import 'package:package_flutter/presentation/sidebar/sidebar.dart';
 import 'package:package_flutter/presentation/tutorial/dialogue_window.dart';
 import 'package:showcaseview/showcaseview.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-// TODO: This is a mess, refactor it
+// TODO(Package): Refactor the map page.
 class MapPage extends ConsumerStatefulWidget {
   const MapPage({super.key});
 
@@ -41,6 +44,8 @@ class _MapPageState extends ConsumerState<MapPage> {
   final _buildPanelController = PanelController();
   final _inventoryPanelController = PanelController();
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  MapCurrencyChange? _currencyChange;
+  int _currencyChangeId = 0;
 
   PersistentBottomSheetController? destroyModeController;
 
@@ -74,7 +79,12 @@ class _MapPageState extends ConsumerState<MapPage> {
           ),
         ],
         child: AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle.light,
+          value: const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.light,
+            statusBarBrightness: Brightness.dark,
+            systemStatusBarContrastEnforced: false,
+          ),
           child: BlocBuilder<EmojiBloc, EmojiState>(
             builder: (context, emojiState) {
               final emojis = switch (emojiState) {
@@ -128,14 +138,26 @@ class _MapPageState extends ConsumerState<MapPage> {
                               children: [
                                 SlidingUpPanel(
                                   controller: _buildPanelController,
-                                  slideDirection: SlideDirection.DOWN,
+                                  slideDirection: SlideDirection.UP,
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(28),
+                                  ),
                                   color: Theme.of(context).colorScheme.surface,
                                   panel: BuildPanel(
                                     panelController: _buildPanelController,
+                                    onCurrencyChange: (location, amount) {
+                                      setState(() {
+                                        _currencyChange = MapCurrencyChange(
+                                          id: ++_currencyChangeId,
+                                          location: location,
+                                          amount: amount,
+                                        );
+                                      });
+                                    },
                                   ),
                                   minHeight: 0,
-                                  maxHeight:
-                                      185 + MediaQuery.of(context).padding.top,
+                                  maxHeight: 210 +
+                                      MediaQuery.of(context).padding.bottom,
                                   onPanelClosed: () =>
                                       context.read<PinMarkerBloc>().add(
                                             const PinMarkerEvent.hidden(),
@@ -153,6 +175,9 @@ class _MapPageState extends ConsumerState<MapPage> {
                                     ),
                                     color:
                                         Theme.of(context).colorScheme.surface,
+                                    // Show only the handle and player row when closed.
+                                    minHeight: 66 +
+                                        MediaQuery.of(context).padding.bottom,
                                     maxHeight:
                                         MediaQuery.of(context).size.height -
                                             162,
@@ -172,6 +197,7 @@ class _MapPageState extends ConsumerState<MapPage> {
                                           geolocation: geolocation,
                                           emojis: emojis,
                                           user: user,
+                                          currencyChange: _currencyChange,
                                         ),
                                         Positioned(
                                           top: MediaQuery.of(context)
@@ -182,23 +208,84 @@ class _MapPageState extends ConsumerState<MapPage> {
                                             children: [
                                               Showcase(
                                                 key: _sidebar,
-                                                description: 'Open sidebar',
+                                                description: translate(
+                                                    context, 'Open sidebar'),
                                                 disposeOnTap: true,
                                                 onTargetClick: () => scaffoldKey
                                                     .currentState!
                                                     .openDrawer(),
-                                                child: IconButton(
-                                                  onPressed: () => scaffoldKey
-                                                      .currentState!
-                                                      .openDrawer(),
-                                                  iconSize: 45,
-                                                  color:
-                                                      const Color(0xFF979797),
-                                                  icon: const Icon(Icons.menu),
+                                                child: Material(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .surface,
+                                                  borderRadius:
+                                                      BorderRadius.circular(14),
+                                                  child: IconButton(
+                                                    onPressed: () => scaffoldKey
+                                                        .currentState!
+                                                        .openDrawer(),
+                                                    tooltip: translate(
+                                                        context, 'Open menu'),
+                                                    iconSize: 28,
+                                                    color:
+                                                        const Color(0xFF979797),
+                                                    icon:
+                                                        const Icon(Icons.menu),
+                                                  ),
                                                 ),
                                               ),
                                               const BoostersColumn(),
                                             ],
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: MediaQuery.of(context)
+                                              .padding
+                                              .top,
+                                          right: 10,
+                                          child: IgnorePointer(
+                                            child: ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                maxWidth: MediaQuery.of(context)
+                                                        .size
+                                                        .width -
+                                                    90,
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 4,
+                                                  vertical: 4,
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Flexible(
+                                                      child: AppText(
+                                                        '${user.money.toCurrency()} 💵',
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: const TextStyle(
+                                                            fontSize: 16),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 16),
+                                                    Flexible(
+                                                      child: AppText(
+                                                        '${user.gems.toCurrency()} 💎',
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style: const TextStyle(
+                                                            fontSize: 16),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                         ),
                                         BlocBuilder<TutorialBloc,
@@ -228,7 +315,6 @@ class _MapPageState extends ConsumerState<MapPage> {
                                             _ => const SkipTutorialButton(),
                                           },
                                         ),
-                                        const CurrencyUpdateText(),
                                       ],
                                     ),
                                   ),
@@ -278,10 +364,10 @@ class SkipTutorialButton extends StatelessWidget {
               horizontal: 20,
             ),
           ),
-          child: const Text(
+          child: const AppText(
             'skip tutorial',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 18,
             ),
           ),
         ),
@@ -347,7 +433,8 @@ class _CurrencyUpdateTextState extends ConsumerState<CurrencyUpdateText>
 
     // TODO(P5ina): remove previous values
     ref.listen<AsyncValue<User>>(userProvider, (previous, next) {
-      final user = next.value!;
+      final user = next.value;
+      if (user == null) return;
       if (previousMoney != user.money) {
         controller.forward(from: 0);
       }
@@ -376,7 +463,7 @@ class _CurrencyUpdateTextState extends ConsumerState<CurrencyUpdateText>
 
     if (gemsDiff > BigInt.from(0)) {
       updates.add('+${gemsDiff.toCurrency()} 💎');
-    } else if (expDiff < BigInt.from(0)) {
+    } else if (gemsDiff < BigInt.from(0)) {
       updates.add('${gemsDiff.toCurrency()} 💎');
     }
 
@@ -391,7 +478,7 @@ class _CurrencyUpdateTextState extends ConsumerState<CurrencyUpdateText>
       top: positionTween.evaluate(positionAnimation),
       child: Opacity(
         opacity: opacityTween.evaluate(opacityAnimation),
-        child: Text(
+        child: AppText(
           text,
           style: TextStyle(
             fontSize: scaleTween.evaluate(scaleAnimation),

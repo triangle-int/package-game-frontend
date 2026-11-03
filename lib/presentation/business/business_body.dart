@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -74,23 +75,28 @@ class BusinessBody extends HookConsumerWidget {
                 padding: const EdgeInsets.only(top: 60 + 12),
                 child: Column(
                   children: [
-                    Text(
+                    AppText(
                       'Level ${businessAndTaxes.business.level}',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontFamily: 'Sansation',
-                        fontSize: 48,
+                        fontSize: 28,
                       ),
                     ),
                     const SizedBox(height: 15),
-                    Text(
-                      'income: ${income.toCurrency()}(${taxes.toCurrency()} taxes)',
+                    AppText(
+                      'Income per minute: ${income.toCurrency()} (${taxes.toCurrency()} tax)',
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
-                        fontSize: 24,
+                        fontSize: 18,
                       ),
                     ),
-                    const SizedBox(height: 15),
+                    const SizedBox(height: 8),
+                    const AppText(
+                        'Collect income directly or use a nearby satellite.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12, color: Colors.white70)),
+                    const SizedBox(height: 8),
                     BlocBuilder<BusinessUpgradeBloc, BusinessUpgradeState>(
                       builder: (context, upgradeState) {
                         return switch (upgradeState) {
@@ -180,13 +186,13 @@ class UpgradeButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(37),
             ),
           ),
-          child: Text(
+          child: AppText(
             isMaxLevel
                 ? 'max level'
                 : 'upgrade ${businessCost.toCurrency()}$resourceToUpgradeEmoji',
             style: const TextStyle(
               fontWeight: FontWeight.w500,
-              fontSize: 24,
+              fontSize: 18,
             ),
           ),
         );

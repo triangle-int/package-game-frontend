@@ -11,9 +11,19 @@ part 'doggie_express_bloc.freezed.dart';
 
 class DoggieExpressBloc extends Bloc<DoggieExpressEvent, DoggieExpressState> {
   final TruckRepository _repository;
+  int _revision = 0;
+  bool _creating = false;
 
   DoggieExpressBloc(this._repository) : super(DoggieExpressState.initial()) {
     on<DoggieExpressEvent>((event, emit) async {
+      if (_creating && event is! DoggieExpressEventReset) return;
+      if (event is DoggieExpressEventReset) _creating = false;
+      if (event is! DoggieExpressEventConfirm) {
+        _revision++;
+        if (state.isLoading && event is! DoggieExpressEventCalculate) {
+          emit(state.copyWith(isLoading: false));
+        }
+      }
       switch (event) {
         case DoggieExpressEventTruckTypeUpdated(:final truckType):
           emit(
@@ -89,7 +99,9 @@ class DoggieExpressBloc extends Bloc<DoggieExpressEvent, DoggieExpressState> {
             ),
           );
         case DoggieExpressEventCalculate():
-          emit(state.copyWith(isLoading: true, failureOrNull: null));
+          final revision = _revision;
+          emit(
+              state.copyWith(isLoading: true, failureOrNull: null, path: null));
 
           if (state.pointA == null) {
             emit(
@@ -131,12 +143,22 @@ class DoggieExpressBloc extends Bloc<DoggieExpressEvent, DoggieExpressState> {
             return;
           }
 
+          if (state.truckType < 0 || state.scheduleDuration < 0) {
+            emit(state.copyWith(
+              isLoading: false,
+              failureOrNull: const TruckFailure.pathNotCalculated(),
+            ));
+            return;
+          }
+
           final calculatedPathOrFailure = await _repository.calculatePathCost(
             state.pointA!.id,
             state.pointB!.id,
             truckType: state.truckType,
             resourceCount: state.amount.toInt(),
           );
+
+          if (revision != _revision) return;
 
           calculatedPathOrFailure.fold(
             (f) => emit(
@@ -154,6 +176,20 @@ class DoggieExpressBloc extends Bloc<DoggieExpressEvent, DoggieExpressState> {
             ),
           );
         case DoggieExpressEventConfirm():
+          if (state.path == null ||
+              state.pointA == null ||
+              state.pointB == null ||
+              state.resource.isEmpty ||
+              state.amount <= BigInt.zero ||
+              state.truckType < 0 ||
+              state.scheduleDuration < 0) {
+            emit(state.copyWith(
+              failureOrNull: const TruckFailure.pathNotCalculated(),
+            ));
+            return;
+          }
+          final revision = _revision;
+          _creating = true;
           emit(
             state.copyWith(
               isLoading: true,
@@ -162,14 +198,20 @@ class DoggieExpressBloc extends Bloc<DoggieExpressEvent, DoggieExpressState> {
             ),
           );
 
-          final unitOrFailure = await _repository.createTruck(
+          final unitOrFailure = await _repository
+              .createTruck(
             state.pointA!.id,
             state.pointB!.id,
             truckType: state.truckType,
             resourceCount: state.amount.toInt(),
             scheduleDuration: state.scheduleDuration,
             resourceName: state.resource,
-          );
+          )
+              .whenComplete(() {
+            if (revision == _revision) _creating = false;
+          });
+
+          if (revision != _revision) return;
 
           emit(
             unitOrFailure.fold(

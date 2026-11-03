@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_flutter/presentation/loading/loader.dart';
@@ -24,7 +25,7 @@ class LoadingPage extends StatelessWidget {
             const Loader(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 17),
-              child: Text(
+              child: AppText(
                 text,
                 textAlign: TextAlign.center,
                 style: const TextStyle(

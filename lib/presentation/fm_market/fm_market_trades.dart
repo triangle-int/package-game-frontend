@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -104,10 +105,10 @@ class _FMMarketTradesState extends ConsumerState<FMMarketTrades> {
                       }).toList(),
                     )
                   : const Center(
-                      child: Text(
+                      child: AppText(
                         'No trades 🛒',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 18,
                           fontWeight: FontWeight.w500,
                           color: Colors.black,
                         ),
@@ -182,7 +183,7 @@ class Trade extends HookConsumerWidget {
             ),
           ),
           const SizedBox(height: 3),
-          Text(
+          AppText(
             '$count 📦',
             style: const TextStyle(
               color: Colors.black,
@@ -191,7 +192,7 @@ class Trade extends HookConsumerWidget {
               height: 1,
             ),
           ),
-          Text(
+          AppText(
             '$price 💵',
             style: const TextStyle(
               color: Colors.black,
@@ -200,7 +201,7 @@ class Trade extends HookConsumerWidget {
               height: 1,
             ),
           ),
-          Text(
+          AppText(
             '$ownerAvatar $ownerNickname',
             textAlign: TextAlign.center,
             style: const TextStyle(
@@ -259,12 +260,12 @@ class FilterTradeItem extends StatelessWidget {
         child: Row(
           children: [
             const SizedBox(width: 30),
-            Text(
+            AppText(
               item.emoji,
               style: const TextStyle(fontSize: 27),
             ),
             const SizedBox(width: 5),
-            Text(
+            AppText(
               item.name
                   .split('_')
                   .map(

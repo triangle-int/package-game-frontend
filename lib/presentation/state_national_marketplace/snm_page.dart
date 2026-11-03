@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:auto_route/annotations.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -55,11 +56,11 @@ class SNMPage extends HookConsumerWidget {
             height: 150,
             color: Colors.black,
             child: const Center(
-              child: Text(
+              child: AppText(
                 'State National Marketplace',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 36,
+                  fontSize: 26,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -228,11 +229,11 @@ class SNMCategory extends StatelessWidget {
         color: Colors.black,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(
+      child: AppText(
         name,
         textAlign: TextAlign.center,
         style: const TextStyle(
-          fontSize: 24,
+          fontSize: 18,
           fontWeight: FontWeight.w500,
         ),
       ),

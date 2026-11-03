@@ -11,12 +11,17 @@ part 'sidebar_state.dart';
 
 class SidebarBloc extends Bloc<SidebarEvent, SidebarState> {
   final TruckRepository _truckRepository;
+  bool _loadingRoutes = false;
+  int _routesRequest = 0;
 
   SidebarBloc(this._truckRepository)
       : super(const SidebarState.initial(isSettingsOpened: false)) {
     on<SidebarEvent>((event, emit) async {
       switch (event) {
         case SidebarEventRoutesSelected():
+          if (_loadingRoutes) return;
+          _loadingRoutes = true;
+          final request = ++_routesRequest;
           emit(switch (state) {
             SidebarStateInitial() => const SidebarState.routes(
                 null,
@@ -24,9 +29,17 @@ class SidebarBloc extends Bloc<SidebarEvent, SidebarState> {
               ),
             SidebarStateRoutes(:final copyWith) => copyWith(isLoading: true),
           });
-          final schedulesOrFailure = await _truckRepository.getSchedules();
-          emit(SidebarState.routes(schedulesOrFailure, isLoading: false));
+          try {
+            final schedulesOrFailure = await _truckRepository.getSchedules();
+            if (request == _routesRequest && state is SidebarStateRoutes) {
+              emit(SidebarState.routes(schedulesOrFailure, isLoading: false));
+            }
+          } finally {
+            if (request == _routesRequest) _loadingRoutes = false;
+          }
         case SidebarEventInitialPageSelected():
+          _routesRequest++;
+          _loadingRoutes = false;
           emit(const SidebarState.initial(isSettingsOpened: false));
         case SidebarEventSettingsToggled():
           switch (state) {

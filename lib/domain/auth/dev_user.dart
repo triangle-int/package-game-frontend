@@ -2,7 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class DevUser implements User {
   @override
-  final String uid = 'dev_user_1';
+  final String uid;
+
+  const DevUser({required this.uid});
 
   @override
   final String? email = 'dev@package.local';
@@ -18,7 +20,7 @@ class DevUser implements User {
 
   @override
   Future<String> getIdToken([bool forceRefresh = false]) async =>
-      'dev_token';
+      'dev_token:$uid';
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_flutter/bloc/tutorial/tutorial_bloc.dart';
@@ -50,7 +51,7 @@ class DialogueWindow extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        Text(
+                        AppText(
                           switch (tutorialState.step) {
                             InitialTutorialStep() =>
                               "Hi, I am your new business consultant. I will help you properly manage your uncle's inheritance.",
@@ -100,7 +101,7 @@ class DialogueWindow extends StatelessWidget {
                         ),
                         if (canContinue) ...[
                           const SizedBox(height: 23),
-                          const Text(
+                          const AppText(
                             'Click on the dialog box to continue',
                             textAlign: TextAlign.center,
                             style: TextStyle(

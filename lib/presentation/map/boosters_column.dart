@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -87,7 +88,7 @@ class BoostersColumnState extends ConsumerState<ConsumerStatefulWidget> {
                       size: 45,
                     ),
                     const SizedBox(height: 3),
-                    Text(
+                    AppText(
                       untilEndString,
                       style: const TextStyle(
                         fontSize: 10,

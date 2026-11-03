@@ -35,6 +35,8 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
             (inventory) => emit(InventoryState.loadSuccess(inventory)),
           );
         case InventoryEventReset():
+          await _inventorySubscription?.cancel();
+          _inventorySubscription = null;
           emit(const InventoryState.initial());
       }
     });

@@ -1,12 +1,9 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'dart:async';
 
-import 'package:auto_route/auto_route.dart';
-import 'package:dartz/dartz.dart' as dartz;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:logger/logger.dart';
-import 'package:package_flutter/app_router.dart';
 import 'package:package_flutter/bloc/config/config_provider.dart';
 import 'package:package_flutter/bloc/sidebar/sidebar_bloc.dart';
 import 'package:package_flutter/domain/truck/truck.dart';
@@ -28,18 +25,31 @@ class TruckItem extends StatefulHookConsumerWidget {
 
 class _TruckItemState extends ConsumerState<TruckItem> {
   Timer? _timer;
+  DateTime? _lastRefresh;
 
   @override
   void initState() {
+    super.initState();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (widget.truck.endTime.isBefore(DateTime.now())) {
-        Logger().w('RELOAD TRUCKS');
+      final now = DateTime.now();
+      if (!widget.truck.endTime.isAfter(now) &&
+          (_lastRefresh == null ||
+              now.difference(_lastRefresh!) >= const Duration(seconds: 10))) {
+        _lastRefresh = now;
         context.read<SidebarBloc>().add(const SidebarEvent.routesSelected());
       }
 
       setState(() {});
     });
-    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant TruckItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.truck.id != widget.truck.id ||
+        oldWidget.truck.endTime != widget.truck.endTime) {
+      _lastRefresh = null;
+    }
   }
 
   @override
@@ -50,7 +60,8 @@ class _TruckItemState extends ConsumerState<TruckItem> {
 
   @override
   Widget build(BuildContext context) {
-    final untilNext = widget.truck.endTime.difference(DateTime.now());
+    final remaining = widget.truck.endTime.difference(DateTime.now());
+    final untilNext = remaining.isNegative ? Duration.zero : remaining;
     final untilNextString = untilNext.inHours > 0
         ? '${untilNext.inHours}h ${untilNext.inMinutes % 60}m'
         : untilNext.inMinutes > 0
@@ -59,12 +70,14 @@ class _TruckItemState extends ConsumerState<TruckItem> {
 
     final config = ref.watch(configProvider).value!;
 
-    final emojiResource =
-        config.items.firstWhere((i) => i.name == widget.truck.resource).emoji;
+    final resources =
+        config.items.where((i) => i.name == widget.truck.resource);
+    final emojiResource = resources.isEmpty ? '📦' : resources.first.emoji;
     final resourceCount = widget.truck.resourceCount.toCurrency();
 
-    final emojiStart = widget.truck.startBuilding!.getEmoji(config);
-    final emojiDestination = widget.truck.destinationBuilding!.getEmoji(config);
+    final emojiStart = widget.truck.startBuilding?.getEmoji(config) ?? '📍';
+    final emojiDestination =
+        widget.truck.destinationBuilding?.getEmoji(config) ?? '📍';
 
     return Column(
       children: [
@@ -74,7 +87,7 @@ class _TruckItemState extends ConsumerState<TruckItem> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                AppText(
                   'one time route\n$untilNextString away\ncargo: $resourceCount $emojiResource',
                   style: const TextStyle(
                     fontSize: 17,
@@ -83,35 +96,12 @@ class _TruckItemState extends ConsumerState<TruckItem> {
                 ),
               ],
             ),
-            Expanded(
-              child: Align(
-                alignment: Alignment.topRight,
-                child: ElevatedButton(
-                  onPressed: () {
-                    context.router.push(
-                      RouteMapRoute(
-                        truckOrSchedule: dartz.left(widget.truck),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    fixedSize: const Size(48, 48),
-                    minimumSize: const Size(48, 48),
-                    padding: const EdgeInsets.all(3),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(11),
-                    ),
-                  ),
-                  child: const EmojiImage(emoji: '📍'),
-                ),
-              ),
-            )
           ],
         ),
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            EmojiImage(emoji: emojiDestination, size: 24),
+            EmojiImage(emoji: emojiStart, size: 24),
             Expanded(
               child: Column(
                 children: [
@@ -129,7 +119,7 @@ class _TruckItemState extends ConsumerState<TruckItem> {
                 ],
               ),
             ),
-            EmojiImage(emoji: emojiStart, size: 24),
+            EmojiImage(emoji: emojiDestination, size: 24),
           ],
         )
       ],

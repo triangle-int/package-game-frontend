@@ -58,7 +58,7 @@ class BuildingBloc extends Bloc<BuildingEvent, BuildingState> {
           case BuildingUpdated(:final building):
             final list = List<Building>.from(state.buildings);
             list.removeWhere((b) => b.id == building.id);
-            emit(state.copyWith(buildings: [...state.buildings, building]));
+            emit(state.copyWith(buildings: [...list, building]));
         }
       },
       transformer: (events, mapper) {

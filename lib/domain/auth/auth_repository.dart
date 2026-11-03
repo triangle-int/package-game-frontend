@@ -30,11 +30,12 @@ class AuthRepository {
   final GoogleSignIn _googleSignIn;
   final _devChanges = StreamController<bool>.broadcast();
   bool _devSignedIn = false;
+  String? _devUserId;
 
   AuthRepository(this._auth, this._googleSignIn);
 
   Future<String?> getToken() async {
-    if (kDebugMode && _devSignedIn) return 'dev_token';
+    if (kDebugMode && _devSignedIn) return 'dev_token:$_devUserId';
     return _auth.currentUser?.getIdToken();
   }
 
@@ -42,7 +43,7 @@ class AuthRepository {
     return Stream.multi((controller) {
       void emit(User? user) {
         if (kDebugMode && _devSignedIn) {
-          controller.add(right(DevUser()));
+          controller.add(right(DevUser(uid: _devUserId!)));
         } else if (user == null) {
           controller.add(left(const AuthFailure.unauthenticated()));
         } else {
@@ -62,12 +63,15 @@ class AuthRepository {
 
   void signInForDevelopment() {
     if (!kDebugMode) return;
+    final random = Random.secure().nextInt(0x7fffffff).toRadixString(36);
+    _devUserId = 'dev_${DateTime.now().microsecondsSinceEpoch}_$random';
     _devSignedIn = true;
     _devChanges.add(true);
   }
 
   Future signOut() async {
     _devSignedIn = false;
+    _devUserId = null;
     _devChanges.add(false);
     await _auth.signOut();
   }

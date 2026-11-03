@@ -1,3 +1,5 @@
+import 'package:package_flutter/l10n/translations.dart';
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +30,7 @@ class SidebarBody extends StatelessWidget {
             padding: const EdgeInsets.only(top: 16),
             children: [
               Showcase(
-                description: 'Open Noodle',
+                description: translate(context, 'Open Noodle'),
                 key: noodleKey,
                 disposeOnTap: true,
                 onTargetClick: () => context.router.push(const NoodleRoute()),
@@ -42,7 +44,7 @@ class SidebarBody extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Showcase(
-                description: 'Open Doggy Express',
+                description: translate(context, 'Open Doggy Express'),
                 key: doggyExpressKey,
                 disposeOnTap: true,
                 onTargetClick: () =>
@@ -75,10 +77,10 @@ class SidebarBody extends StatelessWidget {
                     headerBuilder: (context, isOpen) => Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       alignment: Alignment.centerLeft,
-                      child: const Text(
+                      child: const AppText(
                         '⚙️ Settings',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 18,
                           fontWeight: FontWeight.w400,
                           fontFamily: 'Montserrat',
                         ),

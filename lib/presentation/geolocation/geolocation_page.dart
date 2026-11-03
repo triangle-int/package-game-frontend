@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:package_flutter/bloc/geolocation/geolocation_bloc.dart';
@@ -29,7 +30,7 @@ class GeolocationPage extends StatelessWidget {
           child: PackageTitle(
             child: Column(
               children: [
-                const Text(
+                const AppText(
                   'Satellite access lost',
                   textAlign: TextAlign.center,
                   style: TextStyle(

@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 
 class GeolocationFailureWidget extends StatelessWidget {
@@ -17,7 +18,7 @@ class GeolocationFailureWidget extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 58),
-        Text(
+        AppText(
           errorTitle,
           style: const TextStyle(
             fontFamily: 'Montserrat',
@@ -37,7 +38,7 @@ class GeolocationFailureWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(130),
             ),
           ),
-          child: Text(
+          child: AppText(
             buttonResolveText,
             style: const TextStyle(
               fontFamily: 'Montserrat',

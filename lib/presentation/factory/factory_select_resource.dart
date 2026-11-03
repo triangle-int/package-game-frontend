@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -50,32 +51,22 @@ class FactorySelectResource extends HookConsumerWidget {
           return Column(
             children: [
               const SizedBox(height: 18),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SelectResourceButton(
-                    resourceName: 'wheel',
-                  ),
-                  SizedBox(width: 20),
-                  SelectResourceButton(
-                    resourceName: 'long_drum',
-                  ),
-                  SizedBox(width: 20),
-                  SelectResourceButton(
-                    resourceName: 'mail',
-                  ),
-                ],
+              AppText(
+                'Choose the production line. You cannot change it later; upgrades can change the resource produced. Send output to a warehouse, then to a market. Running the factory has a recurring fee.',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              const SizedBox(height: 12),
+              const Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                runSpacing: 8,
                 children: [
-                  SelectResourceButton(
-                    resourceName: 'ring_buoy',
-                  ),
-                  SizedBox(width: 20),
-                  SelectResourceButton(
-                    resourceName: 'wheat',
-                  ),
+                  SelectResourceButton(resourceName: 'wheel'),
+                  SelectResourceButton(resourceName: 'long_drum'),
+                  SelectResourceButton(resourceName: 'mail'),
+                  SelectResourceButton(resourceName: 'ring_buoy'),
+                  SelectResourceButton(resourceName: 'wheat'),
                 ],
               ),
               const SizedBox(height: 20),
@@ -87,11 +78,13 @@ class FactorySelectResource extends HookConsumerWidget {
                 ),
               ] else ...[
                 ElevatedButton(
-                  onPressed: () => context.read<FactoryResourceBloc>().add(
-                        FactoryResourceEvent.confirmed(
-                          factoryId,
-                        ),
-                      ),
+                  onPressed: state.resource.isEmpty
+                      ? null
+                      : () => context.read<FactoryResourceBloc>().add(
+                            FactoryResourceEvent.confirmed(
+                              factoryId,
+                            ),
+                          ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).primaryColor,
                     shape: RoundedRectangleBorder(
@@ -99,20 +92,20 @@ class FactorySelectResource extends HookConsumerWidget {
                     ),
                     fixedSize: const Size(240, 49),
                   ),
-                  child: const Text(
-                    'Choose',
+                  child: const AppText(
+                    'Confirm resource',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
               ],
               const SizedBox(height: 9),
-              const Text(
-                'Choose a branch to produce',
+              const AppText(
+                'Select a resource, then confirm',
                 style: TextStyle(
-                  fontSize: 17,
+                  fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
               ),

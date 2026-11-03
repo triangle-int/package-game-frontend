@@ -16,10 +16,12 @@ class AmountAndProductBloc
     extends Bloc<AmountAndProductEvent, AmountAndProductState> {
   final BuildingRepository _buildingRepository;
   final FactoryRepository _factoryRepository;
+  int _request = 0;
 
   AmountAndProductBloc(this._buildingRepository, this._factoryRepository)
       : super(const AmountAndProductState.initial()) {
     on<AmountAndProductEvent>((event, emit) async {
+      final request = ++_request;
       switch (event) {
         case AmountAndProductEventInitialOpened():
           emit(const AmountAndProductState.initial());
@@ -38,6 +40,7 @@ class AmountAndProductBloc
             case StorageBuilding(:final id):
               final buildingOrFailure =
                   await _buildingRepository.getStorage(storageId: id);
+              if (request != _request) return;
               return buildingOrFailure.fold(
                 (f) => emit(AmountAndProductState.productSelectionFailure(f)),
                 (building) => emit(
@@ -49,6 +52,7 @@ class AmountAndProductBloc
             case FactoryBuilding(:final id):
               final buildingOrFailure =
                   await _factoryRepository.getFactory(factoryId: id);
+              if (request != _request) return;
               buildingOrFailure.fold(
                 (f) => emit(AmountAndProductState.productSelectionFailure(f)),
                 (building) => emit(
@@ -60,6 +64,7 @@ class AmountAndProductBloc
             case MarketBuilding(:final id):
               final buildingOrFailure =
                   await _buildingRepository.getMarket(marketId: id);
+              if (request != _request) return;
               buildingOrFailure.fold(
                 (f) => emit(AmountAndProductState.productSelectionFailure(f)),
                 (building) => emit(
@@ -88,33 +93,36 @@ class AmountAndProductBloc
             case StorageBuilding(:final id):
               final buildingOrFailure =
                   await _buildingRepository.getStorage(storageId: id);
+              if (request != _request) return;
               buildingOrFailure.fold(
                 (f) => emit(AmountAndProductState.amountSelectionFailure(f)),
                 (b) => emit(
                   AmountAndProductState.amountSelectionSuccess(
-                    b.inventory!.firstWhere((i) => i.name == itemName).count,
+                    _availableAmount(b.inventory, itemName),
                   ),
                 ),
               );
             case FactoryBuilding(:final id):
               final buildingOrFailure =
                   await _factoryRepository.getFactory(factoryId: id);
+              if (request != _request) return;
               buildingOrFailure.fold(
                 (f) => emit(AmountAndProductState.amountSelectionFailure(f)),
                 (b) => emit(
                   AmountAndProductState.amountSelectionSuccess(
-                    b.inventory!.firstWhere((i) => i.name == itemName).count,
+                    _availableAmount(b.inventory, itemName),
                   ),
                 ),
               );
             case MarketBuilding(:final id):
               final buildingOrFailure =
                   await _buildingRepository.getMarket(marketId: id);
+              if (request != _request) return;
               buildingOrFailure.fold(
                 (f) => emit(AmountAndProductState.amountSelectionFailure(f)),
                 (b) => emit(
                   AmountAndProductState.amountSelectionSuccess(
-                    b.inventory!.firstWhere((i) => i.name == itemName).count,
+                    _availableAmount(b.inventory, itemName),
                   ),
                 ),
               );
@@ -123,13 +131,18 @@ class AmountAndProductBloc
     });
   }
 
+  BigInt _availableAmount(List<InventoryItem>? inventory, String name) {
+    final items = (inventory ?? <InventoryItem>[]).where((i) => i.name == name);
+    return items.isEmpty ? BigInt.zero : items.first.count;
+  }
+
   List<Item> buildingItems(Building pointA, Building pointB, Config config) {
     final inventory = switch (pointA) {
       BusinessBuilding() => <InventoryItem>[],
       SatelliteBuilding() => <InventoryItem>[],
-      StorageBuilding(:final inventory) => inventory!,
-      FactoryBuilding(:final inventory) => inventory!,
-      MarketBuilding(:final inventory) => inventory!,
+      StorageBuilding(:final inventory) => inventory ?? <InventoryItem>[],
+      FactoryBuilding(:final inventory) => inventory ?? <InventoryItem>[],
+      MarketBuilding(:final inventory) => inventory ?? <InventoryItem>[],
     };
 
     final whitelistItems = switch (pointB) {
@@ -141,9 +154,12 @@ class AmountAndProductBloc
         config.items.whereType<ItemResource>().where((e) => e.group == level),
     };
 
-    final result = inventory
-        .map((i) => config.items.firstWhere((i2) => i2.name == i.name))
-        .where((i) => whitelistItems.any((i2) => i.name == i2.name))
+    final availableNames = inventory
+        .where((item) => item.count > BigInt.zero)
+        .map((item) => item.name)
+        .toSet();
+    final result = whitelistItems
+        .where((item) => availableNames.contains(item.name))
         .toList();
 
     return result;

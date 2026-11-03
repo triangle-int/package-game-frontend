@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 
 class AuthButton extends StatelessWidget {
@@ -20,7 +21,7 @@ class AuthButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(130),
         ),
       ),
-      child: Text(
+      child: AppText(
         text,
         style: const TextStyle(
           fontSize: 24,

@@ -1,3 +1,4 @@
+import 'package:package_flutter/l10n/app_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -46,10 +47,10 @@ class RouteButton extends HookConsumerWidget {
               : context
                   .read<DoggieExpressBloc>()
                   .add(const DoggieExpressEvent.pointBDeselected()),
-          child: Text(
+          child: AppText(
             text,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
           ),

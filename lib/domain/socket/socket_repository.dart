@@ -87,7 +87,6 @@ class SocketRepository {
 
             if (data['type'] == 'connected') {
               Logger().d('Socket connected as: ${data['uid']}');
-              return;
             }
 
             _messagesController.add(data);
@@ -190,6 +189,11 @@ class SocketRepository {
       return data['data'] as Map<String, dynamic>;
     });
   }
+
+  /// The server sends this after authentication, when broadcasts can arrive.
+  Stream<void> getConnectionUpdates() => _messagesController.stream
+      .where((data) => data['type'] == 'connected')
+      .map((_) {});
 
   Stream<Map<String, dynamic>> getTruckArrivedUpdates() async* {
     yield* _messagesController.stream

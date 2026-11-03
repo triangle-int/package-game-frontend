@@ -6,6 +6,7 @@ import 'package:package_flutter/bloc/auth/auth_page/auth_page_bloc.dart';
 import 'package:package_flutter/domain/auth/auth_repository.dart';
 import 'package:package_flutter/presentation/auth/auth_button.dart';
 import 'package:package_flutter/presentation/core/package_title.dart';
+import 'package:package_flutter/presentation/core/language_selector.dart';
 
 class AuthPageBody extends ConsumerWidget {
   const AuthPageBody({super.key});
@@ -17,6 +18,8 @@ class AuthPageBody extends ConsumerWidget {
         child: PackageTitle(
           child: Column(
             children: [
+              const LanguageSelector(),
+              const SizedBox(height: 16),
               AuthButton(
                 'Sign in with Google',
                 onPressed: () => context
@@ -34,8 +37,9 @@ class AuthPageBody extends ConsumerWidget {
                 const SizedBox(height: 16),
                 AuthButton(
                   'Dev Login',
-                  onPressed: () =>
-                      ref.read(authRepositoryProvider).signInForDevelopment(),
+                  onPressed: () {
+                    ref.read(authRepositoryProvider).signInForDevelopment();
+                  },
                 ),
               ],
             ],

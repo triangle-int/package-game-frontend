@@ -37,7 +37,8 @@ class InventoryRepository {
       Logger().d('Get Inventory: Emitting response');
       yield right(inventory);
     } on DioException catch (e) {
-      yield left(InventoryFailure.serverFailure(e.message!));
+      yield left(InventoryFailure.serverFailure(
+          e.message ?? 'Unable to load inventory.'));
     } finally {
       yield* _socketRepository.getInventoryUpdates().map((i) => right(i));
     }
